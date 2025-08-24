@@ -26,13 +26,17 @@ const App = () => {
 
   return (
     <div className="app-container">
-      <div className="flex min-h-screen">
-        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-        <main className="main-content">
-          <div className="fade-in">
-            {renderContent()}
+      <div className="content-wrapper">
+        <div className="translucent-container">
+          <div className="flex min-h-full">
+            <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <main className="main-content">
+              <div className="fade-in">
+                {renderContent()}
+              </div>
+            </main>
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );
