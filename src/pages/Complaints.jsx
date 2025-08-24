@@ -72,19 +72,19 @@ const Complaints = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'pending': return 'bg-amber-50 text-amber-700 border-amber-200';
-      case 'in-progress': return 'bg-blue-50 text-blue-700 border-blue-200';
-      case 'resolved': return 'bg-green-50 text-green-700 border-green-200';
-      default: return 'bg-gray-50 text-gray-700 border-gray-200';
+      case 'pending': return 'bg-orange-100/80 text-orange-700 border-orange-200/60';
+      case 'in-progress': return 'bg-pink-100/80 text-pink-700 border-pink-200/60';
+      case 'resolved': return 'bg-green-100/80 text-green-700 border-green-200/60';
+      default: return 'bg-gray-100/80 text-gray-700 border-gray-200/60';
     }
   };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return 'text-red-600 bg-red-50';
-      case 'medium': return 'text-orange-600 bg-orange-50';
-      case 'low': return 'text-green-600 bg-green-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'high': return 'text-rose-600 bg-rose-100/60';
+      case 'medium': return 'text-orange-600 bg-orange-100/60';
+      case 'low': return 'text-green-600 bg-green-100/60';
+      default: return 'text-gray-600 bg-gray-100/60';
     }
   };
 
@@ -123,10 +123,10 @@ const Complaints = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 font-['Inter']">My Complaints</h1>
-          <p className="text-gray-500 mt-1 font-['Inter']">Track and manage all your submitted complaints</p>
+          <h1 className="text-2xl font-semibold text-gray-800 font-['Inter']">My Complaints</h1>
+          <p className="text-gray-600 mt-1 font-['Inter']">Track and manage all your submitted complaints</p>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors font-['Inter'] flex items-center">
+        <button className="bg-gradient-to-r from-pink-300 to-rose-300 text-white px-4 py-2 rounded-xl font-medium hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-['Inter'] flex items-center shadow-md">
           <Plus className="w-4 h-4 mr-2" />
           New Complaint
         </button>
@@ -135,39 +135,39 @@ const Complaints = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {filterOptions.map((option) => (
-          <div key={option.value} className={`bg-white rounded-lg border p-4 text-center transition-colors ${
-            selectedFilter === option.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-          }`}>
-            <div className="text-2xl font-semibold text-gray-900 font-['Inter']">{option.count}</div>
+          <div key={option.value} className={`bg-white/40 backdrop-blur-sm rounded-xl border p-4 text-center transition-colors cursor-pointer ${
+            selectedFilter === option.value ? 'border-pink-300/60 bg-pink-100/40' : 'border-white/40 hover:border-white/60'
+          }`} onClick={() => setSelectedFilter(option.value)}>
+            <div className="text-2xl font-semibold text-gray-800 font-['Inter']">{option.count}</div>
             <div className="text-sm text-gray-600 font-['Inter']">{option.label}</div>
           </div>
         ))}
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search complaints..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-['Inter']"
+                className="w-full pl-10 pr-4 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-pink-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
               />
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {filterOptions.map((option) => (
               <button
                 key={option.value}
                 onClick={() => setSelectedFilter(option.value)}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors font-['Inter'] ${
+                className={`px-3 py-2 rounded-xl text-sm font-medium transition-colors font-['Inter'] ${
                   selectedFilter === option.value
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-gradient-to-r from-pink-300 to-rose-300 text-white shadow-md'
+                    : 'bg-white/30 text-gray-700 hover:bg-white/40 backdrop-blur-sm'
                 }`}
               >
                 {option.label} ({option.count})
@@ -181,22 +181,22 @@ const Complaints = () => {
       <div className="space-y-4">
         {filteredComplaints.length > 0 ? (
           filteredComplaints.map((complaint) => (
-            <div key={complaint.id} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-sm transition-shadow">
+            <div key={complaint.id} className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-6 hover:shadow-lg transition-all duration-200 card-hover">
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="text-lg font-medium text-gray-900 font-['Inter']">{complaint.title}</h3>
-                    <span className={`px-2 py-1 rounded-md text-xs font-medium border ${getStatusColor(complaint.status)}`}>
+                    <h3 className="text-lg font-medium text-gray-800 font-['Inter']">{complaint.title}</h3>
+                    <span className={`px-2 py-1 rounded-lg text-xs font-medium border ${getStatusColor(complaint.status)}`}>
                       {complaint.status.replace('-', ' ')}
                     </span>
-                    <span className={`px-2 py-1 rounded-md text-xs font-medium ${getPriorityColor(complaint.priority)}`}>
+                    <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getPriorityColor(complaint.priority)}`}>
                       {complaint.priority} priority
                     </span>
                   </div>
                   
                   <p className="text-gray-600 mb-4 font-['Inter'] leading-relaxed">{complaint.description}</p>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-500">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
                     <div className="flex items-center font-['Inter']">
                       <FileText className="w-4 h-4 mr-2" />
                       <span className="font-medium">ID:</span>
@@ -216,17 +216,17 @@ const Complaints = () => {
                     </div>
                   </div>
                   
-                  <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="mt-4 pt-4 border-t border-white/30">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded font-['Inter']">
+                      <span className="text-xs text-gray-600 bg-white/40 px-2 py-1 rounded-lg font-['Inter'] backdrop-blur-sm">
                         {complaint.category}
                       </span>
                       <div className="flex items-center space-x-2">
-                        <button className="text-blue-600 hover:text-blue-700 text-sm font-medium font-['Inter'] flex items-center">
+                        <button className="text-pink-600 hover:text-pink-700 text-sm font-medium font-['Inter'] flex items-center">
                           <Eye className="w-4 h-4 mr-1" />
                           View Details
                         </button>
-                        <button className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                        <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded transition-colors">
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </div>
@@ -237,11 +237,11 @@ const Complaints = () => {
             </div>
           ))
         ) : (
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FileText className="w-8 h-8 text-gray-400" />
+          <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-12 text-center">
+            <div className="w-16 h-16 bg-white/30 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+              <FileText className="w-8 h-8 text-gray-500" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2 font-['Inter']">
+            <h3 className="text-lg font-medium text-gray-800 mb-2 font-['Inter']">
               {searchQuery || selectedFilter !== 'all' ? 'No complaints found' : 'No complaints yet'}
             </h3>
             <p className="text-gray-600 mb-6 font-['Inter']">
@@ -251,7 +251,7 @@ const Complaints = () => {
               }
             </p>
             {(!searchQuery && selectedFilter === 'all') && (
-              <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors font-['Inter']">
+              <button className="bg-gradient-to-r from-pink-300 to-rose-300 text-white px-6 py-3 rounded-xl font-medium hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-['Inter'] shadow-md">
                 <Plus className="w-4 h-4 inline mr-2" />
                 Submit Your First Complaint
               </button>
@@ -264,16 +264,16 @@ const Complaints = () => {
       {filteredComplaints.length > 10 && (
         <div className="flex justify-center pt-6">
           <div className="flex items-center space-x-2">
-            <button className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 font-['Inter']">
+            <button className="px-3 py-2 text-sm bg-white/30 border border-white/40 rounded-xl hover:bg-white/40 font-['Inter'] backdrop-blur-sm">
               Previous
             </button>
-            <button className="px-3 py-2 text-sm bg-blue-600 text-white rounded-lg font-['Inter']">
+            <button className="px-3 py-2 text-sm bg-gradient-to-r from-pink-300 to-rose-300 text-white rounded-xl font-['Inter'] shadow-md">
               1
             </button>
-            <button className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 font-['Inter']">
+            <button className="px-3 py-2 text-sm bg-white/30 border border-white/40 rounded-xl hover:bg-white/40 font-['Inter'] backdrop-blur-sm">
               2
             </button>
-            <button className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 font-['Inter']">
+            <button className="px-3 py-2 text-sm bg-white/30 border border-white/40 rounded-xl hover:bg-white/40 font-['Inter'] backdrop-blur-sm">
               Next
             </button>
           </div>
