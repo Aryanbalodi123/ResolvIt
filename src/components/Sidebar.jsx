@@ -15,47 +15,47 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <div className="w-72 bg-gray-50 shadow-sm border-r border-gray-200 min-h-screen sticky top-0">
+    <div className="w-72 bg-gradient-to-b from-pink-100/60 to-orange-100/60 backdrop-blur-sm border-r border-white/30 min-h-full sticky top-0">
       {/* Header */}
-      <div className="p-6 border-b border-gray-200">
+      <div className="p-6 border-b border-white/30">
         <div className="flex items-center space-x-3 mb-6">
-          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+          <div className="w-10 h-10 bg-gradient-to-br from-pink-300 to-orange-300 rounded-xl flex items-center justify-center shadow-sm">
             <User className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Portal</h2>
-            <p className="text-sm text-gray-500">User Dashboard</p>
+            <h2 className="text-lg font-semibold text-gray-800">Portal</h2>
+            <p className="text-sm text-gray-600">User Dashboard</p>
           </div>
         </div>
         
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
+        <div className="bg-white/40 backdrop-blur-sm rounded-xl p-4 border border-white/40 shadow-sm">
           <div className="flex items-center space-x-2 mb-1">
             <span className="text-lg">👋</span>
-            <p className="text-sm font-medium text-gray-600">Welcome</p>
+            <p className="text-sm font-medium text-gray-700">Welcome</p>
           </div>
-          <p className="text-lg font-semibold text-gray-900">John Doe</p>
+          <p className="text-lg font-semibold text-gray-800">John Doe</p>
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6">
-        <div className="space-y-1">
+        <div className="space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
             return (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
                   activeTab === item.id
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-gradient-to-r from-pink-300 to-orange-300 text-white shadow-md'
+                    : 'text-gray-700 hover:bg-white/30 hover:shadow-sm'
                 }`}
               >
                 <Icon className="w-5 h-5" />
                 <span className="font-medium text-sm">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                  <span className="ml-auto bg-gradient-to-r from-pink-400 to-rose-400 text-white text-xs px-2 py-1 rounded-full font-medium shadow-sm">
                     {item.badge}
                   </span>
                 )}
@@ -66,13 +66,13 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       </nav>
 
       {/* Settings at bottom */}
-      <div className="p-4 border-t border-gray-200 mt-auto">
+      <div className="p-4 border-t border-white/30 mt-auto">
         <button
           onClick={() => setActiveTab('settings')}
-          className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
+          className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
             activeTab === 'settings'
-              ? 'bg-blue-600 text-white shadow-sm'
-              : 'text-gray-700 hover:bg-gray-100'
+              ? 'bg-gradient-to-r from-pink-300 to-orange-300 text-white shadow-md'
+              : 'text-gray-700 hover:bg-white/30 hover:shadow-sm'
           }`}
         >
           <Settings className="w-5 h-5" />
