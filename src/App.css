@@ -1,16 +1,41 @@
 @import "tailwindcss";
 
-/* App Container */
+/* App Container with Gradient Background */
 .app-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 25%, #fd79a8 50%, #fdcb6e 75%, #e17055 100%);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Content Wrapper for Centering */
+.content-wrapper {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Translucent Container */
+.translucent-container {
+  background: rgba(255, 255, 255, 0.559);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgb(255, 255, 255);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.221);
+  width: 100%;
+  min-height: calc(100vh - 4rem);
 }
 
 /* Main Content */
 .main-content {
   flex: 1;
-  min-height: 100vh;
+  min-height: calc(100vh - 4rem);
   overflow-x: hidden;
   background: transparent;
 }
@@ -37,17 +62,17 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: rgba(241, 241, 241, 0.5);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: rgba(193, 193, 193, 0.8);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: rgba(168, 168, 168, 0.9);
 }
 
 /* Focus states */
@@ -56,7 +81,7 @@ input:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 182, 193, 0.3);
 }
 
 /* Card hover effects */
@@ -65,8 +90,8 @@ textarea:focus {
 }
 
 .card-hover:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(253, 121, 168, 0.15);
 }
 
 /* Button animations */
@@ -82,11 +107,12 @@ textarea:focus {
   transform: translateY(0);
 }
 
-/* Glass effect for sidebar */
+/* Glass effect for cards */
 .glass-effect {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* Custom border radius */
@@ -100,7 +126,7 @@ textarea:focus {
 
 /* Text selection */
 ::selection {
-  background-color: rgba(59, 130, 246, 0.2);
+  background-color: rgba(253, 121, 168, 0.3);
   color: inherit;
 }
 
@@ -120,8 +146,8 @@ textarea:focus {
   background: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.2) 20%,
-    rgba(255, 255, 255, 0.5) 60%,
+    rgba(255, 255, 255, 0.3) 20%,
+    rgba(255, 255, 255, 0.6) 60%,
     rgba(255, 255, 255, 0) 100%
   );
   animation: loading 2s infinite;
@@ -150,7 +176,7 @@ textarea:focus {
   transform: translateY(-50%);
   width: 4px;
   height: 4px;
-  background: #f59e0b;
+  background: #fab1a0;
   border-radius: 50%;
   animation: pulse 2s infinite;
 }
@@ -167,7 +193,7 @@ textarea:focus {
   transform: translateY(-50%);
   width: 4px;
   height: 4px;
-  background: #3b82f6;
+  background: #fd79a8;
   border-radius: 50%;
   animation: pulse 2s infinite;
 }
@@ -185,6 +211,10 @@ textarea:focus {
 
 /* Responsive utilities */
 @media (max-width: 768px) {
+  .app-container {
+    padding: 1rem;
+  }
+  
   .main-content {
     padding: 1rem;
   }
@@ -196,26 +226,9 @@ textarea:focus {
   .btn-animate:hover {
     transform: none;
   }
-}
-
-/* Dark mode support (if needed later) */
-@media (prefers-color-scheme: dark) {
-  .app-container {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  }
-}
-
-/* Print styles */
-@media print {
-  .sidebar,
-  .quick-actions,
-  button {
-    display: none !important;
-  }
   
-  .main-content {
-    margin: 0 !important;
-    padding: 0 !important;
+  .translucent-container {
+    min-height: calc(100vh - 2rem);
   }
 }
 
@@ -223,36 +236,38 @@ textarea:focus {
 .complaint-card {
   transition: all 0.2s ease-in-out;
   border-left: 4px solid transparent;
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .complaint-card:hover {
-  border-left-color: #3b82f6;
+  border-left-color: #fd79a8;
   transform: translateX(2px);
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .complaint-card.pending {
-  border-left-color: #f59e0b;
+  border-left-color: #fab1a0;
 }
 
 .complaint-card.in-progress {
-  border-left-color: #3b82f6;
+  border-left-color: #fd79a8;
 }
 
 .complaint-card.resolved {
-  border-left-color: #10b981;
+  border-left-color: #a8e6cf;
 }
 
 /* Priority indicators */
 .priority-high {
-  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
+  box-shadow: 0 0 0 1px rgba(255, 182, 193, 0.4);
 }
 
 .priority-medium {
-  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 0 0 1px rgba(250, 177, 160, 0.4);
 }
 
 .priority-low {
-  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 0 0 1px rgba(168, 230, 207, 0.4);
 }
 
 /* Interactive elements */
@@ -262,11 +277,11 @@ textarea:focus {
 }
 
 .interactive:hover {
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: rgba(253, 121, 168, 0.1);
 }
 
 .interactive:active {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(253, 121, 168, 0.2);
   transform: scale(0.99);
 }
 
@@ -293,6 +308,6 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Focus visible for better accessibility */
 .focus-visible:focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #fd79a8;
   outline-offset: 2px;
 }
