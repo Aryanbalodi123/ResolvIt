@@ -8,7 +8,12 @@ import {
   MapPin,
   Calendar,
   Clock,
-  AlertTriangle
+  AlertTriangle,
+  TrendingUp,
+  Filter,
+  MoreVertical,
+  Eye,
+  ArrowUpRight
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -20,7 +25,8 @@ const Dashboard = () => {
       priority: 'medium',
       date: '2024-08-15',
       location: 'Main Street, Block A',
-      description: 'Street light has been out for 3 days, causing safety concerns'
+      description: 'Street light has been out for 3 days, causing safety concerns',
+      timeAgo: '3 days ago'
     },
     {
       id: 'C002',
@@ -29,137 +35,230 @@ const Dashboard = () => {
       priority: 'high',
       date: '2024-08-12',
       location: 'Park Avenue, Sector 5',
-      description: 'Inconsistent water supply for the past week'
+      description: 'Inconsistent water supply for the past week',
+      timeAgo: '6 days ago'
+    },
+    {
+      id: 'C003',
+      title: 'Noise Complaint',
+      status: 'resolved',
+      priority: 'low',
+      date: '2024-08-08',
+      location: 'Green Valley Apartments',
+      description: 'Construction noise during restricted hours',
+      timeAgo: '1 week ago'
     }
   ];
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'pending': return 'bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-200';
-      case 'in-progress': return 'bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 border border-blue-200';
-      case 'resolved': return 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200';
-      default: return 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 border border-gray-200';
+      case 'pending': return 'bg-amber-50 text-amber-700 border-amber-200';
+      case 'in-progress': return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'resolved': return 'bg-green-50 text-green-700 border-green-200';
+      default: return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
 
-  const getPriorityIcon = (priority) => {
+  const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return <AlertTriangle className="w-4 h-4 text-red-500" />;
-      case 'medium': return <Clock className="w-4 h-4 text-yellow-500" />;
-      case 'low': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      default: return <Clock className="w-4 h-4 text-gray-500" />;
+      case 'high': return 'text-red-600 bg-red-50';
+      case 'medium': return 'text-orange-600 bg-orange-50';
+      case 'low': return 'text-green-600 bg-green-50';
+      default: return 'text-gray-600 bg-gray-50';
     }
   };
+
+  const stats = [
+    {
+      title: 'My Complaints',
+      value: '3',
+      subtitle: '1 pending, 1 in progress',
+      icon: FileText,
+      color: 'from-blue-500 to-blue-600',
+      bgColor: 'bg-blue-50',
+      textColor: 'text-blue-700'
+    },
+    {
+      title: 'Lost & Found',
+      value: '2',
+      subtitle: '1 lost, 1 found item',
+      icon: Search,
+      color: 'from-purple-500 to-purple-600',
+      bgColor: 'bg-purple-50',
+      textColor: 'text-purple-700'
+    },
+    {
+      title: 'Resolved',
+      value: '1',
+      subtitle: 'This month',
+      icon: CheckCircle,
+      color: 'from-green-500 to-green-600',
+      bgColor: 'bg-green-50',
+      textColor: 'text-green-700'
+    }
+  ];
 
   return (
-    <div className="space-y-8">
-      {/* Welcome Section */}
-      <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 rounded-3xl p-8 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full -ml-24 -mb-24"></div>
-        <div className="relative z-10">
-          <h1 className="text-4xl font-bold mb-2 font-['Poppins']">Welcome back, John! 👋</h1>
-          <p className="text-blue-100 text-lg font-['Inter']">Manage your complaints and stay updated on their progress</p>
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900 font-['Inter']">Dashboard</h1>
+            <p className="text-gray-500 mt-1 font-['Inter']">Welcome back, John! Manage your complaints and stay updated on their progress.</p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+              <Filter className="w-5 h-5" />
+            </button>
+            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors font-['Inter']">
+              <Plus className="w-4 h-4 inline mr-2" />
+              New Complaint
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
-              <FileText className="w-6 h-6 text-white" />
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {stats.map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <div key={index} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-sm transition-shadow">
+              <div className="flex items-center justify-between">
+                <div className={`p-3 rounded-lg ${stat.bgColor}`}>
+                  <Icon className={`w-5 h-5 ${stat.textColor}`} />
+                </div>
+                <span className="text-2xl font-semibold text-gray-900 font-['Inter']">{stat.value}</span>
+              </div>
+              <div className="mt-4">
+                <h3 className="font-medium text-gray-900 font-['Inter']">{stat.title}</h3>
+                <p className="text-sm text-gray-500 mt-1 font-['Inter']">{stat.subtitle}</p>
+              </div>
             </div>
-            <span className="text-2xl font-bold text-gray-800 font-['Poppins']">3</span>
-          </div>
-          <h3 className="font-semibold text-gray-800 font-['Inter']">My Complaints</h3>
-          <p className="text-sm text-gray-500 mt-1">1 pending, 1 in progress</p>
-        </div>
-
-        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl">
-              <Search className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-gray-800 font-['Poppins']">2</span>
-          </div>
-          <h3 className="font-semibold text-gray-800 font-['Inter']">Lost & Found</h3>
-          <p className="text-sm text-gray-500 mt-1">1 lost, 1 found item</p>
-        </div>
-
-        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-xl">
-              <CheckCircle className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-gray-800 font-['Poppins']">1</span>
-          </div>
-          <h3 className="font-semibold text-gray-800 font-['Inter']">Resolved</h3>
-          <p className="text-sm text-gray-500 mt-1">This month</p>
-        </div>
+          );
+        })}
       </div>
 
-      {/* Recent Activity */}
+      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-          <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-            <h3 className="text-xl font-bold text-gray-800 font-['Poppins']">Recent Complaints</h3>
+        {/* Recent Complaints */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900 font-['Inter']">Recent Complaints</h2>
+              <button className="text-blue-600 hover:text-blue-700 font-medium text-sm font-['Inter'] flex items-center">
+                View all <ArrowUpRight className="w-4 h-4 ml-1" />
+              </button>
+            </div>
           </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {recentComplaints.map((complaint) => (
-                <div key={complaint.id} className="p-4 rounded-xl bg-gradient-to-r from-gray-50 to-white border border-gray-100 hover:shadow-md transition-all duration-300">
-                  <div className="flex justify-between items-start mb-3">
-                    <h4 className="font-semibold text-gray-900 font-['Inter']">{complaint.title}</h4>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(complaint.status)}`}>
-                      {complaint.status}
-                    </span>
-                  </div>
-                  <p className="text-gray-600 text-sm mb-3 font-['Inter']">{complaint.description}</p>
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <div className="flex items-center space-x-4">
-                      <span className="flex items-center">
+          <div className="divide-y divide-gray-200">
+            {recentComplaints.map((complaint) => (
+              <div key={complaint.id} className="p-6 hover:bg-gray-50 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <h3 className="text-sm font-medium text-gray-900 font-['Inter']">{complaint.title}</h3>
+                      <span className={`px-2 py-1 rounded-md text-xs font-medium border ${getStatusColor(complaint.status)}`}>
+                        {complaint.status.replace('-', ' ')}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-3 font-['Inter']">{complaint.description}</p>
+                    <div className="flex items-center space-x-4 text-xs text-gray-500">
+                      <span className="flex items-center font-['Inter']">
                         <MapPin className="w-3 h-3 mr-1" />
                         {complaint.location}
                       </span>
-                      <span className="flex items-center">
-                        <Calendar className="w-3 h-3 mr-1" />
-                        {complaint.date}
+                      <span className="flex items-center font-['Inter']">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {complaint.timeAgo}
+                      </span>
+                      <span className={`px-2 py-1 rounded-md text-xs font-medium ${getPriorityColor(complaint.priority)}`}>
+                        {complaint.priority} priority
                       </span>
                     </div>
-                    {getPriorityIcon(complaint.priority)}
+                  </div>
+                  <div className="flex items-center space-x-1 ml-4">
+                    <button className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <button className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
-          <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-            <h3 className="text-xl font-bold text-gray-800 font-['Poppins']">Quick Actions</h3>
+        {/* Quick Actions */}
+        <div className="space-y-6">
+          {/* Actions Card */}
+          <div className="bg-white rounded-xl border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900 font-['Inter']">Quick Actions</h2>
+            </div>
+            <div className="p-6 space-y-3">
+              <button className="w-full p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-left">
+                <div className="flex items-center space-x-3">
+                  <Plus className="w-5 h-5" />
+                  <div>
+                    <div className="font-medium font-['Inter']">New Complaint</div>
+                    <div className="text-xs text-blue-100 font-['Inter']">Report a new issue</div>
+                  </div>
+                </div>
+              </button>
+              
+              <button className="w-full p-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-left">
+                <div className="flex items-center space-x-3">
+                  <Search className="w-5 h-5" />
+                  <div>
+                    <div className="font-medium font-['Inter']">Report Lost Item</div>
+                    <div className="text-xs text-purple-100 font-['Inter']">Add to lost & found</div>
+                  </div>
+                </div>
+              </button>
+              
+              <button className="w-full p-4 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-left">
+                <div className="flex items-center space-x-3">
+                  <MessageSquare className="w-5 h-5" />
+                  <div>
+                    <div className="font-medium font-['Inter']">Send Feedback</div>
+                    <div className="text-xs text-gray-500 font-['Inter']">Share your thoughts</div>
+                  </div>
+                </div>
+              </button>
+            </div>
           </div>
-          <div className="p-6 space-y-4">
-            <button className="w-full p-4 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
-              <div className="flex items-center justify-center space-x-3">
-                <Plus className="w-5 h-5" />
-                <span className="font-semibold font-['Inter']">New Complaint</span>
+
+          {/* Activity Summary */}
+          <div className="bg-white rounded-xl border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900 font-['Inter']">This Month</h2>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 font-['Inter']">Complaints submitted</span>
+                  <span className="text-sm font-medium text-gray-900 font-['Inter']">3</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 font-['Inter']">Issues resolved</span>
+                  <span className="text-sm font-medium text-gray-900 font-['Inter']">1</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 font-['Inter']">Average response time</span>
+                  <span className="text-sm font-medium text-gray-900 font-['Inter']">2 days</span>
+                </div>
               </div>
-            </button>
-            
-            <button className="w-full p-4 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
-              <div className="flex items-center justify-center space-x-3">
-                <Search className="w-5 h-5" />
-                <span className="font-semibold font-['Inter']">Report Lost Item</span>
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="flex items-center text-sm text-green-600">
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  <span className="font-['Inter']">Response time improved by 20%</span>
+                </div>
               </div>
-            </button>
-            
-            <button className="w-full p-4 rounded-xl border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all duration-300">
-              <div className="flex items-center justify-center space-x-3">
-                <MessageSquare className="w-5 h-5" />
-                <span className="font-semibold font-['Inter']">Send Feedback</span>
-              </div>
-            </button>
+            </div>
           </div>
         </div>
       </div>

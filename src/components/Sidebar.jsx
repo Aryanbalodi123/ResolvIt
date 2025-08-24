@@ -1,9 +1,9 @@
 import React from 'react';
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Search, 
-  Settings, 
+import {
+  LayoutDashboard,
+  FileText,
+  Search,
+  Settings,
   User
 } from 'lucide-react';
 
@@ -15,43 +15,47 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <div className="w-72 bg-white/80 backdrop-blur-lg shadow-2xl border-r border-gray-200/50 min-h-screen sticky top-0">
+    <div className="w-72 bg-gray-50 shadow-sm border-r border-gray-200 min-h-screen sticky top-0">
       {/* Header */}
-      <div className="p-8 border-b border-gray-200/50">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-            <User className="w-6 h-6 text-white" />
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex items-center space-x-3 mb-6">
+          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+            <User className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-800 font-['Poppins']">Portal</h2>
-            <p className="text-sm text-gray-500 font-['Inter']">User Dashboard</p>
+            <h2 className="text-lg font-semibold text-gray-900">Portal</h2>
+            <p className="text-sm text-gray-500">User Dashboard</p>
           </div>
         </div>
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4">
-          <p className="text-sm font-medium text-gray-700 font-['Inter']">👋 Welcome</p>
-          <p className="text-lg font-semibold text-gray-900 font-['Poppins']">John Doe</p>
+        
+        <div className="bg-white rounded-lg p-4 border border-gray-200">
+          <div className="flex items-center space-x-2 mb-1">
+            <span className="text-lg">👋</span>
+            <p className="text-sm font-medium text-gray-600">Welcome</p>
+          </div>
+          <p className="text-lg font-semibold text-gray-900">John Doe</p>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-6 py-8">
-        <div className="space-y-3">
+      <nav className="flex-1 px-4 py-6">
+        <div className="space-y-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
             return (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center space-x-4 px-4 py-4 rounded-xl text-left transition-all duration-300 font-['Inter'] ${
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
                   activeTab === item.id
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-105'
+                    ? 'bg-blue-600 text-white shadow-sm'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
                 <Icon className="w-5 h-5" />
-                <span className="font-medium">{item.label}</span>
+                <span className="font-medium text-sm">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                  <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
                     {item.badge}
                   </span>
                 )}
@@ -62,17 +66,17 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       </nav>
 
       {/* Settings at bottom */}
-      <div className="p-6 border-t border-gray-200/50">
+      <div className="p-4 border-t border-gray-200 mt-auto">
         <button
           onClick={() => setActiveTab('settings')}
-          className={`w-full flex items-center space-x-4 px-4 py-4 rounded-xl text-left transition-all duration-300 font-['Inter'] ${
+          className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
             activeTab === 'settings'
-              ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-105'
+              ? 'bg-blue-600 text-white shadow-sm'
               : 'text-gray-700 hover:bg-gray-100'
           }`}
         >
           <Settings className="w-5 h-5" />
-          <span className="font-medium">Settings</span>
+          <span className="font-medium text-sm">Settings</span>
         </button>
       </div>
     </div>
