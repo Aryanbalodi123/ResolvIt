@@ -1,4 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {sendComplaint  } from '../services/ComplaintServices';
+
 import { 
   FileText, 
   Search, 
@@ -13,10 +17,33 @@ import {
   Filter,
   MoreVertical,
   Eye,
-  ArrowUpRight
+  ArrowUpRight,
+  X
 } from 'lucide-react';
 
 const Dashboard = () => {
+    const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+
+      navigate("/login", { replace: true });
+    }
+
+  
+  }, [navigate]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    location: '',
+    priority: 'medium',
+    category: 'infrastructure'
+  });
+
   const recentComplaints = [
     {
       id: 'C001',
@@ -98,6 +125,62 @@ const Dashboard = () => {
     }
   ];
 
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setFormData({
+      title: '',
+      description: '',
+      location: '',
+      priority: 'medium',
+      category: 'infrastructure'
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const user = JSON.parse(localStorage.getItem("token") || "{}");
+
+  const payload = {
+    user_id: user.rollNumber ?? null,   
+    title: formData.title,
+    description: formData.description,
+    location: formData.location,
+    priority: formData.priority,      
+    category: formData.category,
+    status:"pending",
+    isResolved: false
+  };
+
+  try {
+    const data = await sendComplaint(payload); 
+    console.log("Complaint saved:", data);
+    alert("Complaint submitted successfully!");
+    handleModalClose();
+  } catch (error) {
+    console.error("Failed to send complaint:", error.message);
+    alert("Error submitting complaint: " + error.message);
+  }
+
+    e.preventDefault();
+    // Dummy submit handler
+    console.log('Submitting complaint:', formData);
+    alert(`Complaint submitted successfully!\n\nTitle: ${formData.title}\nCategory: ${formData.category}\nPriority: ${formData.priority}\nLocation: ${formData.location}\nDescription: ${formData.description}`);
+    handleModalClose();
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Header */}
@@ -111,7 +194,10 @@ const Dashboard = () => {
             <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded-xl transition-colors backdrop-blur-sm">
               <Filter className="w-5 h-5" />
             </button>
-            <button className="bg-gradient-to-r from-pink-300 to-rose-300 text-white px-4 py-2 rounded-xl font-medium hover:from-pink-400 hover:to-rose-400 transition-all duration-200 shadow-md font-['Inter']">
+            <button 
+              onClick={handleModalOpen}
+              className="bg-gradient-to-r from-pink-300 to-rose-300 text-white px-4 py-2 rounded-xl font-medium hover:from-pink-400 hover:to-rose-400 transition-all duration-200 shadow-md font-['Inter']"
+            >
               <Plus className="w-4 h-4 inline mr-2" />
               New Complaint
             </button>
@@ -200,7 +286,10 @@ const Dashboard = () => {
               <h2 className="text-lg font-semibold text-gray-800 font-['Inter']">Quick Actions</h2>
             </div>
             <div className="p-6 space-y-3">
-              <button className="w-full p-4 bg-gradient-to-r from-pink-300 to-rose-300 text-white rounded-xl hover:from-pink-400 hover:to-rose-400 transition-all duration-200 text-left shadow-md">
+              <button 
+                onClick={handleModalOpen}
+                className="w-full p-4 bg-gradient-to-r from-pink-300 to-rose-300 text-white rounded-xl hover:from-pink-400 hover:to-rose-400 transition-all duration-200 text-left shadow-md"
+              >
                 <div className="flex items-center space-x-3">
                   <Plus className="w-5 h-5" />
                   <div>
@@ -262,6 +351,129 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal Overlay */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-white/40 w-full max-w-md shadow-2xl">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
+              <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">New Complaint</h2>
+              <button 
+                onClick={handleModalClose}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/60 rounded-xl transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Title <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  placeholder="Brief description of the issue"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                />
+              </div>
+
+              {/* Category */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Category
+                </label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                >
+                  <option value="infrastructure">Infrastructure</option>
+                  <option value="utilities">Utilities</option>
+                  <option value="safety">Safety</option>
+                  <option value="environment">Environment</option>
+                  <option value="transportation">Transportation</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              {/* Priority */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Priority
+                </label>
+                <select
+                  name="priority"
+                  value={formData.priority}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Location <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                  placeholder="Street address or area"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  placeholder="Detailed description of the issue"
+                  required
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm resize-none font-['Inter']"
+                />
+              </div>
+
+              {/* Form Actions */}
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={handleModalClose}
+                  className="flex-1 px-4 py-2 text-gray-700 bg-gray-100/60 border border-gray-300/60 rounded-xl hover:bg-gray-200/60 transition-colors font-medium font-['Inter']"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-pink-300 to-rose-300 text-white rounded-xl hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-medium shadow-md font-['Inter']"
+                >
+                  Submit Complaint
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

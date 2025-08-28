@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { loginUser } from '../services/AuthServices';
+import { Navigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+    const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState(null);
   const [rollNumber, setRollNumber] = useState('');
   const [password, setPassword] = useState('');
@@ -55,6 +58,8 @@ const Login = () => {
           showAlert(`Welcome back, ${user.name}!`, "success");
     console.log("Logged in user:", user); 
 
+  localStorage.setItem("token", JSON.stringify(user));
+      navigate("/dashboard")
 
     
     }
