@@ -4,10 +4,12 @@ import Dashboard from './pages/Dashboard';
 import Complaints from './pages/Complaints';
 import LostFound from './pages/LostFound';
 import Settings from './pages/Settings';
+import AdminDashboard from './pages/AdminDashboard';  
+
 import './App.css';
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('adminDashboard');
 
   const renderContent = () => {
     switch (activeTab) {
@@ -19,6 +21,8 @@ const App = () => {
         return <LostFound />;
       case 'settings':
         return <Settings />;
+      case 'adminDashboard':
+        return <AdminDashboard />;
       default:
         return <Dashboard />;
     }
