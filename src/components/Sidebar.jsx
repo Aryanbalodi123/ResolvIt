@@ -1,17 +1,18 @@
-import React from 'react';
+import React from "react";
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   FileText,
   Search,
   Settings,
-  User
-} from 'lucide-react';
+  User,
+} from "lucide-react";
 
-const Sidebar = ({ activeTab, setActiveTab }) => {
+const Sidebar = () => {
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'complaints', label: 'My Complaints', icon: FileText, badge: 2 },
-    { id: 'lost-found', label: 'Lost & Found', icon: Search }
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+    { id: "complaints", label: "My Complaints", icon: FileText, badge: 2, path: "/complaints" },
+    { id: "lost-found", label: "Lost & Found", icon: Search, path: "/lost-found" },
   ];
 
   return (
@@ -27,7 +28,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
             <p className="text-sm text-gray-600">User Dashboard</p>
           </div>
         </div>
-        
+
         <div className="bg-white/40 backdrop-blur-sm rounded-xl p-4 border border-white/40 shadow-sm">
           <div className="flex items-center space-x-2 mb-1">
             <span className="text-lg">👋</span>
@@ -43,14 +44,16 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
           {menuItems.map((item) => {
             const Icon = item.icon;
             return (
-              <button
+              <NavLink
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
-                  activeTab === item.id
-                    ? 'bg-gradient-to-r from-pink-300 to-orange-300 text-white shadow-md'
-                    : 'text-gray-700 hover:bg-white/30 hover:shadow-sm'
-                }`}
+                to={item.path}
+                className={({ isActive }) =>
+                  `w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
+                    isActive
+                      ? "bg-gradient-to-r from-pink-300 to-orange-300 text-white shadow-md"
+                      : "text-gray-700 hover:bg-white/30 hover:shadow-sm"
+                  }`
+                }
               >
                 <Icon className="w-5 h-5" />
                 <span className="font-medium text-sm">{item.label}</span>
@@ -59,7 +62,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
                     {item.badge}
                   </span>
                 )}
-              </button>
+              </NavLink>
             );
           })}
         </div>
@@ -67,17 +70,19 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
 
       {/* Settings at bottom */}
       <div className="p-4 border-t border-white/30 mt-auto">
-        <button
-          onClick={() => setActiveTab('settings')}
-          className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
-            activeTab === 'settings'
-              ? 'bg-gradient-to-r from-pink-300 to-orange-300 text-white shadow-md'
-              : 'text-gray-700 hover:bg-white/30 hover:shadow-sm'
-          }`}
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            `w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
+              isActive
+                ? "bg-gradient-to-r from-pink-300 to-orange-300 text-white shadow-md"
+                : "text-gray-700 hover:bg-white/30 hover:shadow-sm"
+            }`
+          }
         >
           <Settings className="w-5 h-5" />
           <span className="font-medium text-sm">Settings</span>
-        </button>
+        </NavLink>
       </div>
     </div>
   );

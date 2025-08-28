@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { reportLostItem } from '../services/LostFoundServices';
+
 import { 
   Plus, 
   Search, 
@@ -14,13 +18,41 @@ import {
   AlertTriangle,
   MoreVertical,
   Image as ImageIcon,
-  Package
+  Package,
+  X,
+  Camera,
+  Upload
 } from 'lucide-react';
 
 const LostFound = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login", { replace: true });
+    }
+  }, [navigate]);
+
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('browse');
+  const [isLostModalOpen, setIsLostModalOpen] = useState(false);
+  const [isFoundModalOpen, setIsFoundModalOpen] = useState(false);
+  
+  const [lostFormData, setLostFormData] = useState({
+    title: '',
+    description: '',
+    location: '',
+    category: 'Personal Items',
+    reward: '',
+    contactMethod: 'email',
+    contactDetails: '',
+    dateLost: '',
+    distinguishingFeatures: ''
+  });
+  
+
 
   const lostFoundItems = [
     {
@@ -157,6 +189,115 @@ const LostFound = () => {
     { value: 'claimed', label: 'Claimed', count: stats.claimed }
   ];
 
+  // Modal handlers
+  const handleLostModalOpen = () => setIsLostModalOpen(true);
+  const handleFoundModalOpen = () => setIsFoundModalOpen(true);
+
+  const handleLostModalClose = () => {
+    setIsLostModalOpen(false);
+    setLostFormData({
+      title: '',
+      description: '',
+      location: '',
+      category: 'Personal Items',
+      reward: '',
+      contactMethod: 'email',
+      contactDetails: '',
+      dateLost: '',
+      distinguishingFeatures: ''
+    });
+  };
+
+  const handleFoundModalClose = () => {
+    setIsFoundModalOpen(false);
+    setFoundFormData({
+      title: '',
+      description: '',
+      location: '',
+      category: 'Personal Items',
+      contactMethod: 'email',
+      contactDetails: '',
+      dateFound: '',
+      distinguishingFeatures: ''
+    });
+  };
+
+  const handleLostInputChange = (e) => {
+    const { name, value } = e.target;
+    setLostFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFoundInputChange = (e) => {
+    const { name, value } = e.target;
+    setFoundFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleLostSubmit = async (e) => {
+    e.preventDefault();
+    
+    const user = JSON.parse(localStorage.getItem("token") || "{}");
+    
+    const payload = {
+      user_id: user.rollNumber ?? null,
+      title: lostFormData.title,
+      description: lostFormData.description,
+      location: lostFormData.location,
+      category: lostFormData.category,
+      reward: lostFormData.reward || null,
+      contact_details: lostFormData.contactDetails,
+      date_lost: lostFormData.dateLost,
+      distinguishing_features: lostFormData.distinguishingFeatures,
+    };
+
+    try {
+      const data = await reportLostItem(payload);
+      
+      console.log("Lost item payload:", payload);
+      alert("Lost item reported successfully!");
+      handleLostModalClose();
+    } catch (error) {
+      console.error("Failed to report lost item:", error.message);
+      alert("Error reporting lost item: " + error.message);
+    }
+  };
+
+  const handleFoundSubmit = async (e) => {
+    e.preventDefault();
+    
+    const user = JSON.parse(localStorage.getItem("token") || "{}");
+    
+    const payload = {
+      user_id: user.rollNumber ?? null,
+      title: foundFormData.title,
+      description: foundFormData.description,
+      location: foundFormData.location,
+      category: foundFormData.category,
+      type: 'found',
+      status: 'active',
+      reward: null,
+      contact_method: foundFormData.contactMethod,
+      contact_details: foundFormData.contactDetails,
+      date_found: foundFormData.dateFound,
+      distinguishing_features: foundFormData.distinguishingFeatures,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    try {
+      // Uncomment when service is ready
+      // const data = await reportFoundItem(payload);
+      // console.log("Found item reported:", data);
+      
+      // Temporary dummy implementation
+      console.log("Found item payload:", payload);
+      alert("Found item reported successfully!");
+      handleFoundModalClose();
+    } catch (error) {
+      console.error("Failed to report found item:", error.message);
+      alert("Error reporting found item: " + error.message);
+    }
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Header */}
@@ -166,11 +307,17 @@ const LostFound = () => {
           <p className="text-gray-600 mt-1 font-['Inter']">Help reunite lost items with their owners or find your missing belongings</p>
         </div>
         <div className="flex gap-3">
-          <button className="bg-gradient-to-r from-purple-300 to-indigo-300 text-white px-4 py-2 rounded-xl font-medium hover:from-purple-400 hover:to-indigo-400 transition-all duration-200 font-['Inter'] flex items-center shadow-md">
+          <button 
+            onClick={handleFoundModalOpen}
+            className="bg-gradient-to-r from-purple-300 to-indigo-300 text-white px-4 py-2 rounded-xl font-medium hover:from-purple-400 hover:to-indigo-400 transition-all duration-200 font-['Inter'] flex items-center shadow-md"
+          >
             <Search className="w-4 h-4 mr-2" />
             Report Found Item
           </button>
-          <button className="bg-gradient-to-r from-rose-300 to-pink-300 text-white px-4 py-2 rounded-xl font-medium hover:from-rose-400 hover:to-pink-400 transition-all duration-200 font-['Inter'] flex items-center shadow-md">
+          <button 
+            onClick={handleLostModalOpen}
+            className="bg-gradient-to-r from-rose-300 to-pink-300 text-white px-4 py-2 rounded-xl font-medium hover:from-rose-400 hover:to-pink-400 transition-all duration-200 font-['Inter'] flex items-center shadow-md"
+          >
             <Plus className="w-4 h-4 mr-2" />
             Report Lost Item
           </button>
@@ -342,11 +489,17 @@ const LostFound = () => {
             </p>
             {(!searchQuery && selectedFilter === 'all') && (
               <div className="flex justify-center space-x-3">
-                <button className="bg-gradient-to-r from-rose-300 to-pink-300 text-white px-6 py-3 rounded-xl font-medium hover:from-rose-400 hover:to-pink-400 transition-all duration-200 font-['Inter'] shadow-md">
+                <button 
+                  onClick={handleLostModalOpen}
+                  className="bg-gradient-to-r from-rose-300 to-pink-300 text-white px-6 py-3 rounded-xl font-medium hover:from-rose-400 hover:to-pink-400 transition-all duration-200 font-['Inter'] shadow-md"
+                >
                   <Plus className="w-4 h-4 inline mr-2" />
                   Report Lost Item
                 </button>
-                <button className="bg-gradient-to-r from-purple-300 to-indigo-300 text-white px-6 py-3 rounded-xl font-medium hover:from-purple-400 hover:to-indigo-400 transition-all duration-200 font-['Inter'] shadow-md">
+                <button 
+                  onClick={handleFoundModalOpen}
+                  className="bg-gradient-to-r from-purple-300 to-indigo-300 text-white px-6 py-3 rounded-xl font-medium hover:from-purple-400 hover:to-indigo-400 transition-all duration-200 font-['Inter'] shadow-md"
+                >
                   <Search className="w-4 h-4 inline mr-2" />
                   Report Found Item
                 </button>
@@ -371,6 +524,347 @@ const LostFound = () => {
           </div>
         </div>
       </div>
+
+      {/* Report Lost Item Modal */}
+      {isLostModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-white/40 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
+              <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">Report Lost Item</h2>
+              <button 
+                onClick={handleLostModalClose}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/60 rounded-xl transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleLostSubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Item Title <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={lostFormData.title}
+                  onChange={handleLostInputChange}
+                  placeholder="e.g., iPhone 13, Black Wallet, Blue Backpack"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Category
+                </label>
+                <select
+                  name="category"
+                  value={lostFormData.category}
+                  onChange={handleLostInputChange}
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                >
+                  <option value="Personal Items">Personal Items</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Bags">Bags</option>
+                  <option value="Keys">Keys</option>
+                  <option value="Jewelry">Jewelry</option>
+                  <option value="Documents">Documents</option>
+                  <option value="Clothing">Clothing</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Location Where Lost <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="location"
+                  value={lostFormData.location}
+                  onChange={handleLostInputChange}
+                  placeholder="Be as specific as possible"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Date Lost
+                </label>
+                <input
+                  type="date"
+                  name="dateLost"
+                  value={lostFormData.dateLost}
+                  onChange={handleLostInputChange}
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="description"
+                  value={lostFormData.description}
+                  onChange={handleLostInputChange}
+                  placeholder="Describe the item in detail - color, brand, condition, etc."
+                  required
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm resize-none font-['Inter']"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Distinguishing Features
+                </label>
+                <input
+                  type="text"
+                  name="distinguishingFeatures"
+                  value={lostFormData.distinguishingFeatures}
+                  onChange={handleLostInputChange}
+                  placeholder="Unique marks, scratches, engravings, etc."
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Reward (Optional)
+                </label>
+                <input
+                  type="text"
+                  name="reward"
+                  value={lostFormData.reward}
+                  onChange={handleLostInputChange}
+                  placeholder="e.g., ₹1000"
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Contact Method
+                </label>
+                <select
+                  name="contactMethod"
+                  value={lostFormData.contactMethod}
+                  onChange={handleLostInputChange}
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                >
+                  <option value="email">Email</option>
+                  <option value="phone">Phone</option>
+                  <option value="both">Both Email & Phone</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Contact Details <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="contactDetails"
+                  value={lostFormData.contactDetails}
+                  onChange={handleLostInputChange}
+                  placeholder={lostFormData.contactMethod === 'email' ? 'your.email@example.com' : lostFormData.contactMethod === 'phone' ? '+91 98765 43210' : 'email@example.com, +91 98765 43210'}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                />
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={handleLostModalClose}
+                  className="flex-1 px-4 py-2 text-gray-700 bg-gray-100/60 border border-gray-300/60 rounded-xl hover:bg-gray-200/60 transition-colors font-medium font-['Inter']"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-rose-300 to-pink-300 text-white rounded-xl hover:from-rose-400 hover:to-pink-400 transition-all duration-200 font-medium shadow-md font-['Inter']"
+                >
+                  Report Lost Item
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Report Found Item Modal */}
+      {isFoundModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-white/40 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
+              <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">Report Found Item</h2>
+              <button 
+                onClick={handleFoundModalClose}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/60 rounded-xl transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleFoundSubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Item Title <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={foundFormData.title}
+                  onChange={handleFoundInputChange}
+                  placeholder="e.g., Black Wallet, Set of Keys, Blue Umbrella"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Category
+                </label>
+                <select
+                  name="category"
+                  value={foundFormData.category}
+                  onChange={handleFoundInputChange}
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                >
+                  <option value="Personal Items">Personal Items</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Bags">Bags</option>
+                  <option value="Keys">Keys</option>
+                  <option value="Jewelry">Jewelry</option>
+                  <option value="Documents">Documents</option>
+                  <option value="Clothing">Clothing</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Location Where Found <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="location"
+                  value={foundFormData.location}
+                  onChange={handleFoundInputChange}
+                  placeholder="Be as specific as possible"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Date Found
+                </label>
+                <input
+                  type="date"
+                  name="dateFound"
+                  value={foundFormData.dateFound}
+                  onChange={handleFoundInputChange}
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="description"
+                  value={foundFormData.description}
+                  onChange={handleFoundInputChange}
+                  placeholder="General description - avoid revealing unique identifying features"
+                  required
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm resize-none font-['Inter']"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Distinguishing Features (Private)
+                </label>
+                <input
+                  type="text"
+                  name="distinguishingFeatures"
+                  value={foundFormData.distinguishingFeatures}
+                  onChange={handleFoundInputChange}
+                  placeholder="Details only the owner would know (kept private)"
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Contact Method
+                </label>
+                <select
+                  name="contactMethod"
+                  value={foundFormData.contactMethod}
+                  onChange={handleFoundInputChange}
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                >
+                  <option value="email">Email</option>
+                  <option value="phone">Phone</option>
+                  <option value="both">Both Email & Phone</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Contact Details <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="contactDetails"
+                  value={foundFormData.contactDetails}
+                  onChange={handleFoundInputChange}
+                  placeholder={foundFormData.contactMethod === 'email' ? 'your.email@example.com' : foundFormData.contactMethod === 'phone' ? '+91 98765 43210' : 'email@example.com, +91 98765 43210'}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                />
+              </div>
+
+              <div className="bg-blue-50/60 border border-blue-200/60 rounded-xl p-3 backdrop-blur-sm">
+                <div className="flex items-start text-blue-700 text-sm">
+                  <AlertTriangle className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
+                  <div className="font-['Inter']">
+                    <strong>Privacy Tip:</strong> Don't include unique identifying features in the public description. Save those details to verify the real owner when they contact you.
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={handleFoundModalClose}
+                  className="flex-1 px-4 py-2 text-gray-700 bg-gray-100/60 border border-gray-300/60 rounded-xl hover:bg-gray-200/60 transition-colors font-medium font-['Inter']"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-300 to-indigo-300 text-white rounded-xl hover:from-purple-400 hover:to-indigo-400 transition-all duration-200 font-medium shadow-md font-['Inter']"
+                >
+                  Report Found Item
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
