@@ -27,58 +27,7 @@ import {
 const AdminDashboard = () => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('month');
 
-  const latestComplaints = [
-    {
-      id: 'C001',
-      title: 'Street Light Not Working',
-      status: 'unassigned',
-      priority: 'medium',
-      date: '2024-08-15',
-      location: 'Main Street, Block A',
-      description: 'Street light has been out for 3 days, causing safety concerns',
-      timeAgo: '3 hours ago',
-      user: 'John Doe',
-      userId: 'U001'
-    },
-    {
-      id: 'C002',
-      title: 'Water Supply Issue',
-      status: 'in-progress',
-      priority: 'high',
-      date: '2024-08-12',
-      location: 'Park Avenue, Sector 5',
-      description: 'Inconsistent water supply for the past week',
-      timeAgo: '1 day ago',
-      user: 'Jane Smith',
-      userId: 'U002',
-      assignedTo: 'Water Dept.'
-    },
-    {
-      id: 'C003',
-      title: 'Noise Complaint',
-      status: 'resolved',
-      priority: 'low',
-      date: '2024-08-08',
-      location: 'Green Valley Apartments',
-      description: 'Construction noise during restricted hours',
-      timeAgo: '3 days ago',
-      user: 'Mike Johnson',
-      userId: 'U003',
-      assignedTo: 'Environmental Team'
-    },
-    {
-      id: 'C004',
-      title: 'Garbage Collection Missed',
-      status: 'pending',
-      priority: 'high',
-      date: '2024-08-14',
-      location: 'Rose Garden Colony',
-      description: 'Garbage not collected for 2 days, creating hygiene issues',
-      timeAgo: '5 hours ago',
-      user: 'Sarah Wilson',
-      userId: 'U004'
-    }
-  ];
+
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -99,67 +48,9 @@ const AdminDashboard = () => {
     }
   };
 
-  const stats = [
-    {
-      title: 'Total Complaints',
-      value: '247',
-      subtitle: '+12 from last month',
-      icon: FileText,
-      color: 'from-pink-300 to-rose-300',
-      bgColor: 'bg-pink-100/60',
-      textColor: 'text-pink-700',
-      trend: '+4.8%'
-    },
-    {
-      title: 'Active Complaints',
-      value: '89',
-      subtitle: '23 unassigned, 66 in progress',
-      icon: Activity,
-      color: 'from-purple-300 to-indigo-300',
-      bgColor: 'bg-purple-100/60',
-      textColor: 'text-purple-700',
-      trend: '-2.1%'
-    },
-    {
-      title: 'Resolved This Month',
-      value: '158',
-      subtitle: '64% resolution rate',
-      icon: CheckCircle,
-      color: 'from-green-300 to-emerald-300',
-      bgColor: 'bg-green-100/60',
-      textColor: 'text-green-700',
-      trend: '+8.3%'
-    },
-    {
-      title: 'Active Users',
-      value: '1,243',
-      subtitle: '+47 new this month',
-      icon: Users,
-      color: 'from-blue-300 to-cyan-300',
-      bgColor: 'bg-blue-100/60',
-      textColor: 'text-blue-700',
-      trend: '+3.2%'
-    }
-  ];
 
-  const chartData = [
-    { name: 'Jan', resolved: 120, active: 45, total: 165 },
-    { name: 'Feb', resolved: 135, active: 52, total: 187 },
-    { name: 'Mar', resolved: 148, active: 38, total: 186 },
-    { name: 'Apr', resolved: 162, active: 61, total: 223 },
-    { name: 'May', resolved: 171, active: 49, total: 220 },
-    { name: 'Jun', resolved: 158, active: 67, total: 225 },
-    { name: 'Jul', resolved: 143, active: 71, total: 214 },
-    { name: 'Aug', resolved: 158, active: 89, total: 247 }
-  ];
 
-  const departmentStats = [
-    { name: 'Infrastructure', complaints: 89, percentage: 36, color: 'bg-pink-400' },
-    { name: 'Water & Sanitation', complaints: 67, percentage: 27, color: 'bg-blue-400' },
-    { name: 'Environment', complaints: 45, percentage: 18, color: 'bg-green-400' },
-    { name: 'Public Safety', complaints: 32, percentage: 13, color: 'bg-purple-400' },
-    { name: 'Others', complaints: 14, percentage: 6, color: 'bg-gray-400' }
-  ];
+
 
   const SimpleBarChart = ({ data }) => {
     const maxValue = Math.max(...data.map(d => d.total));

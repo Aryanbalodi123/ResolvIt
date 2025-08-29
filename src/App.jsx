@@ -28,7 +28,7 @@ const App = () => {
         <Route path="/admin" element={<MainLayout><AdminDashboard /></MainLayout>} />
 
         {/* Default */}
-        <Route path="*" element={<Dashboard />} />
+        <Route path="*" element={<Login />} />
       </Routes>
     </Router>
   );
@@ -36,9 +36,6 @@ const App = () => {
 
 export default App;
 
-//
-// Layouts to keep code clean
-//
 const AuthLayout = ({ children }) => (
   <div style={{ minHeight: "100vh", background: "black", color: "white" }}>
     {children}

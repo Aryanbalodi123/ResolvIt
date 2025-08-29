@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { registerUser,registerAdmin } from '../services/AuthServices';
+import { registerUser,registerAdmin } from '../../services/AuthServices';
 import bcrypt from "bcryptjs";
 
 const Register = () => {
