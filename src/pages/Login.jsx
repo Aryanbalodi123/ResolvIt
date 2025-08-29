@@ -59,7 +59,12 @@ const Login = () => {
     console.log("Logged in user:", user); 
 
   localStorage.setItem("token", JSON.stringify(user));
-      navigate("/dashboard")
+     if (selectedRole=='user'){
+       navigate("/dashboard")
+     }
+     else{
+       navigate("/admin")
+     }
 
     
     }
