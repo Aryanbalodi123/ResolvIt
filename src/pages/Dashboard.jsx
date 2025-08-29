@@ -203,18 +203,6 @@ const Dashboard = () => {
               their progress.
             </p>
           </div>
-          <div className="flex items-center space-x-3">
-            <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded-xl transition-colors backdrop-blur-sm">
-              <Filter className="w-5 h-5" />
-            </button>
-            <button
-              onClick={handleModalOpen}
-              className="bg-gradient-to-r from-pink-300 to-rose-300 text-white px-4 py-2 rounded-xl font-medium hover:from-pink-400 hover:to-rose-400 transition-all duration-200 shadow-md font-['Inter']"
-            >
-              <Plus className="w-4 h-4 inline mr-2" />
-              New Complaint
-            </button>
-          </div>
         </div>
       </div>
 
@@ -325,13 +313,13 @@ const Dashboard = () => {
         {/* Quick Actions */}
         <div className="space-y-6">
           {/* Actions Card */}
-          <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40">
+          <div className= "bg-white/40 backdrop-blur-sm h-full rounded-xl border border-white/40">
             <div className="p-6 border-b border-white/30">
               <h2 className="text-lg font-semibold text-gray-800 font-['Inter']">
                 Quick Actions
               </h2>
             </div>
-            <div className="p-6 space-y-3">
+            <div className="p-6 space-y-4">
               <button
                 onClick={handleModalOpen}
                 className="w-full p-4 bg-gradient-to-r from-pink-300 to-rose-300 text-white rounded-xl hover:from-pink-400 hover:to-rose-400 transition-all duration-200 text-left shadow-md"
