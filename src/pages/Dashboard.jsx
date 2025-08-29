@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { sendComplaint } from "../../services/ComplaintServices";
+import { retrieveComplaint } from "../../services/ComplaintServices";
 
 import {
   FileText,
@@ -23,6 +24,7 @@ import {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+      const [complaints, setComplaints] = useState([]); 
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -31,6 +33,23 @@ const Dashboard = () => {
       navigate("/login", { replace: true });
     }
   }, [navigate]);
+
+    useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await retrieveComplaint();
+        setComplaints(data || []);  
+        console.log("Fetched complaints:", data);
+      } catch (err) {
+        console.error("Error fetching complaints:", err.message);
+      }
+    };
+
+    fetchData(); 
+
+    const interval = setInterval(fetchData, 2000); 
+    return () => clearInterval(interval);
+  }, []);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -256,7 +275,7 @@ const Dashboard = () => {
 
           {/* Scrollable section with fixed height */}
           <div className="divide-y divide-white/30 h-80 overflow-y-auto">
-            {recentComplaints.map((complaint) => (
+            {complaints.map((complaint) => (
               <div
                 key={complaint.id}
                 className="p-6 hover:bg-white/20 transition-colors"
@@ -272,7 +291,7 @@ const Dashboard = () => {
                           complaint.status
                         )}`}
                       >
-                        {complaint.status.replace("-", " ")}
+                        {complaint.status}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 mb-3 font-['Inter']">

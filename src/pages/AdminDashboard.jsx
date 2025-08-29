@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
+import { retrieveComplaint } from '../../services/ComplaintServices';
 import { 
   FileText, 
   Users, 
@@ -26,7 +27,21 @@ import {
 
 const AdminDashboard = () => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('month');
+  const [complaints, setComplaints] = useState([]); 
+useEffect(() => {
+  const fetchData = async () => {
+    await retrieveComplaint();  
+  };
 
+  fetchData();
+  setComplaints(fetchData)
+  const interval = setInterval(() => {
+    setComplaints(fetchData)
+    retrieveComplaint(); 
+  }, 10000);
+
+  return () => clearInterval(interval);
+}, []);
 
 
   const getStatusColor = (status) => {
@@ -48,9 +63,67 @@ const AdminDashboard = () => {
     }
   };
 
+  const stats = [
+    {
+      title: 'Total Complaints',
+      value: '247',
+      subtitle: '+12 from last month',
+      icon: FileText,
+      color: 'from-pink-300 to-rose-300',
+      bgColor: 'bg-pink-100/60',
+      textColor: 'text-pink-700',
+      trend: '+4.8%'
+    },
+    {
+      title: 'Active Complaints',
+      value: '89',
+      subtitle: '23 unassigned, 66 in progress',
+      icon: Activity,
+      color: 'from-purple-300 to-indigo-300',
+      bgColor: 'bg-purple-100/60',
+      textColor: 'text-purple-700',
+      trend: '-2.1%'
+    },
+    {
+      title: 'Resolved This Month',
+      value: '158',
+      subtitle: '64% resolution rate',
+      icon: CheckCircle,
+      color: 'from-green-300 to-emerald-300',
+      bgColor: 'bg-green-100/60',
+      textColor: 'text-green-700',
+      trend: '+8.3%'
+    },
+    {
+      title: 'Active Users',
+      value: '1,243',
+      subtitle: '+47 new this month',
+      icon: Users,
+      color: 'from-blue-300 to-cyan-300',
+      bgColor: 'bg-blue-100/60',
+      textColor: 'text-blue-700',
+      trend: '+3.2%'
+    }
+  ];
 
+  const chartData = [
+    { name: 'Jan', resolved: 120, active: 45, total: 165 },
+    { name: 'Feb', resolved: 135, active: 52, total: 187 },
+    { name: 'Mar', resolved: 148, active: 38, total: 186 },
+    { name: 'Apr', resolved: 162, active: 61, total: 223 },
+    { name: 'May', resolved: 171, active: 49, total: 220 },
+    { name: 'Jun', resolved: 158, active: 67, total: 225 },
+    { name: 'Jul', resolved: 143, active: 71, total: 214 },
+    { name: 'Aug', resolved: 158, active: 89, total: 247 }
+  ];
 
-
+  const departmentStats = [
+    { name: 'Infrastructure', complaints: 89, percentage: 36, color: 'bg-pink-400' },
+    { name: 'Water & Sanitation', complaints: 67, percentage: 27, color: 'bg-blue-400' },
+    { name: 'Environment', complaints: 45, percentage: 18, color: 'bg-green-400' },
+    { name: 'Public Safety', complaints: 32, percentage: 13, color: 'bg-purple-400' },
+    { name: 'Others', complaints: 14, percentage: 6, color: 'bg-gray-400' }
+  ];
 
   const SimpleBarChart = ({ data }) => {
     const maxValue = Math.max(...data.map(d => d.total));
@@ -149,14 +222,14 @@ const AdminDashboard = () => {
             </div>
           </div>
           <div className="divide-y divide-white/30">
-            {latestComplaints.map((complaint) => (
+            {complaints.map((complaint) => (
               <div key={complaint.id} className="p-6 hover:bg-white/20 transition-colors">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-3 mb-2">
                       <h3 className="text-sm font-medium text-gray-800 font-['Inter']">{complaint.title}</h3>
                       <span className={`px-2 py-1 rounded-lg text-xs font-medium border ${getStatusColor(complaint.status)}`}>
-                        {complaint.status.replace('-', ' ')}
+                        {complaint.status}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 mb-3 font-['Inter']">{complaint.description}</p>
@@ -167,7 +240,7 @@ const AdminDashboard = () => {
                       </span>
                       <span className="flex items-center font-['Inter']">
                         <Clock className="w-3 h-3 mr-1" />
-                        {complaint.timeAgo}
+                        {complaint.date}
                       </span>
                       <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getPriorityColor(complaint.priority)}`}>
                         {complaint.priority} priority

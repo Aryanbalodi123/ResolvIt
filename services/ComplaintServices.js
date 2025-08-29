@@ -9,3 +9,12 @@ export async function sendComplaint(complaintPayload) {
     if (error) throw error;
     return data;
 }
+
+export async function retrieveComplaint() {
+    const {data,error} = await supabase
+    .from('complaints')
+    .select("*")
+
+    if(error) throw error
+    return data;
+}

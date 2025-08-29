@@ -36,3 +36,21 @@ export async function loginUser(rollNumber,password) {
   return user;
 
 }
+
+export async function loginAdmin(rollNumber,password) {
+    const{data,error} = await supabase
+    .from('admin')
+    .select("rollNumber, email, password, name")
+    .eq("rollNumber",rollNumber)
+    .single();
+
+    if (error) throw error;
+    if (!data) throw new Error("No data found");
+
+    const valid = await bcrypt.compare(password , data.password);
+      if (!valid) throw new Error("Invalid credentials");
+
+  const { password: _, ...user } = data;
+  return user;
+
+}
