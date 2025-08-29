@@ -304,7 +304,7 @@ const Dashboard = () => {
                       </span>
                       <span className="flex items-center font-['Inter']">
                         <Clock className="w-3 h-3 mr-1" />
-                        {complaint.timeAgo}
+                        {complaint.created_at}
                       </span>
                       <span
                         className={`px-2 py-1 rounded-lg text-xs font-medium ${getPriorityColor(
@@ -315,14 +315,14 @@ const Dashboard = () => {
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-1 ml-4">
+                  {/* <div className="flex items-center space-x-1 ml-4">
                     <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded transition-colors">
                       <Eye className="w-4 h-4" />
                     </button>
                     <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded transition-colors">
                       <MoreVertical className="w-4 h-4" />
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             ))}
