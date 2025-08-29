@@ -24,7 +24,7 @@ import {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-      const [complaints, setComplaints] = useState([]); 
+  const [complaints, setComplaints] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -34,20 +34,20 @@ const Dashboard = () => {
     }
   }, [navigate]);
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await retrieveComplaint();
-        setComplaints(data || []);  
+        setComplaints(data || []);
         console.log("Fetched complaints:", data);
       } catch (err) {
         console.error("Error fetching complaints:", err.message);
       }
     };
 
-    fetchData(); 
+    fetchData();
 
-    const interval = setInterval(fetchData, 2000); 
+    const interval = setInterval(fetchData, 2000);
     return () => clearInterval(interval);
   }, []);
 
@@ -183,10 +183,9 @@ const Dashboard = () => {
       title: formData.title,
       description: formData.description,
       location: formData.location,
-      priority: formData.priority,
+      priority: null,
       category: formData.category,
-      status: "pending",
-      isResolved: false,
+      status: "pending"
     };
 
     try {
@@ -218,8 +217,8 @@ const Dashboard = () => {
               Good Morning, {/*user.name*/}
             </h1>
             <p className="text-gray-600 mt-1 font-['Inter']">
-              Welcome back, Manage your complaints and stay updated on
-              their progress.
+              Welcome back, Manage your complaints and stay updated on their
+              progress.
             </p>
           </div>
         </div>
@@ -278,26 +277,23 @@ const Dashboard = () => {
             {complaints.map((complaint) => (
               <div
                 key={complaint.id}
-                className="p-6 hover:bg-white/20 transition-colors"
+                className="p-4 hover:bg-white/20 transition-colors"
               >
                 <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="text-sm font-medium text-gray-800 font-['Inter']">
-                        {complaint.title}
-                      </h3>
-                      <span
-                        className={`px-2 py-1 rounded-lg text-xs font-medium border ${getStatusColor(
-                          complaint.status
-                        )}`}
-                      >
-                        {complaint.status}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-3 font-['Inter']">
+                  {/* Left side: title, desc, meta */}
+                  <div className="flex-1 min-w-0 space-y-2">
+                    {/* Title */}
+                    <h3 className="text-sm font-medium text-gray-800 font-['Inter']">
+                      {complaint.title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-sm text-gray-600 font-['Inter']">
                       {complaint.description}
                     </p>
-                    <div className="flex items-center space-x-4 text-xs text-gray-500">
+
+                    {/* Meta info */}
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
                       <span className="flex items-center font-['Inter']">
                         <MapPin className="w-3 h-3 mr-1" />
                         {complaint.location}
@@ -307,7 +303,7 @@ const Dashboard = () => {
                         {complaint.created_at}
                       </span>
                       <span
-                        className={`px-2 py-1 rounded-lg text-xs font-medium ${getPriorityColor(
+                        className={`px-2 py-0.5 rounded-lg text-xs font-medium ${getPriorityColor(
                           complaint.priority
                         )}`}
                       >
@@ -315,6 +311,15 @@ const Dashboard = () => {
                       </span>
                     </div>
                   </div>
+
+                  {/* Right side: status badge */}
+                  <span
+                    className={`px-2 py-0.5 ml-4 rounded-lg text-xs font-medium border ${getStatusColor(
+                      complaint.status
+                    )}`}
+                  >
+                    {complaint.status}
+                  </span>
                   {/* <div className="flex items-center space-x-1 ml-4">
                     <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded transition-colors">
                       <Eye className="w-4 h-4" />
@@ -332,7 +337,7 @@ const Dashboard = () => {
         {/* Quick Actions */}
         <div className="space-y-6">
           {/* Actions Card */}
-          <div className= "bg-white/40 backdrop-blur-sm h-full rounded-xl border border-white/40">
+          <div className="bg-white/40 backdrop-blur-sm h-full rounded-xl border border-white/40">
             <div className="p-6 border-b border-white/30">
               <h2 className="text-lg font-semibold text-gray-800 font-['Inter']">
                 Quick Actions
@@ -443,23 +448,7 @@ const Dashboard = () => {
                 </select>
               </div>
 
-              {/* Priority */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
-                  Priority
-                </label>
-                <select
-                  name="priority"
-                  value={formData.priority}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
-                >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
-              </div>
-
+             
               {/* Location */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
