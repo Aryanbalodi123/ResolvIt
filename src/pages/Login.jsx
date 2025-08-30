@@ -86,9 +86,10 @@ const Login = () => {
   };
 
   const handleSignUpClick = (e) => {
-    e.preventDefault();
-    console.log("Navigate to registration page");
-  };
+  e.preventDefault();
+  navigate("/register"); 
+};
+
 
   return (
     <div className="flex h-screen overflow-hidden bg-white font-['Poppins',sans-serif]">
