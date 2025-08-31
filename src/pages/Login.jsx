@@ -176,7 +176,7 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Email Input */}
+            {/* Roll Number Input */}
             <div className="relative mb-5 group">
               <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">
                 Roll Number
@@ -187,8 +187,8 @@ const Login = () => {
                 onChange={(e) => setRollNumber(e.target.value)}
                 placeholder=""
                 required
-                className="w-full border-0 border-b-2 border-gray-200 py-3 text-sm bg-transparent text-gray-800 transition-all duration-300 focus:outline-none focus:border-emerald-500 focus:transform focus:-translate-y-1 placeholder-gray-400"
-              />
+                className="w-full border-0 border-b-2 border-gray-200 py-3 text-sm bg-transparent text-gray-800 transition-all duration-300 placeholder-gray-400  "
+                />
             </div>
 
             {/* Password Input */}
@@ -202,7 +202,7 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
                 required
-                className="w-full border-0 border-b-2 border-gray-200 py-3 text-sm bg-transparent text-gray-800 transition-all duration-300 focus:outline-none focus:border-emerald-500 focus:transform focus:-translate-y-1 placeholder-gray-400 pr-10"
+                className="w-full border-0 border-b-2 border-gray-200 py-3 text-sm bg-transparent text-gray-800 transition-all duration-300 placeholder-gray-400 pr-10"
                 />
                 <button
           type="button"
@@ -339,6 +339,13 @@ const Login = () => {
           50% {
             transform: translateY(-20px);
           }
+        }
+
+        input:focus,
+        input:invalid,
+        input:required {
+          outline: none !important;   
+          box-shadow: none !important; 
         }
 
         /* Tablet Styles */
