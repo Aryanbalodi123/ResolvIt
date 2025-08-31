@@ -11,6 +11,7 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(true);
   const [alert, setAlert] = useState({ message: "", type: "", show: false });
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword , setShowPassword] = useState(false);
 
   const showAlert = (message, type = "error") => {
     setAlert({ message, type, show: true });
@@ -196,14 +197,23 @@ const Login = () => {
                 Password
               </label>
               <input
-                type="password"
+              type={showPassword ? "text" : "password"}  
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
                 required
-                className="w-full border-0 border-b-2 border-gray-200 py-3 text-sm bg-transparent text-gray-800 transition-all duration-300 focus:outline-none focus:border-emerald-500 focus:transform focus:-translate-y-1 placeholder-gray-400"
-              />
-            </div>
+                className="w-full border-0 border-b-2 border-gray-200 py-3 text-sm bg-transparent text-gray-800 transition-all duration-300 focus:outline-none focus:border-emerald-500 focus:transform focus:-translate-y-1 placeholder-gray-400 pr-10"
+                />
+                <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)} 
+          className="absolute right-2 top-9 text-gray-400 hover:text-emerald-500 transition-colors"
+        >
+          <i
+            className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
+          ></i>{" "}
+        </button>
+        </div>
 
             {/* Options */}
             <div className="flex justify-between items-center mb-6 text-sm">
