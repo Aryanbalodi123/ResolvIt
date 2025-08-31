@@ -397,6 +397,14 @@ const Register = () => {
           }
         }
 
+        
+        input:focus,
+        input:invalid,
+        input:required {
+          outline: none !important;   
+          box-shadow: none !important; 
+        }
+          
         @keyframes bounce {
           0%, 100% {
             transform: translateY(0);
