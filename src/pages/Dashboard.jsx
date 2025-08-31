@@ -355,13 +355,15 @@ const Dashboard = () => {
                         <Clock className="w-3 h-3 mr-1" />
                         {complaint.created_at}
                       </span>
-                      <span
-                        className={`px-2 py-0.5 rounded-lg text-xs font-medium ${getPriorityColor(
-                          complaint.priority
-                        )}`}
-                      >
-                        {complaint.priority} priority
-                      </span>
+                      {complaint.status !== "pending" && (
+    <span
+      className={`px-2 py-0.5 rounded-lg text-xs font-medium ${getPriorityColor(
+        complaint.priority
+      )}`}
+    >
+      {complaint.priority} priority
+    </span>
+  )}
                     </div>
                   </div>
 
