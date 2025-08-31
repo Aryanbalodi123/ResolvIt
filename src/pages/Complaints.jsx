@@ -12,12 +12,26 @@ import {
   MoreVertical,
   FileText,
   MessageSquare,
-  ExternalLink
+  ExternalLink,
+  X
 } from 'lucide-react';
+import { sendComplaint } from "../../services/ComplaintServices";
 
 const Complaints = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Modal states
+  const [isComplaintModalOpen, setIsComplaintModalOpen] = useState(false);
+
+  // Form data states
+  const [complaintFormData, setComplaintFormData] = useState({
+    title: "",
+    description: "",
+    location: "",
+    priority: "medium",
+    category: "infrastructure",
+  });
 
   const userComplaints = [
     {
@@ -102,6 +116,56 @@ const Complaints = () => {
     };
   };
 
+  // Modal handlers for Complaint
+  const handleComplaintModalOpen = () => {
+    setIsComplaintModalOpen(true);
+  };
+
+  const handleComplaintModalClose = () => {
+    setIsComplaintModalOpen(false);
+    setComplaintFormData({
+      title: "",
+      description: "",
+      location: "",
+      priority: "medium",
+      category: "infrastructure",
+    });
+  };
+
+  const handleComplaintInputChange = (e) => {
+    const { name, value } = e.target;
+    setComplaintFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleComplaintSubmit = async (e) => {
+    e.preventDefault();
+
+    const user = JSON.parse(localStorage.getItem("token") || "{}");
+
+    const payload = {
+      user_id: user.rollNumber ?? null,
+      title: complaintFormData.title,
+      description: complaintFormData.description,
+      location: complaintFormData.location,
+      priority: null,
+      category: complaintFormData.category,
+      status: "pending"
+    };
+
+    try {
+      const data = await sendComplaint(payload);
+      console.log("Complaint saved:", data);
+      alert("Complaint submitted successfully!");
+      handleComplaintModalClose();
+    } catch (error) {
+      console.error("Failed to send complaint:", error.message);
+      alert("Error submitting complaint: " + error.message);
+    }
+  };
+
   const filteredComplaints = userComplaints.filter(complaint => {
     const matchesFilter = selectedFilter === 'all' || complaint.status === selectedFilter;
     const matchesSearch = complaint.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -126,7 +190,10 @@ const Complaints = () => {
           <h1 className="text-2xl font-semibold text-gray-800 font-['Inter']">My Complaints</h1>
           <p className="text-gray-600 mt-1 font-['Inter']">Track and manage all your submitted complaints</p>
         </div>
-        <button className="bg-gradient-to-r from-pink-300 to-rose-300 text-white px-4 py-2 rounded-xl font-medium hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-['Inter'] flex items-center shadow-md">
+        <button 
+          onClick={handleComplaintModalOpen}
+          className="bg-gradient-to-r from-pink-300 to-rose-300 text-white px-4 py-2 rounded-xl font-medium hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-['Inter'] flex items-center shadow-md"
+        >
           <Plus className="w-4 h-4 mr-2" />
           New Complaint
         </button>
@@ -251,7 +318,10 @@ const Complaints = () => {
               }
             </p>
             {(!searchQuery && selectedFilter === 'all') && (
-              <button className="bg-gradient-to-r from-pink-300 to-rose-300 text-white px-6 py-3 rounded-xl font-medium hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-['Inter'] shadow-md">
+              <button 
+                onClick={handleComplaintModalOpen}
+                className="bg-gradient-to-r from-pink-300 to-rose-300 text-white px-6 py-3 rounded-xl font-medium hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-['Inter'] shadow-md"
+              >
                 <Plus className="w-4 h-4 inline mr-2" />
                 Submit Your First Complaint
               </button>
@@ -276,6 +346,107 @@ const Complaints = () => {
             <button className="px-3 py-2 text-sm bg-white/30 border border-white/40 rounded-xl hover:bg-white/40 font-['Inter'] backdrop-blur-sm">
               Next
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Complaint Modal */}
+      {isComplaintModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-white/40 w-full max-w-md shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
+              <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">
+                New Complaint
+              </h2>
+              <button
+                onClick={handleComplaintModalClose}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/60 rounded-xl transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleComplaintSubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Title <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={complaintFormData.title}
+                  onChange={handleComplaintInputChange}
+                  placeholder="Brief description of the issue"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Category
+                </label>
+                <select
+                  name="category"
+                  value={complaintFormData.category}
+                  onChange={handleComplaintInputChange}
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                >
+                  <option value="infrastructure">Infrastructure</option>
+                  <option value="utilities">Utilities</option>
+                  <option value="safety">Safety</option>
+                  <option value="environment">Environment</option>
+                  <option value="transportation">Transportation</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Location <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="location"
+                  value={complaintFormData.location}
+                  onChange={handleComplaintInputChange}
+                  placeholder="Street address or area"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="description"
+                  value={complaintFormData.description}
+                  onChange={handleComplaintInputChange}
+                  placeholder="Detailed description of the issue"
+                  required
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm resize-none font-['Inter']"
+                />
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={handleComplaintModalClose}
+                  className="flex-1 px-4 py-2 text-gray-700 bg-gray-100/60 border border-gray-300/60 rounded-xl hover:bg-gray-200/60 transition-colors font-medium font-['Inter']"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-pink-300 to-rose-300 text-white rounded-xl hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-medium shadow-md font-['Inter']"
+                >
+                  Submit Complaint
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
