@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { registerUser,registerAdmin } from '../../services/AuthServices';
 import bcrypt from "bcryptjs";
+import { useNavigate } from "react-router-dom"; 
 
 const Register = () => {
+    const navigate = useNavigate(); 
   const [selectedRole, setSelectedRole] = useState(null);
   const [formData, setFormData] = useState({
     name: '', 
@@ -348,7 +350,7 @@ const Register = () => {
               href="#"
               onClick={(e) => {
                 e.preventDefault();
-                console.log('Navigate to sign in page');
+                navigate("/login");
               }}
               className="text-emerald-500 font-semibold hover:underline"
             >
