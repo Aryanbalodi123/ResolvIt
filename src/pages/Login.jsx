@@ -93,35 +93,35 @@ const Login = () => {
 
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white font-['Poppins',sans-serif]">
+     <div className="flex min-h-screen bg-white font-['Poppins',sans-serif] overflow-x-hidden">
       {/* Left Section */}
-      <div className="flex-1 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white rounded-br-[60px] rounded-tr-[60px] flex flex-col justify-center items-center relative overflow-hidden animate-[slideInLeft_1s_ease-out]">
-        {/* Floating elements */}
+      <div className="hidden md:flex flex-1 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white rounded-br-[60px] rounded-tr-[60px] flex-col justify-center items-center relative overflow-hidden animate-[slideInLeft_1s_ease-out]">
         <div className="absolute w-[150px] h-[150px] bg-white/10 rounded-full top-[10%] -left-[40px] animate-[float_6s_ease-in-out_infinite]"></div>
         <div className="absolute w-[120px] h-[120px] bg-white/5 rounded-full bottom-[20%] -right-[25px] animate-[floatReverse_4s_ease-in-out_infinite]"></div>
-
-        <img
+     <img
           src="https://niceillustrations.com/wp-content/uploads/2021/12/Call-Center-color-800px.png"
           alt="Call Center Illustration"
-          className="max-w-[55%] h-auto animate-[bounce_3s_ease-in-out_infinite] z-10 relative drop-shadow-[0_8px_25px_rgba(0,0,0,0.2)]"
+          className="max-w-[45%] max-h-[60vh] h-auto animate-[bounce_3s_ease-in-out_infinite] z-10 relative drop-shadow-[0_8px_25px_rgba(0,0,0,0.2)]"
+          style={{ animationName: 'none' }} 
         />
 
-        <div className="text-center z-10 mt-6">
-          <h1 className="text-3xl font-bold mb-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.1)]">
-            Welcome Back!
-          </h1>
-          <p className="text-base opacity-90 leading-relaxed">
-            Access your support dashboard and
-            <br />
-            help resolve customer issues efficiently
-          </p>
-        </div>
-      </div>
+  <div className="text-center z-10 mt-6">
+    <h1 className="text-3xl font-bold mb-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.1)]">
+      Welcome Back!
+    </h1>
+    <p className="text-base opacity-90 leading-relaxed">
+      Access your support dashboard and
+      <br />
+      help resolve customer issues efficiently
+    </p>
+  </div>
+</div>
+
 
       {/* Right Section */}
-      <div className="flex-1 flex justify-center items-center bg-white rounded-tl-[60px] rounded-bl-[60px] -ml-16 pl-24 animate-[slideInRight_1s_ease-out] relative z-10">
-        <div className="w-[320px] animate-[fadeInUp_1s_ease-out_0.3s_both]">
-          {/* Logo */}
+       <div className="flex-1 flex justify-center items-center bg-white rounded-tl-[60px] rounded-bl-[60px] md:-ml-16 md:pl-24 px-4 py-8 animate-[slideInRight_1s_ease-out] relative z-10">
+        <div className="w-full max-w-xs animate-[fadeInUp_1s_ease-out_0.3s_both] mx-auto">
+      {/* Logo */}
           <div className="text-center text-4xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 bg-clip-text text-transparent mb-8 relative">
             ResolvIt
             <div className="absolute bottom-[-8px] left-1/2 transform -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-sm"></div>
@@ -146,53 +146,55 @@ const Login = () => {
 
           <div>
             {/* Role Selection */}
-            <div className="mb-5">
-              <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2.5 font-semibold">
-                Select Role
-              </label>
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => handleRoleSelect("user")}
-                  className={`flex-1 p-3 border-2 rounded-xl font-medium cursor-pointer transition-all duration-300 text-sm relative overflow-hidden ${
-                    selectedRole === "user"
-                      ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-transparent transform -translate-y-1 shadow-[0_6px_18px_rgba(16,185,129,0.3)]"
-                      : "border-gray-200 bg-white text-gray-600 hover:border-emerald-500 hover:text-emerald-500 hover:transform hover:-translate-y-1 hover:shadow-[0_4px_12px_rgba(16,185,129,0.2)]"
-                  }`}
-                >
-                  <i className="fas fa-user mr-2"></i> User
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleRoleSelect("admin")}
-                  className={`flex-1 p-3 border-2 rounded-xl font-medium cursor-pointer transition-all duration-300 text-sm relative overflow-hidden ${
-                    selectedRole === "admin"
-                      ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-transparent transform -translate-y-1 shadow-[0_6px_18px_rgba(16,185,129,0.3)]"
-                      : "border-gray-200 bg-white text-gray-600 hover:border-emerald-500 hover:text-emerald-500 hover:transform hover:-translate-y-1 hover:shadow-[0_4px_12px_rgba(16,185,129,0.2)]"
-                  }`}
-                >
-                  <i className="fas fa-user-shield mr-2"></i> Admin
-                </button>
-              </div>
-            </div>
+<div className="mb-3"> 
+  <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2.5 font-semibold">
+    Select Role
+  </label>
+  <div className="flex flex-col sm:flex-row gap-2"> 
+    <button
+      type="button"
+      onClick={() => handleRoleSelect("user")}
+      className={`w-full sm:w-auto px-4 py-2 border-2 rounded-xl font-medium cursor-pointer transition-all duration-300 text-sm ${
+        selectedRole === "user"
+          ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-transparent shadow-md"
+          : "border-gray-200 bg-white text-gray-600 hover:border-emerald-500 hover:text-emerald-500"
+      }`}
+    >
+      <i className="fas fa-user mr-2"></i> User
+    </button>
 
-            {/* Roll Number Input */}
-            <div className="relative mb-5 group">
-              <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">
-                Roll Number
-              </label>
-              <input
-                type="text"
-                value={rollNumber}
-                onChange={(e) => setRollNumber(e.target.value)}
-                placeholder=""
-                required
-                className="w-full border-0 border-b-2 border-gray-200 py-3 text-sm bg-transparent text-gray-800 transition-all duration-300 placeholder-gray-400  "
-                />
-            </div>
+    <button
+      type="button"
+      onClick={() => handleRoleSelect("admin")}
+      className={`w-full sm:w-auto px-4 py-2 border-2 rounded-xl font-medium cursor-pointer transition-all duration-300 text-sm ${
+        selectedRole === "admin"
+          ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-transparent shadow-md"
+          : "border-gray-200 bg-white text-gray-600 hover:border-emerald-500 hover:text-emerald-500"
+      }`}
+    >
+      <i className="fas fa-user-shield mr-2"></i> Admin
+    </button>
+  </div>
+</div>
+
+{/* Roll Number Input */}
+<div className="relative mb-4 group"> 
+  <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">
+    Roll Number
+  </label>
+  <input
+    type="text"
+    value={rollNumber}
+    onChange={(e) => setRollNumber(e.target.value)}
+    placeholder=""
+    required
+    className="w-full border-0 border-b-2 border-gray-200 py-3 text-sm bg-transparent text-gray-800 transition-all duration-300 placeholder-gray-400"
+  />
+</div>
+
 
             {/* Password Input */}
-            <div className="relative mb-5 group">
+            <div className="relative mb-4 group">
               <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">
                 Password
               </label>
@@ -216,7 +218,7 @@ const Login = () => {
         </div>
 
             {/* Options */}
-            <div className="flex justify-between items-center mb-6 text-sm">
+            <div className="flex justify-between items-center mb-4 text-sm">
               <label className="flex items-center text-gray-500 cursor-pointer transition-colors duration-300 hover:text-emerald-500">
                 <input
                   type="checkbox"
