@@ -176,7 +176,7 @@ const Dashboard = () => {
       location: complaintFormData.location,
       priority: null,
       category: complaintFormData.category,
-      status: "pending"
+      status: "pending",
     };
 
     try {
@@ -218,10 +218,16 @@ const Dashboard = () => {
 
   const handleLostFoundSubmit = async (e) => {
     e.preventDefault();
-    
+
     console.log("Submitting lost/found item:", lostFoundFormData);
     alert(
-      `${lostFoundFormData.type === 'lost' ? 'Lost' : 'Found'} item reported successfully!\n\nItem: ${lostFoundFormData.itemName}\nLocation: ${lostFoundFormData.location}\nDate: ${lostFoundFormData.dateOccurred}`
+      `${
+        lostFoundFormData.type === "lost" ? "Lost" : "Found"
+      } item reported successfully!\n\nItem: ${
+        lostFoundFormData.itemName
+      }\nLocation: ${lostFoundFormData.location}\nDate: ${
+        lostFoundFormData.dateOccurred
+      }`
     );
     handleLostFoundModalClose();
   };
@@ -252,7 +258,7 @@ const Dashboard = () => {
 
   const handleFeedbackSubmit = async (e) => {
     e.preventDefault();
-    
+
     console.log("Submitting feedback:", feedbackFormData);
     alert(
       `Feedback submitted successfully!\n\nSubject: ${feedbackFormData.subject}\nRating: ${feedbackFormData.rating}/5 stars\nCategory: ${feedbackFormData.category}`
@@ -356,14 +362,14 @@ const Dashboard = () => {
                         {complaint.created_at}
                       </span>
                       {complaint.status !== "pending" && (
-    <span
-      className={`px-2 py-0.5 rounded-lg text-xs font-medium ${getPriorityColor(
-        complaint.priority
-      )}`}
-    >
-      {complaint.priority} priority
-    </span>
-  )}
+                        <span
+                          className={`px-2 py-0.5 rounded-lg text-xs font-medium ${getPriorityColor(
+                            complaint.priority
+                          )}`}
+                        >
+                          {complaint.priority} priority
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -773,7 +779,10 @@ const Dashboard = () => {
                       key={star}
                       type="button"
                       onClick={() =>
-                        setFeedbackFormData((prev) => ({ ...prev, rating: star }))
+                        setFeedbackFormData((prev) => ({
+                          ...prev,
+                          rating: star,
+                        }))
                       }
                       className={`p-1 transition-colors ${
                         star <= feedbackFormData.rating
