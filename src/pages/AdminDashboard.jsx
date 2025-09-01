@@ -28,20 +28,22 @@ import {
 const AdminDashboard = () => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('month');
   const [complaints, setComplaints] = useState([]); 
-useEffect(() => {
-  const fetchData = async () => {
-    await retrieveComplaint();  
-  };
+    useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await retrieveComplaint();
+        setComplaints(data || []);  
+        console.log("Fetched complaints:", data);
+      } catch (err) {
+        console.error("Error fetching complaints:", err.message);
+      }
+    };
 
-  fetchData();
-  setComplaints(fetchData)
-  const interval = setInterval(() => {
-    setComplaints(fetchData)
-    retrieveComplaint(); 
-  }, 10000);
+    fetchData(); 
 
-  return () => clearInterval(interval);
-}, []);
+    const interval = setInterval(fetchData, 2000); 
+    return () => clearInterval(interval);
+  }, []);
 
 
   const getStatusColor = (status) => {
@@ -164,19 +166,11 @@ useEffect(() => {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-800 font-['Inter']">Admin Dashboard</h1>
-            <p className="text-gray-600 mt-1 font-['Inter']">Overview of all complaints, users, and system status across the platform.</p>
+            <h1 className="text-2xl font-semibold text-gray-800 font-['Inter']">Good Morning,</h1>
+            <p className="text-gray-600 mt-1 font-['Inter']">Hope you are doing well!</p>
           </div>
           <div className="flex items-center space-x-3">
-            <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded-xl transition-colors backdrop-blur-sm">
-              <Bell className="w-5 h-5" />
-            </button>
-            <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded-xl transition-colors backdrop-blur-sm">
-              <Filter className="w-5 h-5" />
-            </button>
-            <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded-xl transition-colors backdrop-blur-sm">
-              <Settings className="w-5 h-5" />
-            </button>
+          
             <button className="bg-gradient-to-r from-pink-300 to-rose-300 text-white px-4 py-2 rounded-xl font-medium hover:from-pink-400 hover:to-rose-400 transition-all duration-200 shadow-md font-['Inter']">
               <Download className="w-4 h-4 inline mr-2" />
               Export Report
@@ -222,7 +216,9 @@ useEffect(() => {
             </div>
           </div>
           <div className="divide-y divide-white/30">
-            {complaints.map((complaint) => (
+            {complaints
+             .filter((complaint) => complaint.status !== "success")   
+            .map((complaint) => (
               <div key={complaint.id} className="p-6 hover:bg-white/20 transition-colors">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
@@ -359,55 +355,7 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-        {/* Monthly Trend Chart */}
-        <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40">
-          <div className="p-6 border-b border-white/30">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-800 font-['Inter']">Monthly Trends</h2>
-              <div className="flex items-center space-x-4 text-xs font-['Inter']">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-gradient-to-r from-green-300 to-emerald-300 rounded mr-2"></div>
-                  <span>Resolved</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-gradient-to-r from-pink-300 to-rose-300 rounded mr-2"></div>
-                  <span>Active</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="p-6">
-            <SimpleBarChart data={chartData} />
-          </div>
-        </div>
 
-        {/* Department Breakdown */}
-        <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40">
-          <div className="p-6 border-b border-white/30">
-            <h2 className="text-lg font-semibold text-gray-800 font-['Inter']">Department Breakdown</h2>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {departmentStats.map((dept, index) => (
-                <div key={dept.name} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-800 font-['Inter']">{dept.name}</span>
-                    <span className="text-sm text-gray-600 font-['Inter']">{dept.complaints} ({dept.percentage}%)</span>
-                  </div>
-                  <div className="w-full bg-white/30 rounded-full h-2">
-                    <div 
-                      className={`h-2 rounded-full transition-all duration-500 ${dept.color}`}
-                      style={{ width: `${dept.percentage}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

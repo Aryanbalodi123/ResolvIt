@@ -9,6 +9,7 @@ import Settings from "./pages/Settings";
 import AdminDashboard from "./pages/AdminDashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import AllComplaint from "./pages/AllComplaint"
 
 import "./App.css";
 
@@ -26,6 +27,8 @@ const App = () => {
         <Route path="/lost-found" element={<MainLayout><LostFound /></MainLayout>} />
         <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
         <Route path="/admin" element={<MainLayout><AdminDashboard /></MainLayout>} />
+        <Route path="/all-complaints" element={<MainLayout><AllComplaint /></MainLayout>} />
+
 
         {/* Default */}
         <Route path="*" element={<Login />} />
