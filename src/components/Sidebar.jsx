@@ -9,12 +9,19 @@ import {
 } from "lucide-react";
 
 const Sidebar = () => {
-  const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
-    { id: "complaints", label: "My Complaints", icon: FileText, badge: 2, path: "/complaints" },
-    { id: "lost-found", label: "Lost & Found", icon: Search, path: "/lost-found" },
-  ];
+const role = localStorage.getItem("role");
 
+const menuItems = role === "user"
+  ? [
+      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+      { id: "complaints", label: "My Complaints", icon: FileText, badge: 2, path: "/complaints" },
+      { id: "lost-found", label: "Lost & Found", icon: Search, path: "/lost-found" },
+    ]
+  : [
+      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+      { id: "all-complaint", label: "All Complaints", icon: FileText, badge: 2, path: "/all-complaints" },
+      { id: "lost-found", label: "Lost & Found", icon: Search, path: "/lost-found" },
+    ];
   return (
     <div className="w-72 bg-gradient-to-b from-pink-100/60 to-orange-100/60 backdrop-blur-sm border-r border-white/30 min-h-full sticky top-0">
       {/* Header */}

@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
+
 import { 
   User, 
   Edit3, 
@@ -16,6 +18,15 @@ import {
 } from 'lucide-react';
 
 const Settings = () => {
+    const navigate = useNavigate();
+      useEffect(() => {
+        const token = localStorage.getItem("token");
+    
+        if (!token) {
+          navigate("/login", { replace: true });
+        }
+      }, [navigate]);
+
   const [isEditing, setIsEditing] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -43,7 +54,8 @@ const Settings = () => {
   };
 
   const handleLogout = () => {
-    // Handle logout logic here
+    localStorage.clear();
+    navigate("/login");
     console.log('Logging out...');
     setShowLogoutModal(false);
   };
