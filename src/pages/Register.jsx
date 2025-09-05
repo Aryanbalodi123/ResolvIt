@@ -155,7 +155,7 @@ const Register = () => {
   return (
     <div className="flex h-screen overflow-hidden bg-white font-['Poppins',sans-serif]">
       {/* Left Section */}
-      <div className="flex-1 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white rounded-br-[50px] rounded-tr-[50px] flex flex-col justify-center items-center relative overflow-hidden animate-[slideInLeft_1s_ease-out]">
+      <div className="flex-1 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white rounded-br-[50px] rounded-tr-[50px] flex flex-col justify-center items-center relative overflow-hidden">
         <img 
           src="https://niceillustrations.com/wp-content/uploads/2021/12/Call-Center-color-800px.png" 
           alt="Illustration" 
@@ -168,7 +168,7 @@ const Register = () => {
 
       {/* Right Section */}
       <div className="flex-1 flex justify-center items-center bg-white rounded-tl-[50px] rounded-bl-[50px] -ml-12 px-3 py-3 pl-20 animate-[slideInRight_1s_ease-out] overflow-y-auto">
-        <div className="w-full max-w-[300px] animate-[fadeInUp_1s_ease-out_0.3s_both]">
+        <div className="w-full max-w-[300px]">
           {/* Logo */}
           <div className="text-center text-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 bg-clip-text text-transparent mb-3 relative">
             ResolvIt
