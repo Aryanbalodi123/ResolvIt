@@ -108,57 +108,7 @@ const AdminDashboard = () => {
     }
   ];
 
-  const chartData = [
-    { name: 'Jan', resolved: 120, active: 45, total: 165 },
-    { name: 'Feb', resolved: 135, active: 52, total: 187 },
-    { name: 'Mar', resolved: 148, active: 38, total: 186 },
-    { name: 'Apr', resolved: 162, active: 61, total: 223 },
-    { name: 'May', resolved: 171, active: 49, total: 220 },
-    { name: 'Jun', resolved: 158, active: 67, total: 225 },
-    { name: 'Jul', resolved: 143, active: 71, total: 214 },
-    { name: 'Aug', resolved: 158, active: 89, total: 247 }
-  ];
 
-  const departmentStats = [
-    { name: 'Infrastructure', complaints: 89, percentage: 36, color: 'bg-pink-400' },
-    { name: 'Water & Sanitation', complaints: 67, percentage: 27, color: 'bg-blue-400' },
-    { name: 'Environment', complaints: 45, percentage: 18, color: 'bg-green-400' },
-    { name: 'Public Safety', complaints: 32, percentage: 13, color: 'bg-purple-400' },
-    { name: 'Others', complaints: 14, percentage: 6, color: 'bg-gray-400' }
-  ];
-
-  const SimpleBarChart = ({ data }) => {
-    const maxValue = Math.max(...data.map(d => d.total));
-    
-    return (
-      <div className="space-y-3">
-        {data.slice(-6).map((item, index) => (
-          <div key={item.name} className="space-y-1">
-            <div className="flex justify-between text-xs text-gray-600 font-['Inter']">
-              <span>{item.name}</span>
-              <span>{item.total}</span>
-            </div>
-            <div className="h-6 bg-white/30 rounded-lg overflow-hidden">
-              <div className="h-full flex">
-                <div 
-                  className="bg-gradient-to-r from-green-300 to-emerald-300 transition-all duration-500"
-                  style={{ width: `${(item.resolved / maxValue) * 100}%` }}
-                ></div>
-                <div 
-                  className="bg-gradient-to-r from-pink-300 to-rose-300 transition-all duration-500"
-                  style={{ width: `${(item.active / maxValue) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-            <div className="flex justify-between text-xs text-gray-500 font-['Inter']">
-              <span>Resolved: {item.resolved}</span>
-              <span>Active: {item.active}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -189,14 +139,11 @@ const AdminDashboard = () => {
                 <div className={`p-3 rounded-xl ${stat.bgColor} backdrop-blur-sm`}>
                   <Icon className={`w-5 h-5 ${stat.textColor}`} />
                 </div>
-                <span className={`text-xs font-medium px-2 py-1 rounded-lg ${stat.trend.startsWith('+') ? 'text-green-600 bg-green-100/60' : 'text-red-600 bg-red-100/60'} font-['Inter']`}>
-                  {stat.trend}
-                </span>
+           
               </div>
               <div>
                 <span className="text-2xl font-semibold text-gray-800 font-['Inter']">{stat.value}</span>
                 <h3 className="font-medium text-gray-800 mt-1 font-['Inter']">{stat.title}</h3>
-                <p className="text-sm text-gray-600 mt-1 font-['Inter']">{stat.subtitle}</p>
               </div>
             </div>
           );
@@ -210,9 +157,7 @@ const AdminDashboard = () => {
           <div className="p-6 border-b border-white/30">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-800 font-['Inter']">Latest Complaints (All Users)</h2>
-              <button className="text-pink-600 hover:text-pink-700 font-medium text-sm font-['Inter'] flex items-center">
-                View all <ArrowUpRight className="w-4 h-4 ml-1" />
-              </button>
+           
             </div>
           </div>
           <div className="divide-y divide-white/30">
