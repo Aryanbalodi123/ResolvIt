@@ -155,11 +155,10 @@ const Register = () => {
   return (
     <div className="flex h-screen overflow-hidden bg-white font-['Poppins',sans-serif]">
       {/* Left Section */}
-      <div className="flex-1 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white rounded-br-[50px] rounded-tr-[50px] flex flex-col justify-center items-center relative overflow-hidden animate-[slideInLeft_1s_ease-out]">
+      <div className="flex-1 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white rounded-br-[50px] rounded-tr-[50px] flex flex-col justify-center items-center relative overflow-hidden">
         <img 
           src="https://niceillustrations.com/wp-content/uploads/2021/12/Call-Center-color-800px.png" 
           alt="Illustration" 
-          className="max-w-[45%] h-auto animate-[bounce_3s_ease-in-out_infinite] drop-shadow-[0_6px_15px_rgba(0,0,0,0.2)]"
         />
         <div className="text-center mt-4">
           <h1 className="text-2xl font-bold mb-2">Join ResolvIt!</h1>
@@ -169,7 +168,7 @@ const Register = () => {
 
       {/* Right Section */}
       <div className="flex-1 flex justify-center items-center bg-white rounded-tl-[50px] rounded-bl-[50px] -ml-12 px-3 py-3 pl-20 animate-[slideInRight_1s_ease-out] overflow-y-auto">
-        <div className="w-full max-w-[300px] animate-[fadeInUp_1s_ease-out_0.3s_both]">
+        <div className="w-full max-w-[300px]">
           {/* Logo */}
           <div className="text-center text-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 bg-clip-text text-transparent mb-3 relative">
             ResolvIt
@@ -359,79 +358,6 @@ const Register = () => {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
-        
-        @keyframes slideInLeft {
-          from {
-            transform: translateX(-100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-
-        @keyframes slideInRight {
-          from {
-            transform: translateX(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-
-        @keyframes fadeInUp {
-          from {
-            transform: translateY(30px);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
-        }
-
-        
-        input:focus,
-        input:invalid,
-        input:required {
-          outline: none !important;   
-          box-shadow: none !important; 
-        }
-          
-        @keyframes bounce {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-        }
-
-        @media (max-width: 768px) {
-          .flex {
-            flex-direction: column;
-          }
-          
-          .flex-1:first-child {
-            border-radius: 0 0 40px 40px;
-            padding: 40px 20px;
-          }
-          
-          .flex-1:last-child {
-            border-radius: 40px 40px 0 0;
-            margin-left: 0;
-            margin-top: -40px;
-            padding: 60px 20px 40px;
-          }
-        }
-      `}</style>
     </div>
   );
 };
