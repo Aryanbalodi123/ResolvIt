@@ -1,49 +1,110 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  User, 
-  Edit3, 
-  Camera, 
-  Mail, 
-  Phone, 
-  MapPin, 
+import {
+  User,
+  Edit3,
+  Camera,
+  Mail,
+  Phone,
+  MapPin,
   LogOut,
   Save,
   X,
   Shield,
-  Bell,
   Eye,
-  EyeOff
-} from 'lucide-react';
+  EyeOff,
+} from "lucide-react";
+import { getUserDetails, getUserComplaints } from "../../services/UserServices";
+import { supabase } from "../../lib/SupabaseClient";
 
 const Settings = () => {
   const navigate = useNavigate();
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login", { replace: true });
-    }
-  }, [navigate]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+  const [loading, setLoading] = useState(true);
+
   const [userProfile, setUserProfile] = useState({
-    name: localStorage.getItem("name") || "User",
-    email: localStorage.getItem("email") || "Not provided",
-    phone: localStorage.getItem("phone") || "Not provided",
-    address: localStorage.getItem("address") || "Not provided",
-    joinDate: localStorage.getItem("joinDate") || "Not available",
-    totalComplaints: parseInt(localStorage.getItem("totalComplaints")) || 0,
-    resolvedComplaints: parseInt(localStorage.getItem("resolvedComplaints")) || 0
+    name: "",
+    email: "",
+    joinDate: "",
+    totalComplaints: 0,
+    resolvedComplaints: 0,
   });
 
-  const [editedProfile, setEditedProfile] = useState({...userProfile});
+  const [editedProfile, setEditedProfile] = useState(userProfile);
 
-  const handleSave = () => {
-    setUserProfile(editedProfile);
-    setIsEditing(false);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("rollNumber"); // assuming stored in localStorage
+
+    if (!token || !userId) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        // ✅ Fetch user details from Supabase
+        const userData = await getUserDetails(userId);
+
+        // ✅ Fetch complaints for analytics
+        const complaintsData = await getUserComplaints(userId);
+        const totalComplaints = complaintsData?.length || 0;
+        const resolvedComplaints = complaintsData?.filter(
+          (c) => c.status?.toLowerCase() === "resolved"
+        ).length;
+
+        const formattedProfile = {
+          name: userData?.name || "User",
+          email: userData?.email || "Not provided",
+          joinDate: new Date(userData?.created_at).toLocaleDateString() || "N/A",
+          totalComplaints,
+          resolvedComplaints,
+        };
+
+        setUserProfile(formattedProfile);
+        setEditedProfile(formattedProfile);
+
+        // Optionally store for caching
+        Object.entries(formattedProfile).forEach(([key, value]) =>
+          localStorage.setItem(key, value)
+        );
+      } catch (err) {
+        console.error("Error fetching user info:", err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [navigate]);
+
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      // ✅ Update user profile in Supabase
+      const { error } = await supabase
+        .from("users")
+        .update({
+          name: editedProfile.name,
+          email: editedProfile.email,
+        })
+        .eq("rollNumber", localStorage.getItem("rollNumber"));
+
+      if (error) throw error;
+
+      setUserProfile(editedProfile);
+      setIsEditing(false);
+      alert("Profile updated successfully ✅");
+    } catch (error) {
+      console.error("Error updating profile:", error.message);
+      alert("Failed to update profile ❌");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -54,19 +115,30 @@ const Settings = () => {
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
-    console.log('Logging out...');
-    setShowLogoutModal(false);
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[80vh] text-gray-700 font-['Inter']">
+        Loading your profile...
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-800 font-['Inter']">Settings</h1>
-          <p className="text-gray-600 mt-1 font-['Inter']">Manage your account and preferences</p>
+          <h1 className="text-2xl font-semibold text-gray-800 font-['Inter']">
+            Settings
+          </h1>
+          <p className="text-gray-600 mt-1 font-['Inter']">
+            Manage your account and preferences
+          </p>
         </div>
       </div>
 
+      {/* ---------- Profile Section ---------- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white/40 backdrop-blur-sm rounded-xl border border-white/40">
           <div className="p-6 border-b border-white/30">
@@ -105,6 +177,7 @@ const Settings = () => {
           </div>
 
           <div className="p-6 space-y-6">
+            {/* Profile Picture */}
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center shadow-md">
@@ -117,165 +190,102 @@ const Settings = () => {
                 )}
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-gray-800 font-['Inter']">{userProfile.name}</h3>
-                <p className="text-gray-600 font-['Inter']">Member since {userProfile.joinDate}</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">Full Name</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={editedProfile.name}
-                    onChange={(e) => setEditedProfile({...editedProfile, name: e.target.value})}
-                    className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
-                  />
-                ) : (
-                  <div className="flex items-center px-3 py-2 bg-white/20 rounded-xl font-['Inter'] backdrop-blur-sm">
-                    <User className="w-4 h-4 mr-3 text-gray-500" />
-                    {userProfile.name}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">Email Address</label>
-                {isEditing ? (
-                  <input
-                    type="email"
-                    value={editedProfile.email}
-                    onChange={(e) => setEditedProfile({...editedProfile, email: e.target.value})}
-                    className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
-                  />
-                ) : (
-                  <div className="flex items-center px-3 py-2 bg-white/20 rounded-xl font-['Inter'] backdrop-blur-sm">
-                    <Mail className="w-4 h-4 mr-3 text-gray-500" />
-                    {userProfile.email}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">Phone Number</label>
-                {isEditing ? (
-                  <input
-                    type="tel"
-                    value={editedProfile.phone}
-                    onChange={(e) => setEditedProfile({...editedProfile, phone: e.target.value})}
-                    className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
-                  />
-                ) : (
-                  <div className="flex items-center px-3 py-2 bg-white/20 rounded-xl font-['Inter'] backdrop-blur-sm">
-                    <Phone className="w-4 h-4 mr-3 text-gray-500" />
-                    {userProfile.phone}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">Address</label>
-                {isEditing ? (
-                  <textarea
-                    value={editedProfile.address}
-                    onChange={(e) => setEditedProfile({...editedProfile, address: e.target.value})}
-                    rows={2}
-                    className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
-                  />
-                ) : (
-                  <div className="flex items-start px-3 py-2 bg-white/20 rounded-xl font-['Inter'] backdrop-blur-sm">
-                    <MapPin className="w-4 h-4 mr-3 text-gray-500 mt-0.5" />
-                    {userProfile.address}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {isEditing && (
-              <div className="pt-6 border-t border-white/30">
-                <h3 className="text-lg font-medium text-gray-800 mb-4 font-['Inter'] flex items-center">
-                  <Shield className="w-5 h-5 mr-2" />
-                  Change Password
+                <h3 className="text-xl font-semibold text-gray-800 font-['Inter']">
+                  {userProfile.name}
                 </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">Current Password</label>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        className="w-full px-3 py-2 pr-10 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
-                        placeholder="Enter current password"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                      >
-                        {showPassword ? (
-                          <EyeOff className="w-4 h-4 text-gray-500" />
-                        ) : (
-                          <Eye className="w-4 h-4 text-gray-500" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">New Password</label>
-                    <input
-                      type="password"
-                      className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
-                      placeholder="Enter new password"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">Confirm New Password</label>
-                    <input
-                      type="password"
-                      className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
-                      placeholder="Confirm new password"
-                    />
-                  </div>
-                </div>
+                <p className="text-gray-600 font-['Inter']">
+                  Member since {userProfile.joinDate}
+                </p>
               </div>
-            )}
+            </div>
+
+            {/* Editable Info */}
+            {["name", "email"].map((field) => (
+              <div key={field}>
+                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter'] capitalize">
+                  {field === "email"
+                    ? "Email Address"
+                    : "Full Name"}
+                </label>
+                {isEditing ? (
+                  <input
+                    type={field === "email" ? "email" : "text"}
+                    value={editedProfile[field]}
+                    onChange={(e) =>
+                      setEditedProfile({
+                        ...editedProfile,
+                        [field]: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
+                  />
+                ) : (
+                  <div className="flex items-center px-3 py-2 bg-white/20 rounded-xl font-['Inter'] backdrop-blur-sm">
+                    {field === "email" ? (
+                      <Mail className="w-4 h-4 mr-3 text-gray-500" />
+                    ) : (
+                      <User className="w-4 h-4 mr-3 text-gray-500" />
+                    )}
+                    {userProfile[field]}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
+        {/* ---------- Account Overview ---------- */}
         <div className="space-y-6">
           <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40">
             <div className="p-6 border-b border-white/30">
-              <h2 className="text-lg font-semibold text-gray-800 font-['Inter']">Account Overview</h2>
+              <h2 className="text-lg font-semibold text-gray-800 font-['Inter']">
+                Account Overview
+              </h2>
             </div>
             <div className="p-6 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 font-['Inter']">Total Complaints</span>
-                <span className="text-lg font-semibold text-gray-800 font-['Inter']">{userProfile.totalComplaints}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 font-['Inter']">Resolved Issues</span>
-                <span className="text-lg font-semibold text-emerald-600 font-['Inter']">{userProfile.resolvedComplaints}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 font-['Inter']">Success Rate</span>
-                <span className="text-lg font-semibold text-emerald-600 font-['Inter']">
-                  {userProfile.totalComplaints > 0 ? Math.round((userProfile.resolvedComplaints / userProfile.totalComplaints) * 100) : 0}%
+                <span className="text-sm text-gray-600 font-['Inter']">
+                  Total Complaints
+                </span>
+                <span className="text-lg font-semibold text-gray-800 font-['Inter']">
+                  {userProfile.totalComplaints}
                 </span>
               </div>
-              <div className="pt-4 border-t border-white/30">
-                <div className="text-xs text-gray-600 font-['Inter']">
-                  Member since {userProfile.joinDate}
-                </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 font-['Inter']">
+                  Resolved Issues
+                </span>
+                <span className="text-lg font-semibold text-emerald-600 font-['Inter']">
+                  {userProfile.resolvedComplaints}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 font-['Inter']">
+                  Success Rate
+                </span>
+                <span className="text-lg font-semibold text-emerald-600 font-['Inter']">
+                  {userProfile.totalComplaints > 0
+                    ? Math.round(
+                        (userProfile.resolvedComplaints /
+                          userProfile.totalComplaints) *
+                          100
+                      )
+                    : 0}
+                  %
+                </span>
               </div>
             </div>
           </div>
 
+          {/* ---------- Logout ---------- */}
           <div className="bg-red-100/60 border border-red-200/60 rounded-xl backdrop-blur-sm">
             <div className="p-6 border-b border-red-200/60">
-              <h2 className="text-lg font-semibold text-red-800 font-['Inter']">Account Actions</h2>
+              <h2 className="text-lg font-semibold text-red-800 font-['Inter']">
+                Account Actions
+              </h2>
             </div>
             <div className="p-6 space-y-3">
-              <button 
+              <button
                 onClick={() => setShowLogoutModal(true)}
                 className="w-full p-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl hover:from-rose-500 hover:to-rose-400 cursor-pointer transition-all duration-200 font-['Inter'] flex items-center justify-center shadow-md"
               >
@@ -290,6 +300,7 @@ const Settings = () => {
         </div>
       </div>
 
+      {/* ---------- Logout Modal ---------- */}
       {showLogoutModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white/90 backdrop-blur-md rounded-xl max-w-md w-full p-6 border border-white/40">
@@ -298,15 +309,14 @@ const Settings = () => {
                 <LogOut className="w-6 h-6 text-red-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 font-['Inter']">Sign Out</h3>
-                <p className="text-gray-600 font-['Inter']">Are you sure you want to sign out?</p>
+                <h3 className="text-lg font-semibold text-gray-800 font-['Inter']">
+                  Sign Out
+                </h3>
+                <p className="text-gray-600 font-['Inter']">
+                  Are you sure you want to sign out?
+                </p>
               </div>
             </div>
-            
-            <p className="text-sm text-gray-600 mb-6 font-['Inter']">
-              You will be logged out of your account and redirected to the login page. Any unsaved changes will be lost.
-            </p>
-            
             <div className="flex space-x-3">
               <button
                 onClick={handleLogout}
