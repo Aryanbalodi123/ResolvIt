@@ -18,9 +18,9 @@ const menuItems = role === "user"
       { id: "lost-found", label: "Lost & Found", icon: Search, path: "/lost-found" },
     ]
   : [
-      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
       { id: "all-complaint", label: "All Complaints", icon: FileText, badge: 2, path: "/all-complaints" },
-      { id: "lost-found", label: "Lost & Found", icon: Search, path: "/lost-found" },
+      { id: "lost-found", label: "Lost & Found", icon: Search, path: "/admin/lost-found" },
     ];
   return (
     <div className="w-72 bg-gradient-to-b from-emerald-50/80 to-green-50/80 backdrop-blur-sm border-r border-white/40 min-h-full sticky top-0 shadow-lg shadow-green-100/20 z-40">
@@ -31,18 +31,12 @@ const menuItems = role === "user"
             <User className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-emerald-900">Portal</h2>
-            <p className="text-sm text-emerald-600">User Dashboard</p>
+            <h2 className="text-lg font-semibold text-emerald-900">ResolvIt</h2>
+            <p className="text-sm text-emerald-600">{localStorage.getItem("role") === "user" ? "Student Portal" : "Admin Portal"}</p>
           </div>
         </div>
 
-        <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white/60 shadow-lg hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center space-x-2 mb-1">
-            <span className="text-lg">👋</span>
-            <p className="text-sm font-medium text-emerald-700">Welcome</p>
-          </div>
-          <p className="text-lg font-semibold text-emerald-900">John Doe</p>
-        </div>
+
       </div>
 
       {/* Navigation */}

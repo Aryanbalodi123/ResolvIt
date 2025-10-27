@@ -86,18 +86,18 @@ const Complaints = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'pending': return 'bg-orange-100/80 text-orange-700 border-orange-200/60';
-      case 'in-progress': return 'bg-emerald-50/90 text-emerald-700 border-emerald-100';
-      case 'resolved': return 'bg-green-100/80 text-green-700 border-green-200/60';
+      case 'pending': return 'bg-amber-100/80 text-amber-700 border-amber-200/60';
+      case 'in-progress': return 'bg-emerald-100/80 text-emerald-700 border-emerald-200/60';
+      case 'resolved': return 'bg-emerald-50/90 text-emerald-800 border-emerald-100/80';
       default: return 'bg-gray-100/80 text-gray-700 border-gray-200/60';
     }
   };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return 'text-rose-600 bg-rose-100/60';
-      case 'medium': return 'text-orange-600 bg-orange-100/60';
-      case 'low': return 'text-green-600 bg-green-100/60';
+      case 'high': return 'text-emerald-800 bg-emerald-100/80';
+      case 'medium': return 'text-emerald-700 bg-emerald-50/80';
+      case 'low': return 'text-emerald-600 bg-emerald-50/60';
       default: return 'text-gray-600 bg-gray-100/60';
     }
   };

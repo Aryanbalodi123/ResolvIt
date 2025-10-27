@@ -1,38 +1,58 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { 
+  BrowserRouter as Router, 
+  Routes, 
+  Route, 
+  Outlet, 
+  Navigate 
+} from "react-router-dom";
 
 import Sidebar from "./components/Sidebar";
-import Dashboard from "./pages/Dashboard";
-import Complaints from "./pages/Complaints";
-import LostFound from "./pages/LostFound";
-import Settings from "./pages/Settings";
+import Dashboard from "./pages/Dashboard.jsx";
+import Complaints from "./pages/Complaints.jsx"; // This is the student "My Complaints" page
+import LostFound from "./pages/LostFound.jsx";
+import Settings from "./pages/Settings.jsx";
 import AdminDashboard from "./pages/AdminDashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import AllComplaint from "./pages/AllComplaint"
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminLostFound from "./pages/AdminLostFound";
+import AdminComplaints from "./pages/AdminComplaints.jsx"; // Import the new Admin component
 
 import "./App.css";
 
 const App = () => {
   return (
     <Router>
-      <div className="grain" aria-hidden="true"></div>
       <Routes>
-        {/* Auth Pages */}
+        {/* Public Routes */}
         <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
         <Route path="/register" element={<AuthLayout><Register /></AuthLayout>} />
 
-        {/* Protected Pages with Sidebar */}
-        <Route path="/dashboard" element={<MainLayout><Dashboard /></MainLayout>} />
-        <Route path="/complaints" element={<MainLayout><Complaints /></MainLayout>} />
-        <Route path="/lost-found" element={<MainLayout><LostFound /></MainLayout>} />
-        <Route path="/                                                  " element={<MainLayout><Settings /></MainLayout>} />
-        <Route path="/admin" element={<MainLayout><AdminDashboard /></MainLayout>} />
-        <Route path="/all-complaints" element={<MainLayout><AllComplaint /></MainLayout>} />
+        {/* Protected Routes */}
+        <Route element={
+          <ProtectedRoute>
+            <MainLayout>
+              <div className="circle-top" aria-hidden="true"></div>
+              <div className="circle-bottom" aria-hidden="true"></div>
+            </MainLayout>
+          </ProtectedRoute>
+        }>
+          {/* Student Routes */}
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/complaints" element={<Complaints />} />
+          <Route path="/lost-found" element={<LostFound />} />
+          <Route path="/settings" element={<Settings />} />
 
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/all-complaints" element={<AdminComplaints />} /> {/* Updated this route */}
+          <Route path="/admin/lost-found" element={<AdminLostFound />} />
+        </Route>
 
-        {/* Default */}
-        <Route path="*" element={<Login />} />
+        {/* Default Routes */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );
@@ -48,12 +68,18 @@ const AuthLayout = ({ children }) => (
 
 const MainLayout = ({ children }) => (
   <div className="app-container">
+    <div className="decorative-circles">
+      <div className="circle-top"></div>
+      <div className="circle-bottom"></div>
+    </div>
     <div className="content-wrapper">
       <div className="translucent-container">
         <div className="flex min-h-full">
           <Sidebar />
           <main className="main-content">
-            <div className="fade-in">{children}</div>
+            <div className="fade-in">
+              <Outlet />
+            </div>
           </main>
         </div>
       </div>

@@ -19,3 +19,24 @@ export async function reportFoundItem(payload) {
   if (error) throw error;
   return data;
 }
+
+// Delete a lost item
+export async function deleteLostItem(id) {
+  const { error } = await supabase
+    .from('lost_items')
+    .delete()
+    .eq('id', id);
+
+  if (error) throw error;
+}
+
+// Get all lost items
+export async function getLostItems() {
+  const { data, error } = await supabase
+    .from('lost_items')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data;
+}

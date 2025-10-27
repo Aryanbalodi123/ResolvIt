@@ -32,13 +32,13 @@ const Settings = () => {
   const [showPassword, setShowPassword] = useState(false);
   
   const [userProfile, setUserProfile] = useState({
-    name: 'John Doe',
-    email: 'john.doe@email.com',
-    phone: '+91 98765 43210',
-    address: 'Sector 17, Chandigarh, India',
-    joinDate: 'January 2024',
-    totalComplaints: 4,
-    resolvedComplaints: 1
+    name: localStorage.getItem("name") || "User",
+    email: localStorage.getItem("email") || "Not provided",
+    phone: localStorage.getItem("phone") || "Not provided",
+    address: localStorage.getItem("address") || "Not provided",
+    joinDate: localStorage.getItem("joinDate") || "Not available",
+    totalComplaints: parseInt(localStorage.getItem("totalComplaints")) || 0,
+    resolvedComplaints: parseInt(localStorage.getItem("resolvedComplaints")) || 0
   });
 
   const [editedProfile, setEditedProfile] = useState({...userProfile});
@@ -287,7 +287,7 @@ const Settings = () => {
             <div className="p-6 space-y-3">
               <button 
                 onClick={() => setShowLogoutModal(true)}
-                className="w-full p-3 bg-gradient-to-r from-red-300 to-rose-300 text-white rounded-xl hover:from-red-400 hover:to-rose-400 transition-all duration-200 font-['Inter'] flex items-center justify-center shadow-md"
+                className="w-full p-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl hover:from-rose-500 hover:to-rose-400 cursor-pointer transition-all duration-200 font-['Inter'] flex items-center justify-center shadow-md"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out

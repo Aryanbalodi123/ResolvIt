@@ -6,24 +6,10 @@
   to { transform: rotate(360deg); }
 }
 
-/* Grain Texture */
-.grain {
-  position: fixed;
-  top: -150%;
-  left: -50%;
-  right: -50%;
-  bottom: -150%;
-  width: 200%;
-  height: 300vh;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='6.29' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.15;
-  pointer-events: none;
-}
-
-/* App Container with Modern Background */
+/* App Container with Simplified Background */
 .app-container {
   min-height: 100vh;
-  background: radial-gradient(circle at 50% 50%, #e2f5ea, #c5e8d4);
+  background: linear-gradient(135deg, #f0f8f4, #e6f3ec);
   position: relative;
   overflow: hidden;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -33,32 +19,40 @@
   justify-content: center;
 }
 
-/* Mesh Ball */
-.app-container::before {
-  content: '';
+.decorative-circles {
   position: fixed;
-  width: 60vmin;
-  height: 60vmin;
-  background: radial-gradient(circle at 30% 30%, #7fdbaa, #4aba84);
-  border-radius: 50%;
-  filter: blur(2px);
-  opacity: 0.6;
-  top: -10vmin;
-  right: -10vmin;
-  animation: rotate 20s linear infinite;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* Blurred Light */
-.app-container::after {
-  content: '';
-  position: fixed;
-  width: 80vmin;
-  height: 80vmin;
-  background: radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, transparent 70%);
+.circle-top {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, #2E8B57, #3CB371);
+  border-radius: 50%;
+  filter: blur(30px);
+  opacity: 0.6;
+  top: -100px;
+  right: -100px;
+  pointer-events: none;
+}
+
+.circle-bottom {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: linear-gradient(225deg, #4aba84, #7fdbaa);
+  border-radius: 50%;
   filter: blur(40px);
-  opacity: 0.4;
-  bottom: -20vmin;
-  left: -20vmin;
+  opacity: 0.6;
+  bottom: -150px;
+  left: -150px;
+  pointer-events: none;
 }
 
 /* Content Wrapper for Centering */
@@ -67,22 +61,64 @@
   max-width: 1400px;
   display: flex;
   justify-content: center;
+  position: relative;
+  z-index: 2;
 }
 
-/* Translucent Container */
+/* Enhanced Glass Effect Container - Shows Minimal Background */
 .translucent-container {
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 24px;
-  overflow: hidden;
+  /* Strong glass morphism effect */
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  
+  /* Subtle borders for depth */
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 32px;
+  
+  /* Layered shadows for elevation */
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    0 1px 2px rgba(255, 255, 255, 0.3) inset;
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.2);
+  
+  /* Layout */
   width: 100%;
   min-height: calc(100vh - 4rem);
   position: relative;
+  overflow: hidden;
+  
+  /* Inner glow effect */
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+}
+
+/* Optional: Even stronger glass effect variant */
+.translucent-container.ultra-glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(60px) saturate(200%);
+  -webkit-backdrop-filter: blur(60px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Frosted glass overlay for extra depth */
+.translucent-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.8) 20%,
+    rgba(255, 255, 255, 0.8) 80%,
+    transparent
+  );
+  opacity: 0.5;
 }
 
 /* Main Content */
@@ -91,6 +127,8 @@
   min-height: calc(100vh - 4rem);
   overflow-x: hidden;
   background: transparent;
+  position: relative;
+  z-index: 1;
 }
 
 /* Fade in animation */
@@ -109,23 +147,25 @@
   }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar with glass effect */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(241, 241, 241, 0.5);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  backdrop-filter: blur(10px);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(193, 193, 193, 0.8);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 168, 168, 0.9);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 /* Focus states */
@@ -137,12 +177,14 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(127, 219, 170, 0.3);
 }
 
-/* Card hover effects */
+/* Enhanced Card hover effects with glass */
 .card-hover {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 }
 
 .card-hover:hover {
@@ -150,7 +192,8 @@ textarea:focus {
   box-shadow: 
     0 20px 40px rgba(0, 0, 0, 0.1),
     0 1px 3px rgba(127, 219, 170, 0.1);
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* Button animations */
@@ -166,12 +209,15 @@ textarea:focus {
   transform: translateY(0);
 }
 
-/* Glass effect for cards */
+/* Stronger Glass effect for nested cards */
 .glass-effect {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(30px) saturate(150%);
+  -webkit-backdrop-filter: blur(30px) saturate(150%);
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* Custom border radius */
@@ -288,20 +334,25 @@ textarea:focus {
   
   .translucent-container {
     min-height: calc(100vh - 2rem);
+    border-radius: 24px;
   }
 }
 
-/* Custom component styles */
+/* Enhanced complaint card with glass */
 .complaint-card {
   transition: all 0.2s ease-in-out;
   border-left: 4px solid transparent;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-left-width: 4px;
 }
 
 .complaint-card:hover {
   border-left-color: #fd79a8;
   transform: translateX(2px);
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .complaint-card.pending {
@@ -369,4 +420,47 @@ h1, h2, h3, h4, h5, h6 {
 .focus-visible:focus {
   outline: 2px solid #fd79a8;
   outline-offset: 2px;
+}
+
+/* Additional glass effect utility classes */
+.glass-light {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.glass-medium {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-heavy {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(50px) saturate(180%);
+  -webkit-backdrop-filter: blur(50px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* Shimmer effect for premium feel */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 3s infinite;
 }
