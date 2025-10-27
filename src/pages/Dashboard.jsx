@@ -40,7 +40,6 @@ const Dashboard = () => {
       try {
         const data = await retrieveComplaint();
         setComplaints(data || []);
-        console.log("Fetched complaints:", data);
       } catch (err) {
         console.error("Error fetching complaints:", err.message);
       }
@@ -48,7 +47,8 @@ const Dashboard = () => {
 
     fetchData();
 
-    const interval = setInterval(fetchData, 2000);
+    // Increased interval for better performance
+    const interval = setInterval(fetchData, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -87,26 +87,26 @@ const Dashboard = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case "pending":
-        return "bg-orange-100/80 text-orange-700 border-orange-200/60";
+        return "bg-amber-50/90 text-amber-700 border-amber-200/60";
       case "in-progress":
-        return "bg-pink-100/80 text-pink-700 border-pink-200/60";
+        return "bg-emerald-50/90 text-emerald-700 border-emerald-200/60";
       case "resolved":
-        return "bg-green-100/80 text-green-700 border-green-200/60";
+        return "bg-green-50/90 text-green-700 border-green-200/60";
       default:
-        return "bg-gray-100/80 text-gray-700 border-gray-200/60";
+        return "bg-gray-50/90 text-gray-700 border-gray-200/60";
     }
   };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
       case "high":
-        return "text-rose-600 bg-rose-100/60";
+        return "text-red-600 bg-red-50/80 border border-red-100";
       case "medium":
-        return "text-orange-600 bg-orange-100/60";
+        return "text-amber-600 bg-amber-50/80 border border-amber-100";
       case "low":
-        return "text-green-600 bg-green-100/60";
+        return "text-emerald-600 bg-emerald-50/80 border border-emerald-100";
       default:
-        return "text-gray-600 bg-gray-100/60";
+        return "text-gray-600 bg-gray-50/80 border border-gray-100";
     }
   };
 
@@ -116,27 +116,27 @@ const Dashboard = () => {
       value: "3",
       subtitle: "1 pending, 1 in progress",
       icon: FileText,
-      color: "from-pink-300 to-rose-300",
-      bgColor: "bg-pink-100/60",
-      textColor: "text-pink-700",
+      color: "from-emerald-400 to-green-500",
+      bgColor: "bg-emerald-50/90",
+      textColor: "text-emerald-700",
     },
     {
       title: "Lost & Found",
       value: "2",
       subtitle: "1 lost, 1 found item",
       icon: Search,
-      color: "from-purple-300 to-indigo-300",
-      bgColor: "bg-purple-100/60",
-      textColor: "text-purple-700",
+      color: "from-green-400 to-teal-500",
+      bgColor: "bg-green-50/90",
+      textColor: "text-green-700",
     },
     {
       title: "Resolved",
       value: "1",
       subtitle: "This month",
       icon: CheckCircle,
-      color: "from-green-300 to-emerald-300",
-      bgColor: "bg-green-100/60",
-      textColor: "text-green-700",
+      color: "from-teal-400 to-emerald-500",
+      bgColor: "bg-teal-50/90",
+      textColor: "text-teal-700",
     },
   ];
 
@@ -267,15 +267,15 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="p-8 max-w-7xl mx-auto space-y-8">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-10">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-800 font-['Inter']">
+            <h1 className="text-3xl font-semibold text-emerald-900 font-['Inter']">
               Good Morning, {/*user.name*/}
             </h1>
-            <p className="text-gray-600 mt-1 font-['Inter']">
+            <p className="text-emerald-600 mt-2 font-['Inter'] text-lg">
               Welcome back, Manage your complaints and stay updated on their
               progress.
             </p>
@@ -290,13 +290,13 @@ const Dashboard = () => {
           return (
             <div
               key={index}
-              className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-6 hover:shadow-lg transition-all duration-200 card-hover"
+              className="bg-white/60 backdrop-blur-md rounded-2xl border border-white/60 p-6 hover:shadow-xl transition-all duration-300 card-hover"
             >
               <div className="flex items-center justify-between">
                 <div
-                  className={`p-3 rounded-xl ${stat.bgColor} backdrop-blur-sm`}
+                  className={`p-3.5 rounded-2xl bg-gradient-to-br ${stat.color} shadow-lg`}
                 >
-                  <Icon className={`w-5 h-5 ${stat.textColor}`} />
+                  <Icon className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-2xl font-semibold text-gray-800 font-['Inter']">
                   {stat.value}
@@ -316,54 +316,54 @@ const Dashboard = () => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Complaints */}
-        <div className="lg:col-span-2 bg-white/40 backdrop-blur-sm rounded-xl border border-white/40">
+        <div className="lg:col-span-2 bg-white/60 backdrop-blur-md rounded-2xl border border-white/60 shadow-lg hover:shadow-xl transition-all duration-300">
           {/* Header */}
-          <div className="p-6 border-b border-white/30">
+          <div className="p-6 border-b border-emerald-100/30">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-800 font-['Inter']">
+              <h2 className="text-xl font-semibold text-emerald-900 font-['Inter']">
                 Recent Complaints
               </h2>
-              <button className="text-pink-600 hover:text-pink-700 font-medium text-sm font-['Inter'] flex items-center">
-                View all <ArrowUpRight className="w-4 h-4 ml-1" />
+              <button className="text-emerald-600 hover:text-emerald-700 font-medium text-sm font-['Inter'] flex items-center group">
+                View all <ArrowUpRight className="w-4 h-4 ml-1 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </button>
             </div>
           </div>
 
           {/* Scrollable section with fixed height */}
-          <div className="divide-y divide-white/30 h-80 overflow-y-auto">
+          <div className="divide-y divide-emerald-100/30 h-[calc(100vh-24rem)] overflow-y-auto">
             {complaints.map((complaint) => (
               <div
                 key={complaint.id}
-                className="p-4 hover:bg-white/20 transition-colors"
+                className="p-5 hover:bg-emerald-50/30 transition-all duration-300"
               >
                 <div className="flex items-start justify-between">
                   {/* Left side: title, desc, meta */}
-                  <div className="flex-1 min-w-0 space-y-2">
+                  <div className="flex-1 min-w-0 space-y-3">
                     {/* Title */}
-                    <h3 className="text-sm font-medium text-gray-800 font-['Inter']">
+                    <h3 className="text-base font-medium text-emerald-900 font-['Inter']">
                       {complaint.title}
                     </h3>
 
                     {/* Description */}
-                    <p className="text-sm text-gray-600 font-['Inter']">
+                    <p className="text-sm text-emerald-600 font-['Inter'] leading-relaxed">
                       {complaint.description}
                     </p>
 
                     {/* Meta info */}
-                    <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
-                      <span className="flex items-center font-['Inter']">
-                        <MapPin className="w-3 h-3 mr-1" />
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-emerald-500">
+                      <span className="flex items-center font-['Inter'] bg-emerald-50/50 px-2 py-1 rounded-md">
+                        <MapPin className="w-3.5 h-3.5 mr-1.5" />
                         {complaint.location}
                       </span>
-                      <span className="flex items-center font-['Inter']">
-                        <Clock className="w-3 h-3 mr-1" />
+                      <span className="flex items-center font-['Inter'] bg-emerald-50/50 px-2 py-1 rounded-md">
+                        <Clock className="w-3.5 h-3.5 mr-1.5" />
                         {complaint.created_at}
                       </span>
                       {complaint.status !== "pending" && (
                         <span
-                          className={`px-2 py-0.5 rounded-lg text-xs font-medium ${getPriorityColor(
+                          className={`px-3 py-1 rounded-md text-xs font-medium ${getPriorityColor(
                             complaint.priority
                           )}`}
                         >
@@ -375,7 +375,7 @@ const Dashboard = () => {
 
                   {/* Right side: status badge */}
                   <span
-                    className={`px-2 py-0.5 ml-4 rounded-lg text-xs font-medium border ${getStatusColor(
+                    className={`px-3 py-1 ml-4 rounded-md text-xs font-medium shadow-sm ${getStatusColor(
                       complaint.status
                     )}`}
                   >
@@ -390,24 +390,26 @@ const Dashboard = () => {
         {/* Quick Actions */}
         <div className="space-y-6">
           {/* Actions Card */}
-          <div className="bg-white/40 backdrop-blur-sm h-full rounded-xl border border-white/40">
-            <div className="p-6 border-b border-white/30">
-              <h2 className="text-lg font-semibold text-gray-800 font-['Inter']">
+          <div className="bg-white/60 backdrop-blur-md h-full rounded-2xl border border-white/60 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="p-6 border-b border-emerald-100/30">
+              <h2 className="text-xl font-semibold text-emerald-900 font-['Inter']">
                 Quick Actions
               </h2>
             </div>
             <div className="p-6 space-y-4">
               <button
                 onClick={handleComplaintModalOpen}
-                className="w-full p-4 bg-gradient-to-r from-pink-300 to-rose-300 text-white rounded-xl hover:from-pink-400 hover:to-rose-400 transition-all duration-200 text-left shadow-md"
+                className="w-full p-4 bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-xl hover:from-emerald-500 hover:to-green-600 transition-all duration-300 text-left shadow-lg hover:shadow-xl group"
               >
-                <div className="flex items-center space-x-3">
-                  <Plus className="w-5 h-5" />
+                <div className="flex items-center space-x-4">
+                  <div className="p-2 bg-white/20 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                    <Plus className="w-5 h-5" />
+                  </div>
                   <div>
-                    <div className="font-medium font-['Inter']">
+                    <div className="font-medium font-['Inter'] text-lg">
                       New Complaint
                     </div>
-                    <div className="text-xs text-white/80 font-['Inter']">
+                    <div className="text-sm text-white/90 font-['Inter']">
                       Report a new issue
                     </div>
                   </div>
@@ -416,15 +418,17 @@ const Dashboard = () => {
 
               <button
                 onClick={handleLostFoundModalOpen}
-                className="w-full p-4 bg-gradient-to-r from-purple-300 to-indigo-300 text-white rounded-xl hover:from-purple-400 hover:to-indigo-400 transition-all duration-200 text-left shadow-md"
+                className="w-full p-4 bg-gradient-to-r from-green-400 to-teal-500 text-white rounded-xl hover:from-green-500 hover:to-teal-600 transition-all duration-300 text-left shadow-lg hover:shadow-xl group"
               >
-                <div className="flex items-center space-x-3">
-                  <Search className="w-5 h-5" />
+                <div className="flex items-center space-x-4">
+                  <div className="p-2 bg-white/20 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                    <Search className="w-5 h-5" />
+                  </div>
                   <div>
-                    <div className="font-medium font-['Inter']">
+                    <div className="font-medium font-['Inter'] text-lg">
                       Report Lost Item
                     </div>
-                    <div className="text-xs text-white/80 font-['Inter']">
+                    <div className="text-sm text-white/90 font-['Inter']">
                       Add to lost & found
                     </div>
                   </div>
@@ -433,15 +437,17 @@ const Dashboard = () => {
 
               <button
                 onClick={handleFeedbackModalOpen}
-                className="w-full p-4 bg-white/30 border border-white/40 text-gray-700 rounded-xl hover:bg-white/40 transition-colors text-left backdrop-blur-sm"
+                className="w-full p-4 bg-white/60 border border-white/60 text-emerald-800 rounded-xl hover:bg-white/80 transition-all duration-300 text-left backdrop-blur-sm shadow-lg hover:shadow-xl group"
               >
-                <div className="flex items-center space-x-3">
-                  <MessageSquare className="w-5 h-5" />
+                <div className="flex items-center space-x-4">
+                  <div className="p-2 bg-emerald-100/50 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                    <MessageSquare className="w-5 h-5 text-emerald-600" />
+                  </div>
                   <div>
-                    <div className="font-medium font-['Inter']">
+                    <div className="font-medium font-['Inter'] text-lg">
                       Send Feedback
                     </div>
-                    <div className="text-xs text-gray-600 font-['Inter']">
+                    <div className="text-sm text-emerald-600 font-['Inter']">
                       Share your thoughts
                     </div>
                   </div>
@@ -454,23 +460,23 @@ const Dashboard = () => {
 
       {/* Complaint Modal */}
       {isComplaintModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-white/40 w-full max-w-md shadow-2xl">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
-              <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">
+        <div className="fixed inset-0 bg-emerald-950/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-white/60 w-full max-w-md shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-emerald-100/30">
+              <h2 className="text-xl font-semibold text-emerald-900 font-['Inter']">
                 New Complaint
               </h2>
               <button
                 onClick={handleComplaintModalClose}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/60 rounded-xl transition-colors"
+                className="p-2 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50/60 rounded-xl transition-all duration-300"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleComplaintSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleComplaintSubmit} className="p-8 space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                <label className="block text-sm font-medium text-emerald-800 mb-2 font-['Inter']">
                   Title <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -480,19 +486,19 @@ const Dashboard = () => {
                   onChange={handleComplaintInputChange}
                   placeholder="Brief description of the issue"
                   required
-                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                  className="w-full px-4 py-3 border border-emerald-100 rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter'] shadow-sm placeholder-emerald-300"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+                <label className="block text-sm font-medium text-emerald-800 mb-2 font-['Inter']">
                   Category
                 </label>
                 <select
                   name="category"
                   value={complaintFormData.category}
                   onChange={handleComplaintInputChange}
-                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                  className="w-full px-4 py-3 border border-emerald-100 rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter'] shadow-sm text-emerald-600"
                 >
                   <option value="infrastructure">Infrastructure</option>
                   <option value="utilities">Utilities</option>
@@ -514,7 +520,7 @@ const Dashboard = () => {
                   onChange={handleComplaintInputChange}
                   placeholder="Street address or area"
                   required
-                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                  className="w-full px-4 py-3 border border-emerald-100 rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter'] shadow-sm"
                 />
               </div>
 
@@ -543,7 +549,7 @@ const Dashboard = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-pink-300 to-rose-300 text-white rounded-xl hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-medium shadow-md font-['Inter']"
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-xl hover:from-emerald-500 hover:to-green-600 transition-all duration-300 font-medium shadow-lg hover:shadow-xl font-['Inter']"
                 >
                   Submit Complaint
                 </button>

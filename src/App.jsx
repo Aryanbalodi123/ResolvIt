@@ -16,6 +16,7 @@ import "./App.css";
 const App = () => {
   return (
     <Router>
+      <div className="grain" aria-hidden="true"></div>
       <Routes>
         {/* Auth Pages */}
         <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
@@ -25,7 +26,7 @@ const App = () => {
         <Route path="/dashboard" element={<MainLayout><Dashboard /></MainLayout>} />
         <Route path="/complaints" element={<MainLayout><Complaints /></MainLayout>} />
         <Route path="/lost-found" element={<MainLayout><LostFound /></MainLayout>} />
-        <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
+        <Route path="/                                                  " element={<MainLayout><Settings /></MainLayout>} />
         <Route path="/admin" element={<MainLayout><AdminDashboard /></MainLayout>} />
         <Route path="/all-complaints" element={<MainLayout><AllComplaint /></MainLayout>} />
 

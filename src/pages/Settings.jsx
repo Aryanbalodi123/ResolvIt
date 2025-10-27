@@ -82,7 +82,7 @@ const Settings = () => {
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="text-pink-600 hover:text-pink-700 font-medium text-sm font-['Inter'] flex items-center"
+                  className="text-emerald-600 hover:text-emerald-700 font-medium text-sm font-['Inter'] flex items-center"
                 >
                   <Edit3 className="w-4 h-4 mr-1" />
                   Edit Profile
@@ -91,7 +91,7 @@ const Settings = () => {
                 <div className="flex space-x-2">
                   <button
                     onClick={handleSave}
-                    className="bg-gradient-to-r from-pink-300 to-rose-300 text-white px-3 py-1 rounded-xl text-sm font-medium hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-['Inter'] flex items-center shadow-md"
+                    className="bg-gradient-to-r from-emerald-400 to-green-500 text-white px-3 py-1 rounded-xl text-sm font-medium hover:from-emerald-500 hover:to-green-600 transition-all duration-200 font-['Inter'] flex items-center shadow-md"
                   >
                     <Save className="w-4 h-4 mr-1" />
                     Save
@@ -112,11 +112,11 @@ const Settings = () => {
             {/* Profile Picture */}
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-br from-pink-300 to-purple-300 rounded-full flex items-center justify-center shadow-md">
+                <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center shadow-md">
                   <User className="w-10 h-10 text-white" />
                 </div>
                 {isEditing && (
-                  <button className="absolute -bottom-1 -right-1 bg-gradient-to-r from-pink-300 to-rose-300 text-white p-2 rounded-full hover:from-pink-400 hover:to-rose-400 transition-all duration-200 shadow-md">
+                  <button className="absolute -bottom-1 -right-1 bg-gradient-to-r from-emerald-400 to-green-500 text-white p-2 rounded-full hover:from-emerald-500 hover:to-green-600 transition-all duration-200 shadow-md">
                     <Camera className="w-3 h-3" />
                   </button>
                 )}
@@ -136,7 +136,7 @@ const Settings = () => {
                     type="text"
                     value={editedProfile.name}
                     onChange={(e) => setEditedProfile({...editedProfile, name: e.target.value})}
-                    className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-pink-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
+                    className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
                   />
                 ) : (
                   <div className="flex items-center px-3 py-2 bg-white/20 rounded-xl font-['Inter'] backdrop-blur-sm">
@@ -153,7 +153,7 @@ const Settings = () => {
                     type="email"
                     value={editedProfile.email}
                     onChange={(e) => setEditedProfile({...editedProfile, email: e.target.value})}
-                    className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-pink-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
+                    className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
                   />
                 ) : (
                   <div className="flex items-center px-3 py-2 bg-white/20 rounded-xl font-['Inter'] backdrop-blur-sm">
@@ -170,7 +170,7 @@ const Settings = () => {
                     type="tel"
                     value={editedProfile.phone}
                     onChange={(e) => setEditedProfile({...editedProfile, phone: e.target.value})}
-                    className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-pink-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
+                    className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
                   />
                 ) : (
                   <div className="flex items-center px-3 py-2 bg-white/20 rounded-xl font-['Inter'] backdrop-blur-sm">
@@ -187,7 +187,7 @@ const Settings = () => {
                     value={editedProfile.address}
                     onChange={(e) => setEditedProfile({...editedProfile, address: e.target.value})}
                     rows={2}
-                    className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-pink-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
+                    className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
                   />
                 ) : (
                   <div className="flex items-start px-3 py-2 bg-white/20 rounded-xl font-['Inter'] backdrop-blur-sm">
@@ -211,7 +211,7 @@ const Settings = () => {
                     <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
-                        className="w-full px-3 py-2 pr-10 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-pink-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
+                        className="w-full px-3 py-2 pr-10 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
                         placeholder="Enter current password"
                       />
                       <button
@@ -231,7 +231,7 @@ const Settings = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">New Password</label>
                     <input
                       type="password"
-                      className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-pink-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
+                      className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
                       placeholder="Enter new password"
                     />
                   </div>
@@ -239,7 +239,7 @@ const Settings = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">Confirm New Password</label>
                     <input
                       type="password"
-                      className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-pink-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
+                      className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
                       placeholder="Confirm new password"
                     />
                   </div>
@@ -263,11 +263,11 @@ const Settings = () => {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600 font-['Inter']">Resolved Issues</span>
-                <span className="text-lg font-semibold text-green-600 font-['Inter']">{userProfile.resolvedComplaints}</span>
+                <span className="text-lg font-semibold text-emerald-600 font-['Inter']">{userProfile.resolvedComplaints}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600 font-['Inter']">Success Rate</span>
-                <span className="text-lg font-semibold text-pink-600 font-['Inter']">
+                <span className="text-lg font-semibold text-emerald-600 font-['Inter']">
                   {userProfile.totalComplaints > 0 ? Math.round((userProfile.resolvedComplaints / userProfile.totalComplaints) * 100) : 0}%
                 </span>
               </div>

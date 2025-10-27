@@ -94,10 +94,11 @@ const Complaints = () => {
   };
 
   const getPriorityColor = (priority) => {
+    // Use contrasting greens for priorities so they remain distinct but on-theme
     switch (priority) {
-      case 'high': return 'text-rose-600 bg-rose-100/60';
-      case 'medium': return 'text-orange-600 bg-orange-100/60';
-      case 'low': return 'text-green-600 bg-green-100/60';
+      case 'high': return 'bg-emerald-700 text-white border-emerald-700'; // dark green
+      case 'medium': return 'bg-emerald-400 text-white border-emerald-400'; // medium green
+      case 'low': return 'bg-emerald-100 text-emerald-800 border-emerald-200'; // light green with darker text
       default: return 'text-gray-600 bg-gray-100/60';
     }
   };
@@ -192,7 +193,7 @@ const Complaints = () => {
         </div>
         <button 
           onClick={handleComplaintModalOpen}
-          className="bg-gradient-to-r from-pink-300 to-rose-300 text-white px-4 py-2 rounded-xl font-medium hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-['Inter'] flex items-center shadow-md"
+          className="bg-gradient-to-r from-emerald-400 to-green-500 text-white px-4 py-2 rounded-xl font-medium hover:from-emerald-500 hover:to-green-600 transition-all duration-200 font-['Inter'] flex items-center shadow-md"
         >
           <Plus className="w-4 h-4 mr-2" />
           New Complaint
@@ -203,7 +204,7 @@ const Complaints = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {filterOptions.map((option) => (
           <div key={option.value} className={`bg-white/40 backdrop-blur-sm rounded-xl border p-4 text-center transition-colors cursor-pointer ${
-            selectedFilter === option.value ? 'border-pink-300/60 bg-pink-100/40' : 'border-white/40 hover:border-white/60'
+            selectedFilter === option.value ? 'border-emerald-300/60 bg-emerald-100/40' : 'border-white/40 hover:border-white/60'
           }`} onClick={() => setSelectedFilter(option.value)}>
             <div className="text-2xl font-semibold text-gray-800 font-['Inter']">{option.count}</div>
             <div className="text-sm text-gray-600 font-['Inter']">{option.label}</div>
@@ -222,7 +223,7 @@ const Complaints = () => {
                 placeholder="Search complaints..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-pink-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
+                className="w-full pl-10 pr-4 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
               />
             </div>
           </div>
@@ -233,7 +234,7 @@ const Complaints = () => {
                 onClick={() => setSelectedFilter(option.value)}
                 className={`px-3 py-2 rounded-xl text-sm font-medium transition-colors font-['Inter'] ${
                   selectedFilter === option.value
-                    ? 'bg-gradient-to-r from-pink-300 to-rose-300 text-white shadow-md'
+                    ? 'bg-gradient-to-r from-emerald-400 to-green-500 text-white shadow-md'
                     : 'bg-white/30 text-gray-700 hover:bg-white/40 backdrop-blur-sm'
                 }`}
               >
@@ -320,7 +321,7 @@ const Complaints = () => {
             {(!searchQuery && selectedFilter === 'all') && (
               <button 
                 onClick={handleComplaintModalOpen}
-                className="bg-gradient-to-r from-pink-300 to-rose-300 text-white px-6 py-3 rounded-xl font-medium hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-['Inter'] shadow-md"
+                className="bg-gradient-to-r from-emerald-400 to-green-500 text-white px-6 py-3 rounded-xl font-medium hover:from-emerald-500 hover:to-green-600 transition-all duration-200 font-['Inter'] shadow-md"
               >
                 <Plus className="w-4 h-4 inline mr-2" />
                 Submit Your First Complaint
@@ -337,7 +338,7 @@ const Complaints = () => {
             <button className="px-3 py-2 text-sm bg-white/30 border border-white/40 rounded-xl hover:bg-white/40 font-['Inter'] backdrop-blur-sm">
               Previous
             </button>
-            <button className="px-3 py-2 text-sm bg-gradient-to-r from-pink-300 to-rose-300 text-white rounded-xl font-['Inter'] shadow-md">
+            <button className="px-3 py-2 text-sm bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-xl font-['Inter'] shadow-md">
               1
             </button>
             <button className="px-3 py-2 text-sm bg-white/30 border border-white/40 rounded-xl hover:bg-white/40 font-['Inter'] backdrop-blur-sm">
@@ -378,7 +379,7 @@ const Complaints = () => {
                   onChange={handleComplaintInputChange}
                   placeholder="Brief description of the issue"
                   required
-                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
                 />
               </div>
 
@@ -412,7 +413,7 @@ const Complaints = () => {
                   onChange={handleComplaintInputChange}
                   placeholder="Street address or area"
                   required
-                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
                 />
               </div>
 
@@ -427,7 +428,7 @@ const Complaints = () => {
                   placeholder="Detailed description of the issue"
                   required
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm resize-none font-['Inter']"
+                  className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-transparent bg-white/80 backdrop-blur-sm resize-none font-['Inter']"
                 />
               </div>
 
@@ -441,7 +442,7 @@ const Complaints = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-pink-300 to-rose-300 text-white rounded-xl hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-medium shadow-md font-['Inter']"
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-xl hover:from-emerald-500 hover:to-green-600 transition-all duration-200 font-medium shadow-md font-['Inter']"
                 >
                   Submit Complaint
                 </button>

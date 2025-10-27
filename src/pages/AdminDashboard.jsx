@@ -32,36 +32,36 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         const data = await retrieveComplaint();
-        setComplaints(data || []);  
-        console.log("Fetched complaints:", data);
+        setComplaints(data || []);
       } catch (err) {
         console.error("Error fetching complaints:", err.message);
       }
     };
 
-    fetchData(); 
+    fetchData();
 
-    const interval = setInterval(fetchData, 2000); 
+    // Increase the interval to reduce server load and improve performance
+    const interval = setInterval(fetchData, 10000); 
     return () => clearInterval(interval);
   }, []);
 
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'unassigned': return 'bg-red-100/80 text-red-700 border-red-200/60';
-      case 'pending': return 'bg-orange-100/80 text-orange-700 border-orange-200/60';
-      case 'in-progress': return 'bg-pink-100/80 text-pink-700 border-pink-200/60';
-      case 'resolved': return 'bg-green-100/80 text-green-700 border-green-200/60';
-      default: return 'bg-gray-100/80 text-gray-700 border-gray-200/60';
+      case 'unassigned': return 'bg-red-50/90 text-red-700 border-red-100';
+      case 'pending': return 'bg-amber-50/90 text-amber-700 border-amber-100';
+      case 'in-progress': return 'bg-emerald-50/90 text-emerald-700 border-emerald-100';
+      case 'resolved': return 'bg-green-50/90 text-green-700 border-green-100';
+      default: return 'bg-gray-50/90 text-gray-700 border-gray-100';
     }
   };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return 'text-rose-600 bg-rose-100/60';
-      case 'medium': return 'text-orange-600 bg-orange-100/60';
-      case 'low': return 'text-green-600 bg-green-100/60';
-      default: return 'text-gray-600 bg-gray-100/60';
+      case 'high': return 'text-red-600 bg-red-50/80 border border-red-100';
+      case 'medium': return 'text-amber-600 bg-amber-50/80 border border-amber-100';
+      case 'low': return 'text-emerald-600 bg-emerald-50/80 border border-emerald-100';
+      default: return 'text-gray-600 bg-gray-50/80 border border-gray-100';
     }
   };
 
@@ -71,9 +71,9 @@ const AdminDashboard = () => {
       value: '247',
       subtitle: '+12 from last month',
       icon: FileText,
-      color: 'from-pink-300 to-rose-300',
-      bgColor: 'bg-pink-100/60',
-      textColor: 'text-pink-700',
+      color: 'from-emerald-400 to-green-500',
+      bgColor: 'bg-emerald-50/90',
+      textColor: 'text-emerald-700',
       trend: '+4.8%'
     },
     {
@@ -81,9 +81,9 @@ const AdminDashboard = () => {
       value: '89',
       subtitle: '23 unassigned, 66 in progress',
       icon: Activity,
-      color: 'from-purple-300 to-indigo-300',
-      bgColor: 'bg-purple-100/60',
-      textColor: 'text-purple-700',
+      color: 'from-green-400 to-teal-500',
+      bgColor: 'bg-green-50/90',
+      textColor: 'text-green-700',
       trend: '-2.1%'
     },
     {
@@ -91,9 +91,9 @@ const AdminDashboard = () => {
       value: '158',
       subtitle: '64% resolution rate',
       icon: CheckCircle,
-      color: 'from-green-300 to-emerald-300',
-      bgColor: 'bg-green-100/60',
-      textColor: 'text-green-700',
+      color: 'from-teal-400 to-emerald-500',
+      bgColor: 'bg-teal-50/90',
+      textColor: 'text-teal-700',
       trend: '+8.3%'
     },
     {

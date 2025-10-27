@@ -154,14 +154,14 @@ const LostFound = () => {
         <div className="flex gap-3">
           <button 
             onClick={handleFoundModalOpen}
-            className="bg-gradient-to-r from-purple-300 to-indigo-300 text-white px-4 py-2 rounded-xl shadow-md flex items-center"
+            className="bg-gradient-to-r from-emerald-400 to-green-500 text-white px-4 py-2 rounded-xl shadow-md flex items-center"
           >
             <Search className="w-4 h-4 mr-2" />
             Report Found Item
           </button>
           <button 
             onClick={handleLostModalOpen}
-            className="bg-gradient-to-r from-rose-300 to-pink-300 text-white px-4 py-2 rounded-xl shadow-md flex items-center"
+            className="bg-gradient-to-r from-emerald-400 to-green-500 text-white px-4 py-2 rounded-xl shadow-md flex items-center"
           >
             <Plus className="w-4 h-4 mr-2" />
             Report Lost Item
@@ -177,8 +177,8 @@ const LostFound = () => {
               <div>
                 <h3 className="text-lg font-medium text-gray-800">{item.title}</h3>
                 <div className="flex space-x-2 mt-1">
-                  <span className="px-2 py-1 rounded-lg text-xs bg-rose-100 text-rose-700 border border-rose-200">{item.type}</span>
-                  <span className="px-2 py-1 rounded-lg text-xs bg-pink-100 text-pink-700 border border-pink-200">{item.status}</span>
+                  <span className="px-2 py-1 rounded-lg text-xs bg-emerald-100 text-emerald-800 border border-emerald-200">{item.type}</span>
+                  <span className="px-2 py-1 rounded-lg text-xs bg-emerald-200 text-emerald-800 border border-emerald-300">{item.status}</span>
                 </div>
               </div>
               <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded">
@@ -201,11 +201,11 @@ const LostFound = () => {
       </div>
 
       {/* Tips Section */}
-      <div className="bg-blue-100 border border-blue-200 rounded-xl p-6">
-        <h3 className="text-lg font-medium text-blue-800 mb-3 flex items-center">
-          <AlertTriangle className="w-5 h-5 mr-2" /> Tips for Better Results
+      <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-6">
+        <h3 className="text-lg font-medium text-emerald-800 mb-3 flex items-center">
+          <AlertTriangle className="w-5 h-5 mr-2 text-emerald-600" /> Tips for Better Results
         </h3>
-        <p className="text-blue-700 text-sm">
+        <p className="text-emerald-700 text-sm">
           Include detailed descriptions, exact location, and time when lost.
         </p>
       </div>

@@ -23,25 +23,25 @@ const menuItems = role === "user"
       { id: "lost-found", label: "Lost & Found", icon: Search, path: "/lost-found" },
     ];
   return (
-    <div className="w-72 bg-gradient-to-b from-pink-100/60 to-orange-100/60 backdrop-blur-sm border-r border-white/30 min-h-full sticky top-0">
+    <div className="w-72 bg-gradient-to-b from-emerald-50/80 to-green-50/80 backdrop-blur-sm border-r border-white/40 min-h-full sticky top-0 shadow-lg shadow-green-100/20 z-40">
       {/* Header */}
-      <div className="p-6 border-b border-white/30">
+      <div className="p-6 border-b border-white/40">
         <div className="flex items-center space-x-3 mb-6">
-          <div className="w-10 h-10 bg-gradient-to-br from-pink-300 to-orange-300 rounded-xl flex items-center justify-center shadow-sm">
+          <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-green-500 rounded-xl flex items-center justify-center shadow-lg">
             <User className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-800">Portal</h2>
-            <p className="text-sm text-gray-600">User Dashboard</p>
+            <h2 className="text-lg font-semibold text-emerald-900">Portal</h2>
+            <p className="text-sm text-emerald-600">User Dashboard</p>
           </div>
         </div>
 
-        <div className="bg-white/40 backdrop-blur-sm rounded-xl p-4 border border-white/40 shadow-sm">
+        <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white/60 shadow-lg hover:shadow-xl transition-all duration-300">
           <div className="flex items-center space-x-2 mb-1">
             <span className="text-lg">👋</span>
-            <p className="text-sm font-medium text-gray-700">Welcome</p>
+            <p className="text-sm font-medium text-emerald-700">Welcome</p>
           </div>
-          <p className="text-lg font-semibold text-gray-800">John Doe</p>
+          <p className="text-lg font-semibold text-emerald-900">John Doe</p>
         </div>
       </div>
 
@@ -55,17 +55,17 @@ const menuItems = role === "user"
                 key={item.id}
                 to={item.path}
                 className={({ isActive }) =>
-                  `w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
+                  `w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-300 ${
                     isActive
-                      ? "bg-gradient-to-r from-pink-300 to-orange-300 text-white shadow-md"
-                      : "text-gray-700 hover:bg-white/30 hover:shadow-sm"
+                      ? "bg-gradient-to-r from-emerald-400 to-green-500 text-white shadow-lg"
+                      : "text-emerald-700 hover:bg-white/60 hover:shadow-md hover:text-emerald-800"
                   }`
                 }
               >
                 <Icon className="w-5 h-5" />
                 <span className="font-medium text-sm">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-auto bg-gradient-to-r from-pink-400 to-rose-400 text-white text-xs px-2 py-1 rounded-full font-medium shadow-sm">
+                  <span className="ml-auto bg-gradient-to-r from-emerald-500 to-green-600 text-white text-xs px-2.5 py-1 rounded-full font-medium shadow-md">
                     {item.badge}
                   </span>
                 )}
@@ -76,14 +76,14 @@ const menuItems = role === "user"
       </nav>
 
       {/* Settings at bottom */}
-      <div className="p-4 border-t border-white/30 mt-auto">
+      <div className="p-4 border-t border-emerald-100/30 mt-auto">
         <NavLink
           to="/settings"
           className={({ isActive }) =>
-            `w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
+            `w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-300 ${
               isActive
-                ? "bg-gradient-to-r from-pink-300 to-orange-300 text-white shadow-md"
-                : "text-gray-700 hover:bg-white/30 hover:shadow-sm"
+                ? "bg-gradient-to-r from-emerald-400 to-green-500 text-white shadow-lg"
+                : "text-emerald-700 hover:bg-white/60 hover:shadow-md hover:text-emerald-800"
             }`
           }
         >

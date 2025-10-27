@@ -87,7 +87,7 @@ const Complaints = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return 'bg-orange-100/80 text-orange-700 border-orange-200/60';
-      case 'in-progress': return 'bg-pink-100/80 text-pink-700 border-pink-200/60';
+      case 'in-progress': return 'bg-emerald-50/90 text-emerald-700 border-emerald-100';
       case 'resolved': return 'bg-green-100/80 text-green-700 border-green-200/60';
       default: return 'bg-gray-100/80 text-gray-700 border-gray-200/60';
     }
@@ -190,7 +190,7 @@ const Complaints = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {filterOptions.map((option) => (
           <div key={option.value} className={`bg-white/40 backdrop-blur-sm rounded-xl border p-4 text-center transition-colors cursor-pointer ${
-            selectedFilter === option.value ? 'border-pink-300/60 bg-pink-100/40' : 'border-white/40 hover:border-white/60'
+            selectedFilter === option.value ? 'border-emerald-200 bg-emerald-50/40' : 'border-white/40 hover:border-white/60'
           }`} onClick={() => setSelectedFilter(option.value)}>
             <div className="text-2xl font-semibold text-gray-800 font-['Inter']">{option.count}</div>
             <div className="text-sm text-gray-600 font-['Inter']">{option.label}</div>
@@ -220,7 +220,7 @@ const Complaints = () => {
                 onClick={() => setSelectedFilter(option.value)}
                 className={`px-3 py-2 rounded-xl text-sm font-medium transition-colors font-['Inter'] ${
                   selectedFilter === option.value
-                    ? 'bg-gradient-to-r from-pink-300 to-rose-300 text-white shadow-md'
+                    ? 'bg-gradient-to-r from-emerald-400 to-green-500 text-white shadow-lg'
                     : 'bg-white/30 text-gray-700 hover:bg-white/40 backdrop-blur-sm'
                 }`}
               >
@@ -276,7 +276,7 @@ const Complaints = () => {
                         {complaint.category}
                       </span>
                       <div className="flex items-center space-x-2">
-                        <button className="text-pink-600 hover:text-pink-700 text-sm font-medium font-['Inter'] flex items-center">
+                        <button className="text-emerald-600 hover:text-emerald-700 text-sm font-medium font-['Inter'] flex items-center group">
                           <Eye className="w-4 h-4 mr-1" />
                           View Details
                         </button>
@@ -307,7 +307,7 @@ const Complaints = () => {
             {(!searchQuery && selectedFilter === 'all') && (
               <button 
                 onClick={handleComplaintModalOpen}
-                className="bg-gradient-to-r from-pink-300 to-rose-300 text-white px-6 py-3 rounded-xl font-medium hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-['Inter'] shadow-md"
+                className="bg-gradient-to-r from-emerald-400 to-green-500 text-white px-6 py-3 rounded-xl font-medium hover:from-emerald-500 hover:to-green-600 transition-all duration-300 font-['Inter'] shadow-lg hover:shadow-xl"
               >
                 <Plus className="w-4 h-4 inline mr-2" />
                 Submit Your First Complaint
