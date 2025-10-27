@@ -12,12 +12,10 @@ import {
   X,
   Loader2
 } from 'lucide-react';
-import { getAllComplaints, updateComplaint } from "../../services/AdminServices"; // Import admin services
-import Modal from '../components/Modal'; // <-- 1. Import the new Modal component
+import { getAllComplaints, updateComplaint } from "../../services/AdminServices"; 
+import Modal from '../components/Modal';
 
-// Define department options
 const departmentOptions = [
-  // ... (same options)
   "Not Assigned",
   "Infrastructure",
   "Utilities",
@@ -29,18 +27,14 @@ const departmentOptions = [
   "Other"
 ];
 
-// Define status options
 const statusOptions = [
-  // ... (same options)
   { value: "pending", label: "Pending" },
   { value: "in-progress", label: "In Progress" },
   { value: "resolved", label: "Resolved" },
   { value: "rejected", label: "Rejected" },
 ];
 
-// Define priority options
 const priorityOptions = [
-  // ... (same options)
   { value: "low", label: "Low" },
   { value: "medium", label: "Medium" },
   { value: "high", label: "High" },
@@ -53,7 +47,6 @@ const AdminComplaints = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Modal states for assigning/updating
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [assignmentData, setAssignmentData] = useState({
@@ -63,9 +56,7 @@ const AdminComplaints = () => {
   });
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Fetch all complaints on component mount
   useEffect(() => {
-    // ... (same logic)
     const fetchComplaints = async () => {
       try {
         setIsLoading(true);
@@ -84,7 +75,6 @@ const AdminComplaints = () => {
   }, []);
 
   const getStatusColor = (status) => {
-    // ... (same logic)
     switch (status) {
       case 'pending': return 'bg-amber-100/80 text-amber-700 border-amber-200/60';
       case 'in-progress': return 'bg-blue-100/80 text-blue-700 border-blue-200/60';
@@ -95,7 +85,6 @@ const AdminComplaints = () => {
   };
 
   const getPriorityColor = (priority) => {
-    // ... (same logic)
     switch (priority) {
       case 'high': return 'text-red-800 bg-red-100/80';
       case 'medium': return 'text-amber-800 bg-amber-100/80';
@@ -105,7 +94,6 @@ const AdminComplaints = () => {
   };
 
   const getStatusStats = () => {
-    // ... (same logic)
     const stats = allComplaints.reduce((acc, complaint) => {
       acc[complaint.status] = (acc[complaint.status] || 0) + 1;
       return acc;
@@ -119,9 +107,7 @@ const AdminComplaints = () => {
     };
   };
 
-  // --- Assignment Modal Handlers ---
   const handleAssignModalOpen = (complaint) => {
-    // ... (same logic)
     setSelectedComplaint(complaint);
     setAssignmentData({
       assigned_to: complaint.assigned_to || "Not Assigned",
@@ -132,7 +118,6 @@ const AdminComplaints = () => {
   };
 
   const handleAssignModalClose = () => {
-    // ... (same logic)
     setIsAssignModalOpen(false);
     setSelectedComplaint(null);
     setIsUpdating(false);
@@ -144,7 +129,6 @@ const AdminComplaints = () => {
   };
 
   const handleAssignmentInputChange = (e) => {
-    // ... (same logic)
     const { name, value } = e.target;
     setAssignmentData((prev) => ({
       ...prev,
@@ -153,7 +137,6 @@ const AdminComplaints = () => {
   };
 
   const handleAssignmentSubmit = async (e) => {
-    // ... (same logic)
     e.preventDefault();
     if (!selectedComplaint) return;
 
@@ -164,7 +147,6 @@ const AdminComplaints = () => {
         assignmentData
       );
       
-      // Update the complaint in the local state
       setAllComplaints(prevComplaints =>
         prevComplaints.map(c =>
           c.complaint_id === updatedComplaint.complaint_id ? updatedComplaint : c
@@ -180,10 +162,8 @@ const AdminComplaints = () => {
       setIsUpdating(false);
     }
   };
-  // --- End Modal Handlers ---
 
   const filteredComplaints = allComplaints.filter(complaint => {
-    // ... (same logic)
     const matchesFilter = selectedFilter === 'all' || complaint.status === selectedFilter;
     const searchLower = searchQuery.toLowerCase();
     const matchesSearch = 
@@ -198,7 +178,6 @@ const AdminComplaints = () => {
 
   const stats = getStatusStats();
   const filterOptions = [
-    // ... (same logic)
     { value: 'all', label: 'All', count: stats.total },
     { value: 'pending', label: 'Pending', count: stats.pending },
     { value: 'in-progress', label: 'In Progress', count: stats.inProgress },
@@ -206,7 +185,6 @@ const AdminComplaints = () => {
   ];
 
   if (isLoading) {
-    // ... (same logic)
     return (
       <div className="flex justify-center items-center h-screen">
         <Loader2 className="w-12 h-12 text-emerald-500 animate-spin" />
@@ -215,7 +193,6 @@ const AdminComplaints = () => {
   }
 
   if (error) {
-    // ... (same logic)
     return (
       <div className="p-6 max-w-7xl mx-auto text-center">
         <h2 className="text-2xl font-semibold text-red-600">Error</h2>
@@ -279,7 +256,7 @@ const AdminComplaints = () => {
         {filteredComplaints.length > 0 ? (
           filteredComplaints.map((complaint) => (
             <div key={complaint.complaint_id} className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-6 hover:shadow-lg transition-all duration-200 card-hover">
-              {/* ... (same card content) ... */}
+              {}
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-3 mb-2 flex-wrap">
@@ -342,7 +319,6 @@ const AdminComplaints = () => {
           ))
         ) : (
           <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-12 text-center">
-            {/* ... (same empty state content) ... */}
             <div className="w-16 h-16 bg-white/30 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
               <FileText className="w-8 h-8 text-gray-500" />
             </div>
@@ -359,14 +335,11 @@ const AdminComplaints = () => {
         )}
       </div>
 
-      {/* 2. Replace the old modal structure with the new Modal component */}
+      {}
       <Modal isOpen={isAssignModalOpen} onClose={handleAssignModalClose}>
         {selectedComplaint && (
           <>
-            {/* The modal content (header, form) is now placed *inside* the Modal component.
-              The .modal-center class from modal.css will provide the white
-              background, border-radius, and max-width.
-            */}
+            {}
             <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
               <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">
                 Update Complaint #{selectedComplaint.complaint_id}
