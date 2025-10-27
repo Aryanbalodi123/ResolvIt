@@ -17,6 +17,61 @@ import {
   Loader2 // <-- Added for loading state
 } from 'lucide-react';
 
+// 隼 FIX: Move form components outside the 'LostFound' component
+// This prevents them from being re-defined on every render, which causes focus loss.
+
+const FormInput = ({ label, name, value, onChange, placeholder, required, type = "text" }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+      {label} {required && '*'}
+    </label>
+    <input
+      type={type}
+      name={name}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      required={required}
+      className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+    />
+  </div>
+);
+
+const FormTextarea = ({ label, name, value, onChange, placeholder, required }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+      {label} {required && '*'}
+    </label>
+    <textarea
+      name={name}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      required={required}
+      rows={3}
+      className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+    />
+  </div>
+);
+
+const FormSelect = ({ label, name, value, onChange, children, required }) => (
+   <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+      {label} {required && '*'}
+    </label>
+    <select
+      name={name}
+      value={value}
+      onChange={onChange}
+      required={required}
+      className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+    >
+      {children}
+    </select>
+  </div>
+);
+
+
 const LostFound = () => {
   const navigate = useNavigate();
 
@@ -30,10 +85,10 @@ const LostFound = () => {
   const [isLostModalOpen, setIsLostModalOpen] = useState(false);
   const [isFoundModalOpen, setIsFoundModalOpen] = useState(false);
   
-  // 🔹 Loading state for form submission
+  // 隼 Loading state for form submission
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 🔹 Lost item form state
+  // 隼 Lost item form state
   const [lostFormData, setLostFormData] = useState({
     title: '',
     description: '',
@@ -45,7 +100,7 @@ const LostFound = () => {
     distinguishingFeatures: ''
   });
 
-  // 🔹 Found item form state
+  // 隼 Found item form state
   const [foundFormData, setFoundFormData] = useState({
     title: '',
     description: '',
@@ -84,7 +139,7 @@ const LostFound = () => {
     }
   ];
 
-  // 🔹 Modal handlers
+  // 隼 Modal handlers
   const handleLostModalOpen = () => setIsLostModalOpen(true);
   const handleFoundModalOpen = () => setIsFoundModalOpen(true);
 
@@ -117,7 +172,7 @@ const LostFound = () => {
     });
   };
 
-  // 🔹 Input handlers
+  // 隼 Input handlers
   const handleLostInputChange = (e) => {
     const { name, value } = e.target;
     setLostFormData(prev => ({ ...prev, [name]: value }));
@@ -128,7 +183,7 @@ const LostFound = () => {
     setFoundFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // 🔹 Submit handlers
+  // 隼 Submit handlers
   const handleLostSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -159,56 +214,7 @@ const LostFound = () => {
     }
   };
   
-  const FormInput = ({ label, name, value, onChange, placeholder, required, type = "text" }) => (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
-        {label} {required && '*'}
-      </label>
-      <input
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        required={required}
-        className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
-      />
-    </div>
-  );
-  
-  const FormTextarea = ({ label, name, value, onChange, placeholder, required }) => (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
-        {label} {required && '*'}
-      </label>
-      <textarea
-        name={name}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        required={required}
-        rows={3}
-        className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
-      />
-    </div>
-  );
-  
-  const FormSelect = ({ label, name, value, onChange, children, required }) => (
-     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
-        {label} {required && '*'}
-      </label>
-      <select
-        name={name}
-        value={value}
-        onChange={onChange}
-        required={required}
-        className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
-      >
-        {children}
-      </select>
-    </div>
-  );
+  // 隼 Form components are now defined *above* LostFound
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
