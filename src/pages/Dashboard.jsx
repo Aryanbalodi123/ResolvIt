@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-// 1. Import Lost/Found services
 import { reportLostItem, reportFoundItem } from "../../services/LostFoundServices"; 
 import { sendComplaint, retrieveComplaint } from "../../services/ComplaintServices";
 import { getUserDetails, getUserComplaints, getUserLostItems } from "../../services/UserServices";
@@ -25,11 +24,10 @@ import {
   X,
   Star,
   Loader2,
-  Package, // Icon for Lost
-  PackageOpen, // Icon for Found
+  Package, 
+  PackageOpen, 
 } from "lucide-react";
 
-// 2. Add helper components for forms (re-used from your other files)
 const FormInput = ({ label, name, value, onChange, placeholder, required, type = "text" }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
@@ -94,10 +92,7 @@ const Dashboard = () => {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // 3. Add state for Lost/Found modal
-  const [reportType, setReportType] = useState("lost"); // 'lost' or 'found'
-
-  // Form states
+  const [reportType, setReportType] = useState("lost"); 
   const [complaintFormData, setComplaintFormData] = useState({
     title: "",
     description: "",
@@ -106,7 +101,6 @@ const Dashboard = () => {
     category: "infrastructure",
   });
 
-  // 4. Update Lost/Found form state
   const [lostFoundFormData, setLostFoundFormData] = useState({
     title: "",
     description: "",
@@ -118,7 +112,6 @@ const Dashboard = () => {
   });
 
   const [feedbackFormData, setFeedbackFormData] = useState({
-    // ... (feedback state)
     subject: "",
     category: "general",
     rating: 5,
@@ -127,7 +120,6 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    // ... (Your data fetching logic is good)
     const token = localStorage.getItem("token");
     let userInfo;
     try {
@@ -180,7 +172,6 @@ const Dashboard = () => {
   }, [navigate]);
 
   const stats = [
-    // ... (Your stats array is good)
     {
       title: "My Complaints",
       value: userComplaints?.length.toString() || "0",
@@ -211,7 +202,6 @@ const Dashboard = () => {
   ];
 
   const getStatusColor = (status) => {
-    // ... (Your getStatusColor function is good)
     switch (status?.toLowerCase()) {
       case "pending":
         return "bg-amber-50/90 text-amber-700 border-amber-200/60";
@@ -224,7 +214,6 @@ const Dashboard = () => {
     }
   };
 
-  // --- Complaint Modal Handlers (Complete) ---
   const handleComplaintModalOpen = () => {
     setIsComplaintModalOpen(true);
   };
@@ -279,7 +268,6 @@ const Dashboard = () => {
     }
   };
 
-  // --- 5. Lost/Found Modal Handlers (New) ---
   const handleLostFoundModalOpen = () => {
     setIsLostFoundModalOpen(true);
   };
@@ -314,7 +302,6 @@ const Dashboard = () => {
         throw new Error("User not authenticated");
       }
 
-      // Prepare payload
       let payload = {
         user_id: userInfo.rollNumber,
         title: lostFoundFormData.title,
@@ -328,7 +315,7 @@ const Dashboard = () => {
         payload.dateLost = lostFoundFormData.date;
         payload.distinguishingFeatures = lostFoundFormData.distinguishingFeatures;
         await reportLostItem(payload);
-      } else { // 'found'
+      } else {
         payload.dateFound = lostFoundFormData.date;
         await reportFoundItem(payload);
       }
@@ -336,7 +323,6 @@ const Dashboard = () => {
       alert(`Successfully reported ${reportType} item!`);
       handleLostFoundModalClose();
 
-      // Refresh Lost & Found items in state
       const updatedLostItems = await getUserLostItems(userInfo.rollNumber);
       if (Array.isArray(updatedLostItems)) {
         setLostItems(updatedLostItems);
@@ -352,7 +338,6 @@ const Dashboard = () => {
 
 
   if (isLoading) {
-    // ... (Loading state is good)
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
@@ -362,9 +347,7 @@ const Dashboard = () => {
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
-      {/* Header */}
       <div className="mb-10">
-        {/* ... (Header JSX is good) ... */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-semibold text-emerald-900 font-['Inter']">
@@ -388,9 +371,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {/* ... (Stats grid JSX is good) ... */}
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -421,11 +402,8 @@ const Dashboard = () => {
         })}
       </div>
 
-      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recent Complaints */}
         <div className="lg:col-span-2 bg-white/60 backdrop-blur-md rounded-2xl border border-white/60 shadow-lg hover:shadow-xl transition-all duration-300">
-          {/* Header */}
           <div className="p-6 border-b border-emerald-100/30">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-emerald-900 font-['Inter']">
@@ -440,9 +418,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Complaints List */}
           <div className="divide-y divide-emerald-100/30 h-[calc(100vh-24rem)] overflow-y-auto">
-            {/* ... (Complaints list JSX is good) ... */}
             {!Array.isArray(userComplaints) || userComplaints.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
                 <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-400" />
@@ -456,7 +432,6 @@ const Dashboard = () => {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0 space-y-3">
-                      {/* Title and Status */}
                       <div className="flex items-center justify-between">
                         <h3 className="text-base font-medium text-emerald-900 font-['Inter']">
                           {complaint.title}
@@ -470,12 +445,10 @@ const Dashboard = () => {
                         </span>
                       </div>
 
-                      {/* Description */}
                       <p className="text-sm text-emerald-600 font-['Inter'] leading-relaxed">
                         {complaint.description}
                       </p>
 
-                      {/* Meta info */}
                       <div className="flex flex-wrap items-center gap-4 text-xs text-emerald-500">
                         {complaint.location && (
                           <span className="flex items-center font-['Inter'] bg-emerald-50/50 px-2 py-1 rounded-md">
@@ -502,10 +475,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Quick Actions */}
         <div className="space-y-6">
           <div className="bg-white/60 backdrop-blur-md rounded-2xl border border-white/60 shadow-lg hover:shadow-xl transition-all duration-300">
-            {/* ... (Quick Actions header) ... */}
             <div className="p-6 border-b border-emerald-100/30">
               <h2 className="text-xl font-semibold text-emerald-900 font-['Inter']">
                 Quick Actions
@@ -516,7 +487,6 @@ const Dashboard = () => {
                 onClick={handleComplaintModalOpen}
                 className="w-full p-4 bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-xl hover:from-emerald-500 hover:to-green-600 transition-all duration-300 text-left shadow-lg hover:shadow-xl group"
               >
-                {/* ... (New Complaint button content) ... */}
                 <div className="flex items-center space-x-4">
                   <div className="p-2 bg-white/20 rounded-lg group-hover:scale-110 transition-transform duration-300">
                     <Plus className="w-5 h-5" />
@@ -529,10 +499,9 @@ const Dashboard = () => {
               </button>
 
               <button
-                onClick={handleLostFoundModalOpen} // Now functional
+                onClick={handleLostFoundModalOpen} 
                 className="w-full p-4 bg-gradient-to-r from-green-400 to-teal-500 text-white rounded-xl hover:from-green-500 hover:to-teal-600 transition-all duration-300 text-left shadow-lg hover:shadow-xl group"
               >
-                {/* ... (Lost & Found button content) ... */}
                 <div className="flex items-center space-x-4">
                   <div className="p-2 bg-white/20 rounded-lg group-hover:scale-110 transition-transform duration-300">
                     <Search className="w-5 h-5" />
@@ -548,9 +517,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* --- Modals --- */}
-      
-      {/* New Complaint Modal (Complete) */}
       <Modal isOpen={isComplaintModalOpen} onClose={handleComplaintModalClose}>
         <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
           <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">
@@ -611,7 +577,6 @@ const Dashboard = () => {
         </form>
       </Modal>
 
-      {/* 6. Lost & Found Modal (Now functional) */}
       <Modal isOpen={isLostFoundModalOpen} onClose={handleLostFoundModalClose}>
          <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
             <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">
@@ -625,8 +590,6 @@ const Dashboard = () => {
               <X className="w-5 h-5" />
             </button>
          </div>
-         
-         {/* Tab Buttons */}
          <div className="p-6 pb-0">
            <div className="flex bg-gray-100/60 rounded-xl p-1.5 space-x-2">
              <button

@@ -14,11 +14,11 @@ import {
   MessageSquare,
   ExternalLink,
   X,
-  Loader2 // <-- 1. Import Loader2 for submitting state
+  Loader2
 } from 'lucide-react';
 import { sendComplaint } from "../../services/ComplaintServices";
 import { getUserComplaints } from "../../services/UserServices";
-import Modal from '../components/Modal'; // <-- 2. Import your reusable Modal component
+import Modal from '../components/Modal';
 
 const Complaints = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
@@ -26,15 +26,9 @@ const Complaints = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [complaints, setComplaints] = useState([]);
   const [error, setError] = useState(null);
-
-  // Modal states
   const [isComplaintModalOpen, setIsComplaintModalOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // <-- 3. Add submitting state
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 4. REMOVED the useEffect that manually toggled 'modal-open' class.
-  // The <Modal> component handles this automatically.
-
-  // Form data states
   const [complaintFormData, setComplaintFormData] = useState({
     title: "",
     description: "",
@@ -43,21 +37,15 @@ const Complaints = () => {
     category: "infrastructure",
   });
 
-  // Fetch user complaints
   useEffect(() => {
     const fetchComplaints = async () => {
       try {
         setIsLoading(true);
-        // Get user info from localStorage
         const userInfo = JSON.parse(localStorage.getItem("token") || "{}");
-
-        if (!userInfo.rollNumber) {
-          throw new Error("User not authenticated");
-        }
-
+        if (!userInfo.rollNumber) throw new Error("User not authenticated");
         const userComplaints = await getUserComplaints(userInfo.rollNumber);
         setComplaints(userComplaints || []);
-        setError(null); // Clear error on successful fetch
+        setError(null);
       } catch (err) {
         console.error("Error fetching complaints:", err);
         setError(err.message);
@@ -67,8 +55,6 @@ const Complaints = () => {
     };
 
     fetchComplaints();
-
-    // Refresh data every minute
     const interval = setInterval(fetchComplaints, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -76,7 +62,7 @@ const Complaints = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return 'bg-amber-100/80 text-amber-700 border-amber-200/60';
-      case 'in-progress': return 'bg-blue-100/80 text-blue-700 border-blue-200/60'; // Changed to blue for better contrast
+      case 'in-progress': return 'bg-blue-100/80 text-blue-700 border-blue-200/60';
       case 'resolved': return 'bg-emerald-100/80 text-emerald-700 border-emerald-200/60';
       default: return 'bg-gray-100/80 text-gray-700 border-gray-200/60';
     }
@@ -92,12 +78,10 @@ const Complaints = () => {
   };
 
   const getStatusStats = () => {
-    // ... (same logic)
     const stats = complaints.reduce((acc, complaint) => {
       acc[complaint.status] = (acc[complaint.status] || 0) + 1;
       return acc;
     }, {});
-
     return {
       total: complaints.length,
       pending: stats.pending || 0,
@@ -106,13 +90,12 @@ const Complaints = () => {
     };
   };
 
-  // Modal handlers for Complaint
   const handleComplaintModalOpen = () => {
     setIsComplaintModalOpen(true);
   };
 
   const handleComplaintModalClose = () => {
-    if (isSubmitting) return; // <-- 5. Prevent closing while submitting
+    if (isSubmitting) return;
     setIsComplaintModalOpen(false);
     setComplaintFormData({
       title: "",
@@ -124,7 +107,6 @@ const Complaints = () => {
   };
 
   const handleComplaintInputChange = (e) => {
-    // ... (same logic)
     const { name, value } = e.target;
     setComplaintFormData((prev) => ({
       ...prev,
@@ -134,13 +116,10 @@ const Complaints = () => {
 
   const handleComplaintSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true); // <-- 6. Set submitting state to true
+    setIsSubmitting(true);
     try {
       const userInfo = JSON.parse(localStorage.getItem("token") || "{}");
-
-      if (!userInfo.rollNumber) {
-        throw new Error("User not authenticated");
-      }
+      if (!userInfo.rollNumber) throw new Error("User not authenticated");
 
       const payload = {
         user_id: userInfo.rollNumber,
@@ -154,33 +133,26 @@ const Complaints = () => {
 
       await sendComplaint(payload);
       handleComplaintModalClose();
-
-      // Refresh complaints after submission
       const updatedComplaints = await getUserComplaints(userInfo.rollNumber);
       setComplaints(updatedComplaints || []);
     } catch (err) {
       console.error("Error submitting complaint:", err);
       alert("Failed to submit complaint. Please try again.");
     } finally {
-      setIsSubmitting(false); // <-- 7. Set submitting state to false
+      setIsSubmitting(false);
     }
   };
 
   const stats = getStatusStats();
   const filterOptions = [
-    // ... (same logic)
     { value: 'all', label: 'All', count: stats.total },
     { value: 'pending', label: 'Pending', count: stats.pending },
     { value: 'in-progress', label: 'In Progress', count: stats.inProgress },
     { value: 'resolved', label: 'Resolved', count: stats.resolved }
   ];
 
-  // Helper for rendering filtered list
   const filteredComplaints = complaints
-    .filter(complaint => {
-      if (selectedFilter === 'all') return true;
-      return complaint.status === selectedFilter;
-    })
+    .filter(complaint => selectedFilter === 'all' || complaint.status === selectedFilter)
     .filter(complaint => {
       if (!searchQuery) return true;
       const searchLower = searchQuery.toLowerCase();
@@ -194,7 +166,6 @@ const Complaints = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-800 font-['Inter']">My Complaints</h1>
@@ -209,21 +180,22 @@ const Complaints = () => {
         </button>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {filterOptions.map((option) => (
-          <div key={option.value} className={`bg-white/40 backdrop-blur-sm rounded-xl border p-4 text-center transition-colors cursor-pointer ${
-            selectedFilter === option.value ? 'border-emerald-300/60 bg-emerald-100/40' : 'border-white/40 hover:border-white/60'
-            }`} onClick={() => setSelectedFilter(option.value)}>
+          <div
+            key={option.value}
+            className={`bg-white/40 backdrop-blur-sm rounded-xl border p-4 text-center transition-colors cursor-pointer ${
+              selectedFilter === option.value ? 'border-emerald-300/60 bg-emerald-100/40' : 'border-white/40 hover:border-white/60'
+            }`}
+            onClick={() => setSelectedFilter(option.value)}
+          >
             <div className="text-2xl font-semibold text-gray-800 font-['Inter']">{option.count}</div>
             <div className="text-sm text-gray-600 font-['Inter']">{option.label}</div>
           </div>
         ))}
       </div>
 
-      {/* Filters and Search */}
       <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-4">
-        {/* ... (same filters and search JSX) ... */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
@@ -246,7 +218,7 @@ const Complaints = () => {
                   selectedFilter === option.value
                     ? 'bg-gradient-to-r from-emerald-400 to-green-500 text-white shadow-md'
                     : 'bg-white/30 text-gray-700 hover:bg-white/40 backdrop-blur-sm'
-                  }`}
+                }`}
               >
                 {option.label} ({option.count})
               </button>
@@ -255,7 +227,6 @@ const Complaints = () => {
         </div>
       </div>
 
-      {/* Complaints List, Loading, and Error states */}
       {isLoading ? (
         <div className="flex justify-center items-center py-12">
           <Loader2 className="w-12 h-12 text-emerald-500 animate-spin" />
@@ -319,16 +290,12 @@ const Complaints = () => {
         </div>
       )}
 
-      {/* 8. Replace the old modal div with the Modal component */}
       <Modal isOpen={isComplaintModalOpen} onClose={handleComplaintModalClose}>
-        {/* The modal's content (header, form) goes directly inside */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
-          <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">
-            New Complaint
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">New Complaint</h2>
           <button
             onClick={handleComplaintModalClose}
-            disabled={isSubmitting} // <-- 9. Disable close button while submitting
+            disabled={isSubmitting}
             className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/60 rounded-xl transition-colors disabled:opacity-50"
           >
             <X className="w-5 h-5" />
@@ -370,8 +337,7 @@ const Complaints = () => {
                 <option value="other">Other</option>
               </select>
             </div>
-            
-            {/* 10. Added the missing Priority field */}
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
                 Priority
@@ -388,7 +354,6 @@ const Complaints = () => {
               </select>
             </div>
           </div>
-
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
@@ -424,22 +389,17 @@ const Complaints = () => {
             <button
               type="button"
               onClick={handleComplaintModalClose}
-              disabled={isSubmitting} // <-- 11. Disable button
+              disabled={isSubmitting}
               className="flex-1 px-4 py-2 text-gray-700 bg-gray-100/60 border border-gray-300/60 rounded-xl hover:bg-gray-200/60 transition-colors font-medium font-['Inter'] disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={isSubmitting} // <-- 11. Disable button
+              disabled={isSubmitting}
               className="flex-1 px-4 py-2 bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-xl hover:from-emerald-500 hover:to-green-600 transition-all duration-200 font-medium shadow-md font-['Inter'] disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
             >
-              {/* 12. Show loader or text */}
-              {isSubmitting ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                "Submit Complaint"
-              )}
+              {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Submit Complaint"}
             </button>
           </div>
         </form>

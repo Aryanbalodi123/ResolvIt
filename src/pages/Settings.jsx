@@ -1,6 +1,5 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
-
 import { 
   User, 
   Edit3, 
@@ -18,14 +17,13 @@ import {
 } from 'lucide-react';
 
 const Settings = () => {
-    const navigate = useNavigate();
-      useEffect(() => {
-        const token = localStorage.getItem("token");
-    
-        if (!token) {
-          navigate("/login", { replace: true });
-        }
-      }, [navigate]);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login", { replace: true });
+    }
+  }, [navigate]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -62,7 +60,6 @@ const Settings = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-800 font-['Inter']">Settings</h1>
@@ -71,7 +68,6 @@ const Settings = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Profile Section */}
         <div className="lg:col-span-2 bg-white/40 backdrop-blur-sm rounded-xl border border-white/40">
           <div className="p-6 border-b border-white/30">
             <div className="flex items-center justify-between">
@@ -109,7 +105,6 @@ const Settings = () => {
           </div>
 
           <div className="p-6 space-y-6">
-            {/* Profile Picture */}
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center shadow-md">
@@ -127,7 +122,6 @@ const Settings = () => {
               </div>
             </div>
 
-            {/* Profile Form */}
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">Full Name</label>
@@ -198,7 +192,6 @@ const Settings = () => {
               </div>
             </div>
 
-            {/* Password Section (only show in edit mode) */}
             {isEditing && (
               <div className="pt-6 border-t border-white/30">
                 <h3 className="text-lg font-medium text-gray-800 mb-4 font-['Inter'] flex items-center">
@@ -249,9 +242,7 @@ const Settings = () => {
           </div>
         </div>
 
-        {/* Account Stats & Quick Actions */}
         <div className="space-y-6">
-          {/* Account Statistics */}
           <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40">
             <div className="p-6 border-b border-white/30">
               <h2 className="text-lg font-semibold text-gray-800 font-['Inter']">Account Overview</h2>
@@ -279,7 +270,6 @@ const Settings = () => {
             </div>
           </div>
 
-          {/* Danger Zone */}
           <div className="bg-red-100/60 border border-red-200/60 rounded-xl backdrop-blur-sm">
             <div className="p-6 border-b border-red-200/60">
               <h2 className="text-lg font-semibold text-red-800 font-['Inter']">Account Actions</h2>
@@ -300,7 +290,6 @@ const Settings = () => {
         </div>
       </div>
 
-      {/* Logout Confirmation Modal */}
       {showLogoutModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white/90 backdrop-blur-md rounded-xl max-w-md w-full p-6 border border-white/40">
