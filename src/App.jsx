@@ -9,7 +9,7 @@ import {
 
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard.jsx";
-import Complaints from "./pages/Complaints.jsx"; // This is the student "My Complaints" page
+import Complaints from "./pages/Complaints.jsx";
 import LostFound from "./pages/LostFound.jsx";
 import Settings from "./pages/Settings.jsx";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -17,7 +17,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLostFound from "./pages/AdminLostFound";
-import AdminComplaints from "./pages/AdminComplaints.jsx"; // Import the new Admin component
+import AdminComplaints from "./pages/AdminComplaints.jsx";
 
 import "./App.css";
 
@@ -46,7 +46,7 @@ const App = () => {
 
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/all-complaints" element={<AdminComplaints />} /> {/* Updated this route */}
+          <Route path="/all-complaints" element={<AdminComplaints />} />
           <Route path="/admin/lost-found" element={<AdminLostFound />} />
         </Route>
 

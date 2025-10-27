@@ -24,7 +24,7 @@ const menuItems = role === "user"
     ];
   return (
     <div className="w-72 bg-gradient-to-b from-emerald-50/80 to-green-50/80 backdrop-blur-sm border-r border-white/40 min-h-full sticky top-0 shadow-lg shadow-green-100/20 z-40">
-      {/* Header */}
+      {/* Logo and portal type header */}
       <div className="p-6 border-b border-white/40">
         <div className="flex items-center space-x-3 mb-6">
           <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-green-500 rounded-xl flex items-center justify-center shadow-lg">
@@ -35,11 +35,9 @@ const menuItems = role === "user"
             <p className="text-sm text-emerald-600">{localStorage.getItem("role") === "user" ? "Student Portal" : "Admin Portal"}</p>
           </div>
         </div>
-
-
       </div>
 
-      {/* Navigation */}
+      {/* Main navigation menu */}
       <nav className="flex-1 px-4 py-6">
         <div className="space-y-2">
           {menuItems.map((item) => {
@@ -69,7 +67,7 @@ const menuItems = role === "user"
         </div>
       </nav>
 
-      {/* Settings at bottom */}
+      {/* Settings navigation at bottom */}
       <div className="p-4 border-t border-emerald-100/30 mt-auto">
         <NavLink
           to="/settings"
