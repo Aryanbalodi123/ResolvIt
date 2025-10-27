@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { reportLostItem, reportFoundItem } from '../../services/LostFoundServices';
-import Modal from '../components/Modal'; // <-- 1. Import the Modal component
+import Modal from '../components/Modal'; 
 
 import { 
   Plus, 
@@ -14,11 +14,10 @@ import {
   Image as ImageIcon,
   AlertTriangle,
   X,
-  Loader2 // <-- Added for loading state
+  Loader2 
 } from 'lucide-react';
 
-// 隼 FIX: Move form components outside the 'LostFound' component
-// This prevents them from being re-defined on every render, which causes focus loss.
+
 
 const FormInput = ({ label, name, value, onChange, placeholder, required, type = "text" }) => (
   <div>
@@ -85,34 +84,34 @@ const LostFound = () => {
   const [isLostModalOpen, setIsLostModalOpen] = useState(false);
   const [isFoundModalOpen, setIsFoundModalOpen] = useState(false);
   
-  // 隼 Loading state for form submission
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 隼 Lost item form state
+
   const [lostFormData, setLostFormData] = useState({
     title: '',
     description: '',
     location: '',
     category: 'Personal Items',
-    contactMethod: 'email', // This can be simplified, we'll just use contactDetails
+    contactMethod: 'email', 
     contactDetails: '',
     dateLost: '',
     distinguishingFeatures: ''
   });
 
-  // 隼 Found item form state
+  
   const [foundFormData, setFoundFormData] = useState({
     title: '',
     description: '',
     location: '',
     category: 'General',
     dateFound: '',
-    contactMethod: 'email', // Also simplified
+    contactMethod: 'email', 
     contactDetails: ''
   });
 
   const lostFoundItems = [
-    // ... (Your mock data remains the same)
+ 
     {
       id: 'LF001',
       title: 'iPhone 13 Pro',
@@ -139,12 +138,12 @@ const LostFound = () => {
     }
   ];
 
-  // 隼 Modal handlers
+
   const handleLostModalOpen = () => setIsLostModalOpen(true);
   const handleFoundModalOpen = () => setIsFoundModalOpen(true);
 
   const handleLostModalClose = () => {
-    if (isSubmitting) return; // Don't close while submitting
+    if (isSubmitting) return; 
     setIsLostModalOpen(false);
     setLostFormData({
       title: '',
@@ -172,7 +171,7 @@ const LostFound = () => {
     });
   };
 
-  // 隼 Input handlers
+
   const handleLostInputChange = (e) => {
     const { name, value } = e.target;
     setLostFormData(prev => ({ ...prev, [name]: value }));
@@ -183,7 +182,7 @@ const LostFound = () => {
     setFoundFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // 隼 Submit handlers
+
   const handleLostSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -214,11 +213,10 @@ const LostFound = () => {
     }
   };
   
-  // 隼 Form components are now defined *above* LostFound
+
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-800 font-['Inter']">Lost & Found</h1>
@@ -242,7 +240,6 @@ const LostFound = () => {
         </div>
       </div>
 
-      {/* Items List */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {lostFoundItems.map((item) => (
           <div key={item.id} className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-6 card-hover">
@@ -275,7 +272,6 @@ const LostFound = () => {
         ))}
       </div>
 
-      {/* Tips Section */}
       <div className="bg-emerald-50/50 border border-emerald-100/60 rounded-xl p-6 backdrop-blur-sm">
         <h3 className="text-lg font-medium text-emerald-800 mb-3 flex items-center font-['Inter']">
           <AlertTriangle className="w-5 h-5 mr-2 text-emerald-600" /> Tips for Better Results
@@ -285,8 +281,6 @@ const LostFound = () => {
         </p>
       </div>
 
-      {/* 2. Replace old modal with Modal Component */}
-      {/* Report Lost Item Modal */}
       <Modal isOpen={isLostModalOpen} onClose={handleLostModalClose}>
         <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
           <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">Report Lost Item</h2>
