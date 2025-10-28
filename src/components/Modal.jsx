@@ -23,18 +23,16 @@ const Modal = ({ isOpen, onClose, children }) => {
     };
   }, [isOpen]);
 
-  // Don't render anything if the modal is not open
   if (!isOpen) {
     return null;
   }
 
-  // Use createPortal to render the modal into the 'modalRoot' element
   return createPortal(
     <div 
       className="modal-overlay" 
       onClick={onClose}
     >
-      {/* Stop click propagation so clicking modal content doesn't close it */}
+      {}
       <div 
         className="modal-center" 
         onClick={(e) => e.stopPropagation()}

@@ -9,19 +9,53 @@ import {
 } from "lucide-react";
 
 const Sidebar = () => {
-const role = localStorage.getItem("role");
+  const role = localStorage.getItem("role");
 
-const menuItems = role === "user"
-  ? [
-      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
-      { id: "complaints", label: "My Complaints", icon: FileText, badge: 2, path: "/complaints" },
-      { id: "lost-found", label: "Lost & Found", icon: Search, path: "/lost-found" },
-    ]
-  : [
-      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
-      { id: "all-complaint", label: "All Complaints", icon: FileText, badge: 2, path: "/all-complaints" },
-      { id: "lost-found", label: "Lost & Found", icon: Search, path: "/admin/lost-found" },
-    ];
+  const menuItems =
+    role === "user"
+      ? [
+          {
+            id: "dashboard",
+            label: "Dashboard",
+            icon: LayoutDashboard,
+            path: "/dashboard",
+          },
+          {
+            id: "complaints",
+            label: "My Complaints",
+            icon: FileText,
+            badge: 2,
+            path: "/complaints",
+          },
+          {
+            id: "lost-found",
+            label: "Lost & Found",
+            icon: Search,
+            path: "/lost-found",
+          },
+        ]
+      : [
+          {
+            id: "dashboard",
+            label: "Dashboard",
+            icon: LayoutDashboard,
+            path: "/admin",
+          },
+          {
+            id: "all-complaint",
+            label: "All Complaints",
+            icon: FileText,
+            badge: 2,
+            path: "/all-complaints",
+          },
+          {
+            id: "lost-found",
+            label: "Lost & Found",
+            icon: Search,
+            path: "/admin/lost-found",
+          },
+        ];
+
   return (
     <div className="w-72 bg-gradient-to-b from-emerald-50/80 to-green-50/80 backdrop-blur-sm border-r border-white/40 min-h-full sticky top-0 shadow-lg shadow-green-100/20 z-40">
       {/* Logo and portal type header */}
@@ -31,8 +65,14 @@ const menuItems = role === "user"
             <User className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-emerald-900">ResolvIt</h2>
-            <p className="text-sm text-emerald-600">{localStorage.getItem("role") === "user" ? "Student Portal" : "Admin Portal"}</p>
+            <h2 className="text-lg font-semibold text-emerald-900">
+              ResolvIt
+            </h2>
+            <p className="text-sm text-emerald-600">
+              {localStorage.getItem("role") === "user"
+                ? "Student Portal"
+                : "Admin Portal"}
+            </p>
           </div>
         </div>
       </div>
@@ -42,10 +82,12 @@ const menuItems = role === "user"
         <div className="space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
+            const isDashboard = item.id === "dashboard"; // ✅ identify dashboard
             return (
               <NavLink
                 key={item.id}
                 to={item.path}
+                end={isDashboard} // ✅ exact match for dashboard only
                 className={({ isActive }) =>
                   `w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-300 ${
                     isActive
@@ -71,6 +113,7 @@ const menuItems = role === "user"
       <div className="p-4 border-t border-emerald-100/30 mt-auto">
         <NavLink
           to="/settings"
+          end
           className={({ isActive }) =>
             `w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-300 ${
               isActive

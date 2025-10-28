@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { reportLostItem, reportFoundItem } from "../../services/LostFoundServices"; 
-import { sendComplaint, retrieveComplaint } from "../../services/ComplaintServices";
-import { getUserDetails, getUserComplaints, getUserLostItems } from "../../services/UserServices";
+import {
+  reportLostItem,
+  reportFoundItem,
+} from "../../services/LostFoundServices";
+import {
+  sendComplaint,
+  retrieveComplaint,
+} from "../../services/ComplaintServices";
+import {
+  getUserDetails,
+  getUserComplaints,
+  getUserLostItems,
+} from "../../services/UserServices";
 import "./Dashboard.css";
 import Modal from "../components/Modal";
 
@@ -24,14 +34,22 @@ import {
   X,
   Star,
   Loader2,
-  Package, 
-  PackageOpen, 
+  Package,
+  PackageOpen,
 } from "lucide-react";
 
-const FormInput = ({ label, name, value, onChange, placeholder, required, type = "text" }) => (
+const FormInput = ({
+  label,
+  name,
+  value,
+  onChange,
+  placeholder,
+  required,
+  type = "text",
+}) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
-      {label} {required && '*'}
+      {label} {required && "*"}
     </label>
     <input
       type={type}
@@ -45,10 +63,17 @@ const FormInput = ({ label, name, value, onChange, placeholder, required, type =
   </div>
 );
 
-const FormTextarea = ({ label, name, value, onChange, placeholder, required }) => (
+const FormTextarea = ({
+  label,
+  name,
+  value,
+  onChange,
+  placeholder,
+  required,
+}) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
-      {label} {required && '*'}
+      {label} {required && "*"}
     </label>
     <textarea
       name={name}
@@ -63,9 +88,9 @@ const FormTextarea = ({ label, name, value, onChange, placeholder, required }) =
 );
 
 const FormSelect = ({ label, name, value, onChange, children, required }) => (
-   <div>
+  <div>
     <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
-      {label} {required && '*'}
+      {label} {required && "*"}
     </label>
     <select
       name={name}
@@ -79,7 +104,6 @@ const FormSelect = ({ label, name, value, onChange, children, required }) => (
   </div>
 );
 
-
 const Dashboard = () => {
   const navigate = useNavigate();
   const [complaints, setComplaints] = useState([]);
@@ -91,8 +115,8 @@ const Dashboard = () => {
   const [isLostFoundModalOpen, setIsLostFoundModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const [reportType, setReportType] = useState("lost"); 
+
+  const [reportType, setReportType] = useState("lost");
   const [complaintFormData, setComplaintFormData] = useState({
     title: "",
     description: "",
@@ -108,7 +132,7 @@ const Dashboard = () => {
     category: "Personal Items",
     contactDetails: "",
     date: "",
-    distinguishingFeatures: ""
+    distinguishingFeatures: "",
   });
 
   const [feedbackFormData, setFeedbackFormData] = useState({
@@ -121,11 +145,21 @@ const Dashboard = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    let userInfo;
+    let userInfo = {};
+
     try {
-      userInfo = JSON.parse(localStorage.getItem("token") || "{}");
+      userInfo = {
+        email: localStorage.getItem("email") || "",
+        joinDate: localStorage.getItem("joinDate") || "",
+        name: localStorage.getItem("name") || "",
+        resolvedComplaints: localStorage.getItem("resolvedComplaints") || 0,
+        role: localStorage.getItem("role") || "",
+        rollNumber: localStorage.getItem("rollNumber") || "",
+        token: localStorage.getItem("token") || "",
+        totalComplaints: localStorage.getItem("totalComplaints") || 0,
+      };
     } catch (e) {
-      console.error("Error parsing user info:", e);
+      console.error("Error building user info:", e);
       userInfo = {};
     }
 
@@ -138,12 +172,13 @@ const Dashboard = () => {
       setIsLoading(true);
       try {
         const userId = userInfo.rollNumber;
-        
-        const [userDetailsData, userComplaintsData, userLostItemsData] = await Promise.all([
-          getUserDetails(userId),
-          getUserComplaints(userId),
-          getUserLostItems(userId)
-        ]);
+
+        const [userDetailsData, userComplaintsData, userLostItemsData] =
+          await Promise.all([
+            getUserDetails(userId),
+            getUserComplaints(userId),
+            getUserLostItems(userId),
+          ]);
 
         if (userDetailsData) {
           setUserDetails(userDetailsData);
@@ -154,7 +189,7 @@ const Dashboard = () => {
         if (Array.isArray(userLostItemsData)) {
           setLostItems(userLostItemsData);
         }
-        
+
         const complaintsData = await retrieveComplaint();
         if (Array.isArray(complaintsData)) {
           setComplaints(complaintsData);
@@ -175,7 +210,11 @@ const Dashboard = () => {
     {
       title: "My Complaints",
       value: userComplaints?.length.toString() || "0",
-      subtitle: `${userComplaints?.filter(c => c.status === 'pending').length || 0} pending, ${userComplaints?.filter(c => c.status === 'in-progress').length || 0} in progress`,
+      subtitle: `${
+        userComplaints?.filter((c) => c.status === "pending").length || 0
+      } pending, ${
+        userComplaints?.filter((c) => c.status === "in-progress").length || 0
+      } in progress`,
       icon: FileText,
       color: "from-emerald-400 to-green-500",
       bgColor: "bg-emerald-50/90",
@@ -184,7 +223,11 @@ const Dashboard = () => {
     {
       title: "Lost & Found",
       value: lostItems?.length.toString() || "0",
-      subtitle: `${lostItems?.filter(item => !item.isResolved).length || 0} active, ${lostItems?.filter(item => item.isResolved).length || 0} resolved`,
+      subtitle: `${
+        lostItems?.filter((item) => !item.isResolved).length || 0
+      } active, ${
+        lostItems?.filter((item) => item.isResolved).length || 0
+      } resolved`,
       icon: Search,
       color: "from-green-400 to-teal-500",
       bgColor: "bg-green-50/90",
@@ -192,7 +235,9 @@ const Dashboard = () => {
     },
     {
       title: "Resolved Cases",
-      value: (userComplaints?.filter(c => c.status === 'resolved').length || 0).toString(),
+      value: (
+        userComplaints?.filter((c) => c.status === "resolved").length || 0
+      ).toString(),
       subtitle: "All time",
       icon: CheckCircle,
       color: "from-teal-400 to-emerald-500",
@@ -250,7 +295,7 @@ const Dashboard = () => {
       const payload = {
         user_id: userInfo.rollNumber,
         ...complaintFormData,
-        status: "pending"
+        status: "pending",
       };
 
       await sendComplaint(payload);
@@ -283,19 +328,19 @@ const Dashboard = () => {
       category: "Personal Items",
       contactDetails: "",
       date: "",
-      distinguishingFeatures: ""
+      distinguishingFeatures: "",
     });
   };
-  
+
   const handleLostFoundInputChange = (e) => {
     const { name, value } = e.target;
-    setLostFoundFormData(prev => ({ ...prev, [name]: value }));
+    setLostFoundFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleLostFoundSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       const userInfo = JSON.parse(localStorage.getItem("token") || "{}");
       if (!userInfo.rollNumber) {
@@ -311,9 +356,10 @@ const Dashboard = () => {
         contactDetails: lostFoundFormData.contactDetails,
       };
 
-      if (reportType === 'lost') {
+      if (reportType === "lost") {
         payload.dateLost = lostFoundFormData.date;
-        payload.distinguishingFeatures = lostFoundFormData.distinguishingFeatures;
+        payload.distinguishingFeatures =
+          lostFoundFormData.distinguishingFeatures;
         await reportLostItem(payload);
       } else {
         payload.dateFound = lostFoundFormData.date;
@@ -327,7 +373,6 @@ const Dashboard = () => {
       if (Array.isArray(updatedLostItems)) {
         setLostItems(updatedLostItems);
       }
-      
     } catch (err) {
       console.error(`Failed to report ${reportType} item:`, err.message);
       alert(`Error: ${err.message}`);
@@ -335,7 +380,6 @@ const Dashboard = () => {
       setIsSubmitting(false);
     }
   };
-
 
   if (isLoading) {
     return (
@@ -351,7 +395,7 @@ const Dashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-semibold text-emerald-900 font-['Inter']">
-              Welcome back, {userDetails?.name || 'User'}
+              Welcome back, {userDetails?.name || "User"}
             </h1>
             <div className="mt-2 text-emerald-600">
               <p className="font-['Inter'] text-lg">
@@ -410,10 +454,11 @@ const Dashboard = () => {
                 Recent Complaints
               </h2>
               <button
-                onClick={() => navigate('/complaints')}
+                onClick={() => navigate("/complaints")}
                 className="text-emerald-600 hover:text-emerald-700 font-medium text-sm font-['Inter'] flex items-center group"
               >
-                View all <ArrowUpRight className="w-4 h-4 ml-1 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                View all{" "}
+                <ArrowUpRight className="w-4 h-4 ml-1 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </button>
             </div>
           </div>
@@ -441,7 +486,8 @@ const Dashboard = () => {
                             complaint.status
                           )}`}
                         >
-                          {complaint.status.charAt(0).toUpperCase() + complaint.status.slice(1)}
+                          {complaint.status.charAt(0).toUpperCase() +
+                            complaint.status.slice(1)}
                         </span>
                       </div>
 
@@ -492,14 +538,18 @@ const Dashboard = () => {
                     <Plus className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="font-medium font-['Inter'] text-lg">New Complaint</div>
-                    <div className="text-sm text-white/90 font-['Inter']">Report a new issue</div>
+                    <div className="font-medium font-['Inter'] text-lg">
+                      New Complaint
+                    </div>
+                    <div className="text-sm text-white/90 font-['Inter']">
+                      Report a new issue
+                    </div>
                   </div>
                 </div>
               </button>
 
               <button
-                onClick={handleLostFoundModalOpen} 
+                onClick={handleLostFoundModalOpen}
                 className="w-full p-4 bg-gradient-to-r from-green-400 to-teal-500 text-white rounded-xl hover:from-green-500 hover:to-teal-600 transition-all duration-300 text-left shadow-lg hover:shadow-xl group"
               >
                 <div className="flex items-center space-x-4">
@@ -507,8 +557,12 @@ const Dashboard = () => {
                     <Search className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="font-medium font-['Inter'] text-lg">Lost & Found</div>
-                    <div className="text-sm text-white/90 font-['Inter']">Report an item</div>
+                    <div className="font-medium font-['Inter'] text-lg">
+                      Lost & Found
+                    </div>
+                    <div className="text-sm text-white/90 font-['Inter']">
+                      Report an item
+                    </div>
                   </div>
                 </div>
               </button>
@@ -532,26 +586,57 @@ const Dashboard = () => {
         </div>
 
         <form onSubmit={handleComplaintSubmit} className="p-6 space-y-4">
-          <FormInput label="Title" name="title" value={complaintFormData.title} onChange={handleComplaintInputChange} placeholder="e.g., Broken streetlight on main road" required />
-          
+          <FormInput
+            label="Title"
+            name="title"
+            value={complaintFormData.title}
+            onChange={handleComplaintInputChange}
+            placeholder="e.g., Broken streetlight on main road"
+            required
+          />
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormSelect label="Category" name="category" value={complaintFormData.category} onChange={handleComplaintInputChange}>
-                <option value="infrastructure">Infrastructure</option>
-                <option value="utilities">Utilities</option>
-                <option value="safety">Safety</option>
-                <option value="hostel">Hostel</option>
-                <option value="maintenance">Maintenance</option>
-                <option value="other">Other</option>
+            <FormSelect
+              label="Category"
+              name="category"
+              value={complaintFormData.category}
+              onChange={handleComplaintInputChange}
+            >
+              <option value="infrastructure">Infrastructure</option>
+              <option value="utilities">Utilities</option>
+              <option value="safety">Safety</option>
+              <option value="hostel">Hostel</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="other">Other</option>
             </FormSelect>
-            <FormSelect label="Priority" name="priority" value={complaintFormData.priority} onChange={handleComplaintInputChange}>
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
+            <FormSelect
+              label="Priority"
+              name="priority"
+              value={complaintFormData.priority}
+              onChange={handleComplaintInputChange}
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
             </FormSelect>
           </div>
 
-          <FormInput label="Location" name="location" value={complaintFormData.location} onChange={handleComplaintInputChange} placeholder="e.g., Outside 'A' Block, near library" required />
-          <FormTextarea label="Description" name="description" value={complaintFormData.description} onChange={handleComplaintInputChange} placeholder="Provide as much detail as possible..." required />
+          <FormInput
+            label="Location"
+            name="location"
+            value={complaintFormData.location}
+            onChange={handleComplaintInputChange}
+            placeholder="e.g., Outside 'A' Block, near library"
+            required
+          />
+          <FormTextarea
+            label="Description"
+            name="description"
+            value={complaintFormData.description}
+            onChange={handleComplaintInputChange}
+            placeholder="Provide as much detail as possible..."
+            required
+          />
 
           <div className="flex space-x-3 pt-4">
             <button
@@ -578,84 +663,144 @@ const Dashboard = () => {
       </Modal>
 
       <Modal isOpen={isLostFoundModalOpen} onClose={handleLostFoundModalClose}>
-         <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
-            <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">
-              Report an Item
-            </h2>
+        <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
+          <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">
+            Report an Item
+          </h2>
+          <button
+            onClick={handleLostFoundModalClose}
+            disabled={isSubmitting}
+            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/60 rounded-xl transition-colors disabled:opacity-50"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="p-6 pb-0">
+          <div className="flex bg-gray-100/60 rounded-xl p-1.5 space-x-2">
             <button
+              onClick={() => setReportType("lost")}
+              className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 ${
+                reportType === "lost"
+                  ? "bg-gradient-to-r from-pink-400 to-red-400 text-white shadow-md"
+                  : "text-gray-600 hover:bg-white/60"
+              }`}
+            >
+              <Package className="w-4 h-4" />
+              <span>I Lost Something</span>
+            </button>
+            <button
+              onClick={() => setReportType("found")}
+              className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 ${
+                reportType === "found"
+                  ? "bg-gradient-to-r from-emerald-400 to-green-500 text-white shadow-md"
+                  : "text-gray-600 hover:bg-white/60"
+              }`}
+            >
+              <PackageOpen className="w-4 h-4" />
+              <span>I Found Something</span>
+            </button>
+          </div>
+        </div>
+
+        <form onSubmit={handleLostFoundSubmit} className="p-6 space-y-4">
+          <FormInput
+            label="Item Title"
+            name="title"
+            value={lostFoundFormData.title}
+            onChange={handleLostFoundInputChange}
+            placeholder="e.g., Black Leather Wallet"
+            required
+          />
+          <FormTextarea
+            label="Description"
+            name="description"
+            value={lostFoundFormData.description}
+            onChange={handleLostFoundInputChange}
+            placeholder="Brand, color, contents..."
+            required
+          />
+
+          {reportType === "lost" && (
+            <FormInput
+              label="Distinguishing Features"
+              name="distinguishingFeatures"
+              value={lostFoundFormData.distinguishingFeatures}
+              onChange={handleLostFoundInputChange}
+              placeholder="e.g., 'A' monogram, scratch on corner"
+            />
+          )}
+
+          <FormInput
+            label={
+              reportType === "lost" ? "Last Known Location" : "Location Found"
+            }
+            name="location"
+            value={lostFoundFormData.location}
+            onChange={handleLostFoundInputChange}
+            placeholder="e.g., Library 2nd Floor"
+            required
+          />
+          <FormInput
+            label={reportType === "lost" ? "Date Lost" : "Date Found"}
+            name="date"
+            value={lostFoundFormData.date}
+            onChange={handleLostFoundInputChange}
+            type="date"
+            required
+          />
+
+          <FormSelect
+            label="Category"
+            name="category"
+            value={lostFoundFormData.category}
+            onChange={handleLostFoundInputChange}
+            required
+          >
+            <option>Personal Items</option>
+            <option>Electronics</option>
+            <option>Apparel</option>
+            <option>Documents</option>
+            <option>Other</option>
+          </FormSelect>
+
+          <FormInput
+            label="Your Contact Details"
+            name="contactDetails"
+            value={lostFoundFormData.contactDetails}
+            onChange={handleLostFoundInputChange}
+            placeholder="Your email or phone number"
+            required
+          />
+
+          <div className="flex space-x-3 pt-4">
+            <button
+              type="button"
               onClick={handleLostFoundModalClose}
               disabled={isSubmitting}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/60 rounded-xl transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2 text-gray-700 bg-gray-100/60 border border-gray-300/60 rounded-xl hover:bg-gray-200/60 transition-colors font-medium font-['Inter'] disabled:opacity-50"
             >
-              <X className="w-5 h-5" />
+              Cancel
             </button>
-         </div>
-         <div className="p-6 pb-0">
-           <div className="flex bg-gray-100/60 rounded-xl p-1.5 space-x-2">
-             <button
-               onClick={() => setReportType('lost')}
-               className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 ${
-                 reportType === 'lost' ? 'bg-gradient-to-r from-pink-400 to-red-400 text-white shadow-md' : 'text-gray-600 hover:bg-white/60'
-               }`}
-             >
-               <Package className="w-4 h-4" />
-               <span>I Lost Something</span>
-             </button>
-             <button
-               onClick={() => setReportType('found')}
-               className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 ${
-                 reportType === 'found' ? 'bg-gradient-to-r from-emerald-400 to-green-500 text-white shadow-md' : 'text-gray-600 hover:bg-white/60'
-               }`}
-             >
-               <PackageOpen className="w-4 h-4" />
-               <span>I Found Something</span>
-             </button>
-           </div>
-         </div>
-         
-         <form onSubmit={handleLostFoundSubmit} className="p-6 space-y-4">
-           <FormInput label="Item Title" name="title" value={lostFoundFormData.title} onChange={handleLostFoundInputChange} placeholder="e.g., Black Leather Wallet" required />
-           <FormTextarea label="Description" name="description" value={lostFoundFormData.description} onChange={handleLostFoundInputChange} placeholder="Brand, color, contents..." required />
-           
-           {reportType === 'lost' && (
-             <FormInput label="Distinguishing Features" name="distinguishingFeatures" value={lostFoundFormData.distinguishingFeatures} onChange={handleLostFoundInputChange} placeholder="e.g., 'A' monogram, scratch on corner" />
-           )}
-
-           <FormInput label={reportType === 'lost' ? "Last Known Location" : "Location Found"} name="location" value={lostFoundFormData.location} onChange={handleLostFoundInputChange} placeholder="e.g., Library 2nd Floor" required />
-           <FormInput label={reportType === 'lost' ? "Date Lost" : "Date Found"} name="date" value={lostFoundFormData.date} onChange={handleLostFoundInputChange} type="date" required />
-           
-           <FormSelect label="Category" name="category" value={lostFoundFormData.category} onChange={handleLostFoundInputChange} required>
-             <option>Personal Items</option>
-             <option>Electronics</option>
-             <option>Apparel</option>
-             <option>Documents</option>
-             <option>Other</option>
-           </FormSelect>
-           
-           <FormInput label="Your Contact Details" name="contactDetails" value={lostFoundFormData.contactDetails} onChange={handleLostFoundInputChange} placeholder="Your email or phone number" required />
-           
-           <div className="flex space-x-3 pt-4">
-             <button
-                type="button"
-                onClick={handleLostFoundModalClose}
-                disabled={isSubmitting}
-                className="flex-1 px-4 py-2 text-gray-700 bg-gray-100/60 border border-gray-300/60 rounded-xl hover:bg-gray-200/60 transition-colors font-medium font-['Inter'] disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`flex-1 px-4 py-2 text-white rounded-xl transition-all duration-200 font-medium shadow-md font-['Inter'] disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center ${
-                  reportType === 'lost' ? 'bg-gradient-to-r from-pink-400 to-red-400 hover:from-pink-500 hover:to-red-500' : 'bg-gradient-to-r from-emerald-400 to-green-500 hover:from-emerald-500 hover:to-green-600'
-                }`}
-              >
-                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : (reportType === 'lost' ? 'Report Lost Item' : 'Report Found Item')}
-              </button>
-           </div>
-         </form>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`flex-1 px-4 py-2 text-white rounded-xl transition-all duration-200 font-medium shadow-md font-['Inter'] disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center ${
+                reportType === "lost"
+                  ? "bg-gradient-to-r from-pink-400 to-red-400 hover:from-pink-500 hover:to-red-500"
+                  : "bg-gradient-to-r from-emerald-400 to-green-500 hover:from-emerald-500 hover:to-green-600"
+              }`}
+            >
+              {isSubmitting ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : reportType === "lost" ? (
+                "Report Lost Item"
+              ) : (
+                "Report Found Item"
+              )}
+            </button>
+          </div>
+        </form>
       </Modal>
-
     </div>
   );
 };

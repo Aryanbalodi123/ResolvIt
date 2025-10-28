@@ -1,9 +1,5 @@
 import { supabase } from "../lib/SupabaseClient";
 
-/**
- * Fetches all complaints from the database.
- * Joins with the 'users' table to get the name of the user who filed it.
- */
 export async function getAllComplaints() {
   const { data, error } = await supabase
     .from('complaints')
@@ -21,12 +17,7 @@ export async function getAllComplaints() {
   return data;
 }
 
-/**
- * Updates a specific complaint by its ID.
- * Used for assigning to a department, changing status, or updating priority.
- * @param {bigint} complaintId - The ID of the complaint to update.
- * @param {object} updates - An object containing the fields to update (e.g., { assigned_to, status, priority }).
- */
+
 export async function updateComplaint(complaintId, updates) {
   const { data, error } = await supabase
     .from('complaints')
@@ -35,7 +26,7 @@ export async function updateComplaint(complaintId, updates) {
     .select(`
       *,
       user:users(name, rollNumber)
-    `) // Return the updated row with user info
+    `) 
     .single();
 
   if (error) {
