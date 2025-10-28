@@ -13,7 +13,6 @@ const Register = () => {
     password: '',
   });
   
-  // Separate state for confirmPassword - not included in formData
   const [confirmPassword, setConfirmPassword] = useState('');
   
   const [passwordVisible, setPasswordVisible] = useState(false);
