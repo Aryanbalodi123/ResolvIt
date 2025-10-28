@@ -2,7 +2,6 @@ import { supabase } from "../lib/SupabaseClient";
 
 export const getUserDetails = async (userId) => {
   try {
-    // Convert userId to number if it's a string
     const parsedUserId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
     
     const { data, error } = await supabase
@@ -21,7 +20,6 @@ export const getUserDetails = async (userId) => {
 
 export const getUserComplaints = async (userId) => {
   try {
-    // Convert userId to number if it's a string
     const parsedUserId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
 
     const { data, error } = await supabase
@@ -50,7 +48,6 @@ export const getUserComplaints = async (userId) => {
 
 export const getUserLostItems = async (userId) => {
   try {
-    // Convert userId to number if it's a string
     const parsedUserId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
 
     const { data, error } = await supabase

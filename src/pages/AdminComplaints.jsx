@@ -206,7 +206,7 @@ const AdminComplaints = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {/* ... (same logic) */}
+        {}
         {filterOptions.map((option) => (
           <div key={option.value} className={`bg-white/40 backdrop-blur-sm rounded-xl border p-4 text-center transition-colors cursor-pointer ${
             selectedFilter === option.value ? 'border-emerald-200 bg-emerald-50/40' : 'border-white/40 hover:border-white/60'
@@ -219,7 +219,7 @@ const AdminComplaints = () => {
 
       {/* Filters and Search */}
       <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-4">
-        {/* ... (same logic) */}
+        {}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
