@@ -39,7 +39,11 @@ const Login = () => {
           ? await loginUser(rollNumber, password)
           : await loginAdmin(rollNumber, password);
 
-      localStorage.setItem("token", `token`);
+      localStorage.setItem("token", JSON.stringify({
+        role: selectedRole,
+        rollNumber: userData.rollNumber,
+        name: userData.name
+      }));
       localStorage.setItem("role", selectedRole);
       localStorage.setItem("rollNumber", userData.rollNumber);
       localStorage.setItem("name", userData.name);

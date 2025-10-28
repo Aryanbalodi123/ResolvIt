@@ -41,9 +41,9 @@ const Complaints = () => {
     const fetchComplaints = async () => {
       try {
         setIsLoading(true);
-        const userInfo = JSON.parse(localStorage.getItem("token") || "{}");
-        if (!userInfo.rollNumber) throw new Error("User not authenticated");
-        const userComplaints = await getUserComplaints(userInfo.rollNumber);
+        const rollNumber = localStorage.getItem("rollNumber");
+        if (!rollNumber) throw new Error("User not authenticated");
+        const userComplaints = await getUserComplaints(rollNumber);
         setComplaints(userComplaints || []);
         setError(null);
       } catch (err) {
