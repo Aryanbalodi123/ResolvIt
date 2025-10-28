@@ -37,7 +37,7 @@ const Settings = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("rollNumber"); // assuming stored in localStorage
+    const userId = localStorage.getItem("rollNumber");
 
     if (!token || !userId) {
       navigate("/login", { replace: true });
@@ -47,10 +47,8 @@ const Settings = () => {
     const fetchUserData = async () => {
       try {
         setLoading(true);
-        // ✅ Fetch user details from Supabase
         const userData = await getUserDetails(userId);
 
-        // ✅ Fetch complaints for analytics
         const complaintsData = await getUserComplaints(userId);
         const totalComplaints = complaintsData?.length || 0;
         const resolvedComplaints = complaintsData?.filter(
@@ -68,7 +66,6 @@ const Settings = () => {
         setUserProfile(formattedProfile);
         setEditedProfile(formattedProfile);
 
-        // Optionally store for caching
         Object.entries(formattedProfile).forEach(([key, value]) =>
           localStorage.setItem(key, value)
         );
@@ -85,7 +82,6 @@ const Settings = () => {
   const handleSave = async () => {
     try {
       setLoading(true);
-      // ✅ Update user profile in Supabase
       const { error } = await supabase
         .from("users")
         .update({
