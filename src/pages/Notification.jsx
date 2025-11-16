@@ -6,23 +6,12 @@ import {
   PackageCheck,
   CheckCircle2,
   Circle,
-  Eye,
   Trash2,
   Sparkles
 } from "lucide-react";
 
 import { retrieveComplaint } from "../../services/ComplaintServices";
 import { getLostItems, getFoundItems } from "../../services/LostFoundServices";
-
-/**
- * Improved Notifications page
- * - expressive, vivid UI (chips with counts and unread badges)
- * - timeline-style cards with stronger contrast
- * - mark single / mark all read, dismiss, clear dismissed
- * - groups notifications by date (Today / Yesterday / Older)
- * - robust: defensive fetching, stable IDs, handles missing times
- * - persisted read/dismissed state in localStorage
- */
 
 const STORAGE = {
   DISMISSED: "dismissedNotifs_v2",
@@ -75,7 +64,6 @@ function timeOrNow(t) {
   return d;
 }
 
-// Group notifications into Today / Yesterday / Older
 function groupByDate(list) {
   const groups = { Today: [], Yesterday: [], Older: [] };
   const now = new Date();
@@ -94,14 +82,12 @@ export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // filters (multi-select)
   const [filters, setFilters] = useState({
     complaint: true,
     lost: true,
     found: true,
   });
 
-  // persisted arrays
   const [dismissed, setDismissed] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem(STORAGE.DISMISSED) || "[]");
@@ -109,6 +95,7 @@ export default function Notifications() {
       return [];
     }
   });
+  
   const [readIds, setReadIds] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem(STORAGE.READ) || "[]");
@@ -117,7 +104,6 @@ export default function Notifications() {
     }
   });
 
-  // keep localStorage in sync
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE.DISMISSED, JSON.stringify(dismissed));
@@ -130,7 +116,6 @@ export default function Notifications() {
     } catch {}
   }, [readIds]);
 
-  // robust fetch: services may reject or be undefined
   const fetchAll = useCallback(async () => {
     setLoading(true);
     const settled = await Promise.allSettled([
@@ -143,10 +128,8 @@ export default function Notifications() {
     const lost = settled[1].status === "fulfilled" ? settled[1].value || [] : [];
     const found = settled[2].status === "fulfilled" ? settled[2].value || [] : [];
 
-    // Normalize & protect against duplicates
     const list = [];
 
-    // complaints
     for (const c of complaints) {
       const id = safeGet(c, "complaint_id") || safeGet(c, "id") || genId("complaint", btoa((c.title || "") + (c.created_at || "")));
       list.push({
@@ -160,7 +143,6 @@ export default function Notifications() {
       });
     }
 
-    // lost
     for (const i of lost) {
       const id = safeGet(i, "lost_id") || safeGet(i, "id") || genId("lost", btoa((i.title || "") + (i.date_lost || "")));
       list.push({
@@ -174,7 +156,6 @@ export default function Notifications() {
       });
     }
 
-    // found
     for (const i of found) {
       const id = safeGet(i, "lost_id") || safeGet(i, "id") || genId("found", btoa((i.title || "") + (i.date_lost || "")));
       list.push({
@@ -188,16 +169,13 @@ export default function Notifications() {
       });
     }
 
-    // dedupe by id (most recent wins)
     const seen = new Map();
-    // sort first by time desc so seen keeps newest
     list.sort((a, b) => new Date(b.time) - new Date(a.time));
     for (const n of list) {
       if (!seen.has(n.id)) seen.set(n.id, n);
     }
     const merged = Array.from(seen.values());
 
-    // filter dismissed
     const filtered = merged.filter((n) => !dismissed.includes(n.id));
 
     if (mountedRef.current) {
@@ -206,18 +184,16 @@ export default function Notifications() {
     }
   }, [dismissed]);
 
-  // initial load + interval
   useEffect(() => {
     mountedRef.current = true;
     fetchAll();
-    const id = setInterval(fetchAll, 120000); // 2 minutes
+    const id = setInterval(fetchAll, 120000);
     return () => {
       mountedRef.current = false;
       clearInterval(id);
     };
   }, [fetchAll]);
 
-  // helper actions
   const toggleFilter = (key) => setFilters((p) => ({ ...p, [key]: !p[key] }));
   const markRead = (id) => setReadIds((p) => (p.includes(id) ? p : [...p, id]));
   const markUnread = (id) => setReadIds((p) => p.filter((x) => x !== id));
@@ -225,7 +201,8 @@ export default function Notifications() {
     setDismissed((p) => (p.includes(id) ? p : [...p, id]));
     setNotifications((p) => p.filter((n) => n.id !== id));
   };
-  const markAllRead = () => setReadIds((p) => Array.from(new Set([...p, ...notifications.map((n) => n.id)])));
+  const markAllRead = () =>
+    setReadIds((p) => Array.from(new Set([...p, ...notifications.map((n) => n.id)])));
   const clearDismissed = () => {
     setDismissed([]);
     try {
@@ -233,13 +210,12 @@ export default function Notifications() {
     } catch {}
   };
 
-  // visible notifications according to filter
   const visible = useMemo(() => notifications.filter((n) => filters[n.type]), [notifications, filters]);
 
-  // counts for chips
   const counts = useMemo(() => {
     const c = { complaint: 0, lost: 0, found: 0 };
     for (const n of notifications) c[n.type] = (c[n.type] || 0) + 1;
+
     const unread = { complaint: 0, lost: 0, found: 0 };
     for (const n of notifications) {
       if (!readIds.includes(n.id)) unread[n.type] = (unread[n.type] || 0) + 1;
@@ -247,7 +223,6 @@ export default function Notifications() {
     return { totals: c, unread };
   }, [notifications, readIds]);
 
-  // grouping
   const grouped = useMemo(() => groupByDate(visible), [visible]);
 
   function timeAgoLabel(t) {
@@ -263,244 +238,414 @@ export default function Notifications() {
     }
   }
 
-  // UI: expressive styles, stronger contrast
+  const totalUnread = Object.values(counts.unread).reduce((a, b) => a + b, 0);
+
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-2xl bg-gradient-to-br from-emerald-400 to-green-500 shadow-md">
-            <Bell className="w-5 h-5 text-white" />
+    <div className="w-full h-screen overflow-y-auto bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50">
+      <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-4 sm:space-y-6 pb-20">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-400 to-green-500 shadow-lg">
+              <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            </div>
+
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-emerald-900">
+                Notifications
+              </h1>
+              <p className="text-xs sm:text-sm text-emerald-600 mt-0.5">
+                {totalUnread > 0 ? `${totalUnread} unread notification${totalUnread > 1 ? 's' : ''}` : "You're all caught up!"}
+              </p>
+            </div>
           </div>
 
-          <div>
-            <h1 className="text-2xl font-semibold font-['Inter'] text-emerald-900">Notifications</h1>
-            <p className="text-sm text-emerald-600 font-['Inter']">Updates from complaints, lost & found — stay on top of activity.</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={markAllRead}
-            className="px-3 py-2 rounded-lg bg-white/80 backdrop-blur-md border border-white/50 text-sm hover:shadow-md transition font-['Inter']"
-            aria-label="Mark all as read"
-          >
-            Mark all read
-          </button>
-          <button
-            onClick={clearDismissed}
-            className="px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-sm hover:bg-white/20 transition font-['Inter']"
-            aria-label="Clear dismissed"
-            title="Restore dismissed notifications (dev)"
-          >
-            Clear dismissed
-          </button>
-        </div>
-      </div>
-
-      {/* Chips */}
-      <div className="flex items-center gap-3 flex-wrap">
-        {Object.keys(TYPE_META).map((k) => {
-          const m = TYPE_META[k];
-          const enabled = filters[k];
-          const total = counts.totals[k] || 0;
-          const unreadCount = counts.unread[k] || 0;
-
-          return (
+          {/* Desktop actions */}
+          <div className="hidden sm:flex items-center gap-2">
             <button
-              key={k}
-              onClick={() => toggleFilter(k)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                enabled
-                  ? `bg-gradient-to-r ${m.colorGradient} text-white shadow-xl`
-                  : "bg-white/20 text-gray-800 border border-white/30 hover:bg-white/30"
-              }`}
-              aria-pressed={enabled}
+              onClick={markAllRead}
+              className="px-4 py-2 rounded-lg bg-white hover:bg-emerald-50 border border-emerald-200 text-sm font-medium text-emerald-700 hover:shadow-md transition"
             >
-              <m.Icon className="w-4 h-4" />
-              <span>{m.label}</span>
-
-              {/* counts & small unread badge */}
-              <span className={`ml-2 inline-flex items-center gap-2 text-xs ${enabled ? "text-white/90" : "text-gray-700"}`}>
-                <span className="px-2 py-0.5 rounded-full bg-white/20 font-semibold">{total}</span>
-                {unreadCount > 0 && (
-                  <span className="px-2 py-0.5 rounded-full bg-white text-red-500 font-semibold">{unreadCount}</span>
-                )}
-              </span>
+              Mark all read
             </button>
-          );
-        })}
-      </div>
+            <button
+              onClick={clearDismissed}
+              className="px-4 py-2 rounded-lg bg-white hover:bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700 hover:shadow-md transition"
+              title="Restore dismissed notifications"
+            >
+              Restore dismissed
+            </button>
+          </div>
+        </div>
 
-      {/* Body */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Timeline / list (left, main) */}
-        <div className="lg:col-span-2">
-          <div className="relative pl-6">
-            {/* vertical line */}
-            <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-emerald-100/60 rounded"></div>
+        {/* MOBILE QUICK ACTIONS */}
+        <div className="sm:hidden rounded-xl p-3 border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm">
+          <div className="text-xs font-semibold text-emerald-800 mb-2.5">Quick Actions</div>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={markAllRead}
+              className="px-3 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-green-500 text-white text-sm font-medium shadow-md active:scale-95 transition"
+            >
+              Mark All Read
+            </button>
+            <button
+              onClick={() => {
+                const ids = visible.map((n) => n.id);
+                setDismissed((p) =>
+                  Array.from(new Set([...p, ...ids]))
+                );
+                setNotifications((p) => p.filter((n) => !ids.includes(n.id)));
+              }}
+              className="px-3 py-2.5 rounded-lg border-2 border-emerald-300 text-sm font-medium bg-white text-emerald-700 active:scale-95 transition"
+            >
+              Dismiss All
+            </button>
+            <button
+              onClick={clearDismissed}
+              className="col-span-2 px-3 py-2.5 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 active:scale-95 transition"
+            >
+              Restore Dismissed
+            </button>
+          </div>
+        </div>
 
-            {/* Loading */}
-            {loading ? (
-              <div className="py-10 flex items-center justify-center">
-                <div className="h-10 w-10 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin" />
-              </div>
-            ) : visible.length === 0 ? (
-              <div className="py-12 text-center text-gray-600">
-                <Sparkles className="w-12 h-12 mx-auto mb-3 text-emerald-500" />
-                <div className="font-medium">You're all caught up</div>
-                <div className="text-sm mt-1">No notifications match your selected filters.</div>
-              </div>
-            ) : (
-              <>
-                {Object.entries(grouped).map(([groupLabel, items]) =>
-                  items.length > 0 ? (
-                    <section key={groupLabel} className="mb-6">
-                      <div className="mb-3">
-                        <div className="inline-block px-3 py-1 rounded-full bg-white/10 text-xs text-gray-700 font-semibold">{groupLabel}</div>
-                      </div>
+        {/* FILTER CHIPS */}
+        <div className="w-full overflow-x-auto">
+          <div className="flex items-center gap-2 sm:gap-3 pb-2">
+            {Object.keys(TYPE_META).map((k) => {
+              const m = TYPE_META[k];
+              const enabled = filters[k];
+              const total = counts.totals[k] || 0;
+              const unreadCount = counts.unread[k] || 0;
 
-                      <div className="space-y-4">
-                        {items.map((n) => {
-                          const meta = TYPE_META[n.type];
-                          const Icon = meta.Icon;
-                          const isRead = readIds.includes(n.id);
+              return (
+                <button
+                  key={k}
+                  onClick={() => toggleFilter(k)}
+                  className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold active:scale-95 transition-all shadow-md ${
+                    enabled
+                      ? `bg-gradient-to-r ${m.colorGradient} text-white`
+                      : "bg-white text-gray-700 border-2 border-gray-200"
+                  }`}
+                >
+                  <m.Icon className="w-4 h-4" />
+                  {m.label}
 
-                          return (
-                            <article
-                              key={n.id}
-                              className={`relative bg-white/70 backdrop-blur-md rounded-2xl p-4 border border-white/60 shadow-sm hover:shadow-xl transition flex items-start gap-4`}
-                              role="article"
-                              aria-labelledby={`title-${n.id}`}
-                            >
-                              {/* dot */}
-                              <div
-                                className={`absolute -left-6 top-5 w-4 h-4 rounded-full ring-4 ring-white shadow ${
-                                  isRead ? "bg-gray-300" : meta.dot
-                                }`}
-                                aria-hidden
-                              />
+                  <span
+                    className={`inline-flex items-center gap-1.5 text-xs ${
+                      enabled ? "text-white" : "text-gray-600"
+                    }`}
+                  >
+                    <span className={`px-2 py-0.5 rounded-full ${enabled ? 'bg-white/20' : 'bg-gray-100'}`}>
+                      {total}
+                    </span>
+                    {unreadCount > 0 && (
+                      <span className="px-2 py-0.5 rounded-full bg-red-500 text-white font-bold">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-                              {/* icon */}
-                              <div className={`flex-none p-2 rounded-lg ${meta.pillBg} shadow-sm`}>
-                                <Icon className="w-5 h-5 text-gray-800" />
-                              </div>
+        {/* BODY */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="lg:col-span-2">
+            {/* Desktop timeline */}
+            <div className="hidden sm:block relative pl-6">
+              <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-emerald-200 rounded"></div>
 
-                              {/* content */}
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-start justify-between gap-4">
-                                  <div className="min-w-0">
-                                    <h4
-                                      id={`title-${n.id}`}
-                                      className={`text-sm font-semibold font-['Inter'] ${isRead ? "text-gray-700" : "text-emerald-900"}`}
-                                    >
-                                      {n.title}
-                                    </h4>
-                                    <p className="text-sm text-gray-600 mt-1 truncate">{n.message}</p>
+              {loading ? (
+                <div className="py-10 flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin" />
+                </div>
+              ) : visible.length === 0 ? (
+                <div className="py-12 text-center">
+                  <Sparkles className="w-12 h-12 mx-auto mb-3 text-emerald-500" />
+                  <div className="font-semibold text-gray-800 text-lg">You're all caught up!</div>
+                  <div className="text-sm text-gray-600 mt-1">No notifications match your selected filters.</div>
+                </div>
+              ) : (
+                <>
+                  {Object.entries(grouped).map(([groupLabel, items]) =>
+                    items.length > 0 ? (
+                      <section key={groupLabel} className="mb-6">
+                        <div className="mb-3">
+                          <div className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-xs text-emerald-800 font-bold border border-emerald-300">
+                            {groupLabel}
+                          </div>
+                        </div>
 
-                                    <div className="mt-3 flex items-center gap-3 text-xs text-gray-500">
-                                      <span className="px-2 py-0.5 rounded-full bg-white/10">{meta.label}</span>
-                                      <span className="px-2 py-0.5 rounded-full bg-white/10">{n.meta?.category || n.meta?.status || n.meta?.location || ""}</span>
-                                    </div>
-                                  </div>
+                        <div className="space-y-4">
+                          {items.map((n) => {
+                            const meta = TYPE_META[n.type];
+                            const Icon = meta.Icon;
+                            const isRead = readIds.includes(n.id);
 
-                                  <div className="flex flex-col items-end gap-2">
-                                    <div className="text-xs text-gray-500">{timeAgoLabel(n.time)} ago</div>
+                            return (
+                              <article
+                                key={n.id}
+                                className="relative bg-white rounded-2xl p-4 border-2 border-emerald-100 shadow-sm hover:shadow-xl transition flex items-start gap-4"
+                              >
+                                <div
+                                  className={`absolute -left-6 top-5 w-4 h-4 rounded-full ring-4 ring-white shadow-md ${
+                                    isRead ? "bg-gray-300" : meta.dot
+                                  }`}
+                                />
 
-                                    <div className="flex items-center gap-2">
-                                      {/* mark read/unread */}
-                                      <button
-                                        onClick={() => {
-                                          if (isRead) markUnread(n.id);
-                                          else markRead(n.id);
-                                        }}
-                                        className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition"
-                                        title={isRead ? "Mark as unread" : "Mark as read"}
-                                        aria-pressed={isRead}
+                                <div className={`flex-none p-2.5 rounded-xl ${meta.pillBg} shadow-sm border border-white`}>
+                                  <Icon className="w-5 h-5 text-gray-800" />
+                                </div>
+
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-start justify-between gap-4">
+                                    <div className="min-w-0">
+                                      <h4
+                                        className={`text-sm font-bold ${
+                                          isRead ? "text-gray-600" : "text-emerald-900"
+                                        }`}
                                       >
-                                        {isRead ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Circle className="w-4 h-4 text-gray-500" />}
-                                      </button>
+                                        {n.title}
+                                      </h4>
+                                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">{n.message}</p>
 
-                                 
+                                      <div className="mt-3 flex items-center gap-2 text-xs">
+                                        <span className="px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 font-medium">
+                                          {meta.label}
+                                        </span>
+                                        {(n.meta?.category || n.meta?.status || n.meta?.location) && (
+                                          <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-medium">
+                                            {n.meta?.category || n.meta?.status || n.meta?.location}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    <div className="flex flex-col items-end gap-2">
+                                      <div className="text-xs text-gray-500 font-medium">{timeAgoLabel(n.time)} ago</div>
+
+                                      <div className="flex items-center gap-2">
+                                        <button
+                                          onClick={() => (isRead ? markUnread(n.id) : markRead(n.id))}
+                                          className="p-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition"
+                                          title={isRead ? "Mark as unread" : "Mark as read"}
+                                        >
+                                          {isRead ? (
+                                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                                          ) : (
+                                            <Circle className="w-4 h-4 text-gray-400" />
+                                          )}
+                                        </button>
+                                        <button
+                                          onClick={() => dismissNotif(n.id)}
+                                          className="p-2 rounded-lg bg-red-50 hover:bg-red-100 transition"
+                                        >
+                                          <Trash2 className="w-4 h-4 text-red-600" />
+                                        </button>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                            </article>
-                          );
-                        })}
-                      </div>
-                    </section>
-                  ) : null
-                )}
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Right column: quick stats & filters summary */}
-        <aside className="space-y-4">
-          <div className="bg-white/70 backdrop-blur-md rounded-2xl p-4 border border-white/60 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-semibold font-['Inter']">Summary</div>
-              <div className="text-xs text-gray-500">{notifications.length} total</div>
+                              </article>
+                            );
+                          })}
+                        </div>
+                      </section>
+                    ) : null
+                  )}
+                </>
+              )}
             </div>
 
-            <div className="mt-3 space-y-2">
-              {Object.keys(TYPE_META).map((k) => {
-                const m = TYPE_META[k];
-                const total = counts.totals[k] || 0;
-                const unread = counts.unread[k] || 0;
-                return (
-                  <div key={k} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-md ${m.pillBg}`}>
-                        <m.Icon className="w-4 h-4" />
+            {/* MOBILE CARD VIEW */}
+            <div className="sm:hidden space-y-4">
+              {loading ? (
+                <div className="py-16 flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin" />
+                </div>
+              ) : visible.length === 0 ? (
+                <div className="py-16 text-center bg-white rounded-2xl shadow-sm border border-emerald-100 p-8">
+                  <Sparkles className="w-12 h-12 mx-auto mb-3 text-emerald-500" />
+                  <div className="text-base font-bold text-gray-800">You're all caught up!</div>
+                  <div className="text-sm text-gray-600 mt-2">No notifications match your filters.</div>
+                </div>
+              ) : (
+                <>
+                  {Object.entries(grouped).map(([groupLabel, items]) =>
+                    items.length > 0 ? (
+                      <section key={groupLabel} className="space-y-3">
+                        <div className="pb-2">
+                          <div className="inline-block px-3 py-1.5 rounded-full bg-emerald-100 text-xs text-emerald-800 font-bold border border-emerald-300 shadow-sm">
+                            {groupLabel}
+                          </div>
+                        </div>
+
+                        <div className="space-y-3">
+                          {items.map((n) => {
+                            const meta = TYPE_META[n.type];
+                            const Icon = meta.Icon;
+                            const isRead = readIds.includes(n.id);
+
+                            return (
+                              <article
+                                key={n.id}
+                                className={`rounded-xl p-4 border-2 ${
+                                  isRead ? "border-gray-200 bg-gray-50" : "border-emerald-200 bg-white"
+                                } shadow-sm`}
+                              >
+                                <div className="flex items-start gap-3">
+                                  <div className={`p-2.5 rounded-lg ${meta.pillBg} shadow-sm flex-shrink-0`}>
+                                    <Icon className="w-4 h-4 text-gray-800" />
+                                  </div>
+
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-start justify-between gap-2 mb-2">
+                                      <h4
+                                        className={`text-sm font-bold ${
+                                          isRead ? "text-gray-600" : "text-emerald-900"
+                                        }`}
+                                      >
+                                        {n.title}
+                                      </h4>
+                                      <span className="text-xs text-gray-500 font-medium flex-shrink-0">
+                                        {timeAgoLabel(n.time)}
+                                      </span>
+                                    </div>
+
+                                    <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+                                      {n.message}
+                                    </p>
+
+                                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                                      <span className="px-2.5 py-1 rounded-full bg-gray-100 text-xs text-gray-700 font-medium">
+                                        {meta.label}
+                                      </span>
+                                      {(n.meta?.status ||
+                                        n.meta?.location ||
+                                        n.meta?.category) && (
+                                        <span className="px-2.5 py-1 rounded-full bg-blue-50 text-xs text-blue-700 font-medium">
+                                          {n.meta?.category ||
+                                            n.meta?.status ||
+                                            n.meta?.location}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        onClick={() =>
+                                          isRead ? markUnread(n.id) : markRead(n.id)
+                                        }
+                                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-emerald-500 text-white font-medium active:scale-95 transition shadow-sm"
+                                      >
+                                        {isRead ? (
+                                          <>
+                                            <Circle className="w-4 h-4" />
+                                            <span className="text-sm">Mark Unread</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <CheckCircle2 className="w-4 h-4" />
+                                            <span className="text-sm">Mark Read</span>
+                                          </>
+                                        )}
+                                      </button>
+
+                                      <button
+                                        onClick={() => dismissNotif(n.id)}
+                                        className="p-2.5 rounded-lg bg-red-500 active:scale-95 transition shadow-sm flex-shrink-0"
+                                      >
+                                        <Trash2 className="w-4 h-4 text-white" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </article>
+                            );
+                          })}
+                        </div>
+                      </section>
+                    ) : null
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* DESKTOP RIGHT SIDEBAR */}
+          <aside className="hidden lg:block space-y-4">
+            <div className="bg-white rounded-2xl p-5 border-2 border-emerald-100 shadow-md">
+              <div className="flex items-center justify-between mb-4">
+                <div className="text-sm font-bold text-gray-900">Summary</div>
+                <div className="text-xs text-gray-600 font-medium">{notifications.length} total</div>
+              </div>
+
+              <div className="space-y-3">
+                {Object.keys(TYPE_META).map((k) => {
+                  const m = TYPE_META[k];
+                  const total = counts.totals[k] || 0;
+                  const unread = counts.unread[k] || 0;
+                  return (
+                    <div key={k} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition">
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${m.pillBg} shadow-sm`}>
+                          <m.Icon className="w-4 h-4" />
+                        </div>
+                        <div className="text-sm">
+                          <div className="font-semibold text-gray-800">{m.label}</div>
+                          <div className="text-xs text-gray-500">
+                            {total} notification{total !== 1 ? 's' : ''}
+                          </div>
+                        </div>
                       </div>
+
                       <div className="text-sm">
-                        <div className="font-medium">{m.label}</div>
-                        <div className="text-xs text-gray-500">{total} notifications</div>
+                        {unread > 0 ? (
+                          <div className="px-2.5 py-1 rounded-full bg-red-500 text-white text-xs font-bold shadow-sm">
+                            {unread}
+                          </div>
+                        ) : (
+                          <div className="text-xs text-gray-500 font-medium">All read</div>
+                        )}
                       </div>
                     </div>
-
-                    <div className="text-sm">
-                      {unread > 0 ? <div className="px-2 py-1 rounded-full bg-red-100 text-red-600 text-xs font-semibold">{unread} new</div> : <div className="text-xs text-gray-500">All read</div>}
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
 
-          <div className="bg-white/70 backdrop-blur-md rounded-2xl p-4 border border-white/60 shadow-sm">
-            <div className="text-sm font-semibold font-['Inter']">Actions</div>
-            <div className="mt-3 space-y-2">
-              <button
-                onClick={markAllRead}
-                className="w-full px-3 py-2 rounded-lg bg-emerald-500 text-white hover:from-emerald-600 transition font-['Inter']"
-              >
-                Mark all read
-              </button>
-              <button
-                onClick={() => {
-                  // dismiss all currently visible
-                  const ids = visible.map((n) => n.id);
-                  setDismissed((p) => Array.from(new Set([...p, ...ids])));
-                  setNotifications((p) => p.filter((n) => !ids.includes(n.id)));
-                }}
-                className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-sm hover:bg-red-50 transition font-['Inter']"
-              >
-                Dismiss visible
-              </button>
-              <button
-                onClick={clearDismissed}
-                className="w-full px-3 py-2 rounded-lg bg-white/30 text-sm hover:shadow-md transition font-['Inter']"
-              >
-                Clear dismissed (restore)
-              </button>
+            <div className="bg-white rounded-2xl p-5 border-2 border-emerald-100 shadow-md">
+              <div className="text-sm font-bold text-gray-900 mb-4">Actions</div>
+              <div className="space-y-2">
+                <button
+                  onClick={markAllRead}
+                  className="w-full px-4 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-green-500 text-white font-semibold hover:shadow-lg transition"
+                >
+                  Mark all read
+                </button>
+                <button
+                  onClick={() => {
+                    const ids = visible.map((n) => n.id);
+                    setDismissed((p) => Array.from(new Set([...p, ...ids])));
+                    setNotifications((p) => p.filter((n) => !ids.includes(n.id)));
+                  }}
+                  className="w-full px-4 py-2.5 rounded-lg bg-white border-2 border-red-200 text-sm font-semibold text-red-600 hover:bg-red-50 transition"
+                >
+                  Dismiss visible
+                </button>
+                <button
+                  onClick={clearDismissed}
+                  className="w-full px-4 py-2.5 rounded-lg bg-white border-2 border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+                >
+                  Restore dismissed
+                </button>
+              </div>
             </div>
-          </div>
-        </aside>
+          </aside>
+        </div>
       </div>
     </div>
   );
