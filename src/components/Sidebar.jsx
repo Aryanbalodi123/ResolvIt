@@ -25,7 +25,6 @@ const Sidebar = () => {
             id: "complaints",
             label: "My Complaints",
             icon: FileText,
-            badge: 2,
             path: "/complaints",
           },
           {
