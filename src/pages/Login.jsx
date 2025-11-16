@@ -20,11 +20,37 @@ const Login = () => {
   };
 
   const validateForm = () => {
-    if (!selectedRole) return showAlert("Please select a role (User or Admin)");
-    if (!rollNumber.trim()) return showAlert("Please enter your roll number");
-    if (!password.trim()) return showAlert("Please enter your password");
-    if (password.length < 6)
-      return showAlert("Password must be at least 6 characters long");
+    if (!selectedRole) {
+      showAlert("Please select a role (User or Admin)");
+      return false;
+    }
+    
+    const trimmedRollNumber = rollNumber.trim();
+    if (!trimmedRollNumber) {
+      showAlert("Please enter your roll number");
+      return false;
+    }
+    
+    if (!/^\d+$/.test(trimmedRollNumber)) {
+      showAlert("Roll Number must contain only digits");
+      return false;
+    }
+
+    if (trimmedRollNumber.length !== 10) {
+      showAlert("Roll Number must be exactly 10 digits");
+      return false;
+    }
+    
+    const trimmedPassword = password.trim();
+    if (!trimmedPassword) {
+      showAlert("Please enter your password");
+      return false;
+    }
+
+    if (trimmedPassword.length < 6) {
+      showAlert("Password must be at least 6 characters long");
+      return false;
+    }
     return true;
   };
 
@@ -36,8 +62,8 @@ const Login = () => {
     try {
       const userData =
         selectedRole === "user"
-          ? await loginUser(rollNumber, password)
-          : await loginAdmin(rollNumber, password);
+          ? await loginUser(rollNumber.trim(), password.trim())
+          : await loginAdmin(rollNumber.trim(), password.trim());
 
       localStorage.setItem("token", JSON.stringify({
         role: selectedRole,
@@ -52,7 +78,29 @@ const Login = () => {
 
       navigate(selectedRole === "user" ? "/dashboard" : "/admin");
     } catch (error) {
-      showAlert(error.message || "Login failed", "error");
+      // --- FIX: More specific error handling ---
+      console.error("Login Error:", error); // For developer debugging
+      
+      const errorMessage = error.message ? error.message.toLowerCase() : "";
+
+      if (errorMessage.includes("not found") || errorMessage.includes("user not exist")) {
+        // Case 1: User doesn't exist
+        showAlert(`No ${selectedRole} found with this roll number.`, "error");
+      } else if (errorMessage.includes("invalid password") || errorMessage.includes("wrong password")) {
+        // Case 2: Wrong password
+        showAlert("Incorrect password. Please try again.", "error");
+      } else if (errorMessage.includes("invalid credentials")) {
+        // Fallback for general auth error
+         showAlert("Invalid roll number or password.", "error");
+      }
+      else if (error.name === 'TypeError' || errorMessage.includes('failed to fetch') || errorMessage.includes('network request failed')) {
+        // Network or connection error
+        showAlert("Network error. Please check your internet connection.", "error");
+      } else {
+        // All other errors (500s, DB errors, unexpected issues)
+        showAlert("An unexpected error occurred. Please try again later.", "error");
+      }
+      // --- END FIX ---
     } finally {
       setIsLoading(false);
     }
@@ -174,13 +222,7 @@ const Login = () => {
               />
               Remember me
             </label>
-            <a
-              href="#"
-              onClick={handleForgotPassword}
-              className="text-emerald-500 font-medium hover:text-emerald-600 hover:underline"
-            >
-              Forgot password?
-            </a>
+          
           </div>
 
           <button

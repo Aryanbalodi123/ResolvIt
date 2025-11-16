@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { registerUser,registerAdmin } from '../../services/AuthServices';
+import { registerUser, registerAdmin } from '../../services/AuthServices';
 import bcrypt from "bcryptjs";
 import { useNavigate } from "react-router-dom"; 
 
 const Register = () => {
-    const navigate = useNavigate(); 
+  const navigate = useNavigate(); 
   const [selectedRole, setSelectedRole] = useState(null);
   const [formData, setFormData] = useState({
     name: '', 
@@ -21,6 +21,9 @@ const Register = () => {
   const [passwordMatch, setPasswordMatch] = useState({ matches: null, text: '' });
   const [alert, setAlert] = useState({ message: '', type: '', show: false });
   const [isLoading, setIsLoading] = useState(false);
+
+  // A basic email validation regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const showAlert = (message, type = 'error') => {
     setAlert({ message, type, show: true });
@@ -59,11 +62,11 @@ const Register = () => {
     }
 
     let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[a-z]/.test(password)) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    if (password.length >= 8) strength++; // Min 8 chars
+    if (/[a-z]/.test(password)) strength++; // Lowercase
+    if (/[A-Z]/.test(password)) strength++; // Uppercase
+    if (/[0-9]/.test(password)) strength++; // Numbers
+    if (/[^A-Za-z0-9]/.test(password)) strength++; // Special characters
 
     let text, className;
     if (strength <= 2) {
@@ -81,7 +84,7 @@ const Register = () => {
   };
 
   const checkPasswordMatch = () => {
-    if (!confirmPassword) {
+    if (!confirmPassword || !formData.password) {
       setPasswordMatch({ matches: null, text: '' });
       return;
     }
@@ -101,44 +104,111 @@ const Register = () => {
     checkPasswordMatch();
   }, [formData.password, confirmPassword]);
 
+  // --- FIX: All frontend validation logic ---
+  const validateRegistrationForm = () => {
+    const { name, email, rollNumber, password } = formData;
+    
+    if (!selectedRole) {
+      showAlert('Please select a role');
+      return false;
+    }
+    
+    if (!name.trim()) {
+      showAlert('Please enter your full name');
+      return false;
+    }
+
+    if (!email.trim()) {
+      showAlert('Please enter your email');
+      return false;
+    }
+
+    if (!emailRegex.test(email)) {
+      showAlert('Please enter a valid email address');
+      return false;
+    }
+    
+    if (!email.endsWith("@chitkara.edu.in")) {
+      showAlert("Email must be a valid @chitkara.edu.in address");
+      return false;
+    }
+
+    const trimmedRollNumber = rollNumber.trim();
+    if (!trimmedRollNumber) {
+      showAlert('Please enter your roll number');
+      return false;
+    }
+
+    if (!/^\d+$/.test(trimmedRollNumber)) {
+      showAlert('Roll Number must contain only digits');
+      return false;
+    }
+
+    if (trimmedRollNumber.length !== 10) {
+      showAlert('Roll Number must be exactly 10 digits');
+      return false;
+    }
+
+    if (passwordStrength.level <= 2) { // 2 corresponds to 'Weak'
+      showAlert('Password is too weak. Please include a mix of cases, numbers, and symbols.');
+      return false;
+    }
+
+    if (password !== confirmPassword) {
+      showAlert('Passwords do not match');
+      return false;
+    }
+    
+    return true;
+  };
+  // --- END FIX ---
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!selectedRole) {
-      showAlert('Please select a role');
-      return;
-    }
-  if (!formData.email.endsWith("@chitkara.edu.in")) {
-    showAlert("Email must end with @chitkara.edu.in");
-    return;
-  }
-
-    if (formData.password !== confirmPassword) {
-      showAlert('Passwords do not match');
-      return;
-    }
-
-    if (formData.password.length < 8) {
-      showAlert('Password must be at least 8 characters');
+    // Run all validations first
+    if (!validateRegistrationForm()) {
       return;
     }
 
     setIsLoading(true);
     try {
       const payload = {
-        name: formData.name,
-        email: formData.email,
-        rollNumber: formData.rollNumber,
-        password: await bcrypt.hash(formData.password,10),
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        rollNumber: formData.rollNumber.trim(),
+        password: await bcrypt.hash(formData.password, 10),
       };
-      if(selectedRole=='user'){
-      await registerUser(payload);}
-      else{
-        await registerAdmin(payload)
+      
+      if (selectedRole === 'user') {
+        await registerUser(payload);
+      } else {
+        await registerAdmin(payload);
       }
-      showAlert('User registered successfully!', 'success');
+      
+      showAlert('User registered successfully! You can now log in.', 'success');
+      
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000); 
+
     } catch (err) {
-      showAlert(err.message || 'Registration failed', 'error');
+      // --- FIX: Robust error handling for all cases ---
+      console.error("Registration Error:", err); // For developer debugging
+      
+      const errorMessage = err.message ? err.message.toLowerCase() : '';
+      
+      if (errorMessage.includes('already exists') || errorMessage.includes('duplicate') || errorMessage.includes('in use')) {
+        // Known, specific backend error
+        showAlert('A user with this email or roll number already exists.', 'error');
+      } else if (err.name === 'TypeError' || errorMessage.includes('failed to fetch') || errorMessage.includes('network request failed')) {
+        // Network or connection error
+        showAlert('Network error. Please check your internet connection.', 'error');
+      } else {
+        // All other errors (500s, DB errors, unexpected issues)
+        showAlert('Registration failed. An unexpected error occurred. Please try again later.', 'error');
+      }
+      // --- END FIX ---
     } finally {
       setIsLoading(false);
     }
@@ -159,12 +229,11 @@ const Register = () => {
     <div className="flex h-screen overflow-hidden bg-white font-['Poppins',sans-serif]">
       {/* Left Section */}
       <div className="flex-1 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white rounded-br-[50px] rounded-tr-[50px] flex flex-col justify-center items-center relative overflow-hidden">
-      <img
-  src="https://niceillustrations.com/wp-content/uploads/2021/12/Call-Center-color-800px.png"
-  alt="Illustration"
-  className="w-[260px] md:w-[320px] lg:w-[380px] object-contain"
-/>
-
+        <img
+          src="https://niceillustrations.com/wp-content/uploads/2021/12/Call-Center-color-800px.png"
+          alt="Illustration"
+          className="w-[260px] md:w-[320px] lg:w-[380px] object-contain"
+        />
         <div className="text-center mt-4">
           <h1 className="text-2xl font-bold mb-2">Join ResolvIt!</h1>
           <p className="text-sm opacity-90">Create your account to manage and resolve complaints efficiently</p>
@@ -186,7 +255,7 @@ const Register = () => {
             <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1 font-semibold">
               Select Role
             </label>
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-1 gap-1.5">
               <button
                 type="button"
                 onClick={() => handleRoleSelect('user')}
@@ -198,17 +267,7 @@ const Register = () => {
               >
                 User
               </button>
-              <button
-                type="button"
-                onClick={() => handleRoleSelect('admin')}
-                className={`border-none rounded-md py-2 px-2.5 text-xs font-semibold cursor-pointer transition-all duration-300 text-center ${
-                  selectedRole === 'admin'
-                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-emerald-600 transform -translate-y-1 shadow-[0_2px_8px_rgba(16,185,129,0.3)]'
-                    : 'bg-gray-50 text-gray-500 border-2 border-gray-200 hover:bg-green-50 hover:text-emerald-600 hover:border-emerald-500'
-                }`}
-              >
-                Admin
-              </button>
+          
             </div>
           </div>
 
@@ -247,9 +306,9 @@ const Register = () => {
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                placeholder="john@example.com"
+                placeholder="john@chitkara.edu.in"
                 required
-                className="text-black w-full border-0 border-b-2 border-gray-200 py-2 pr-6 text-xs bg-transparent transition-all duration-300 focus:outline-none focus:border-emerald-500 focus:transform focus:-translate-y-1"
+                className="text-black w-full border-0 border-b-2 border-gray-200 py-2 pr-6 text-xs bg-transparent transition-all duration-300 focus:outline-none focus:border-emerald-500 focus:transform focus:-translate-Y-1"
               />
             </div>
 
@@ -296,7 +355,11 @@ const Register = () => {
                     style={{ width: getStrengthBarWidth() }}
                   ></div>
                 </div>
-                <span className="text-gray-500 text-xs">{passwordStrength.text}</span>
+                <span className={`text-xs ${
+                  passwordStrength.className === 'strength-weak' ? 'text-red-500' :
+                  passwordStrength.className === 'strength-medium' ? 'text-amber-500' :
+                  passwordStrength.className === 'strength-strong' ? 'text-emerald-500' : 'text-gray-500'
+                }`}>{passwordStrength.text}</span>
               </div>
             </div>
 
