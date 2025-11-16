@@ -189,9 +189,7 @@ const Settings = () => {
                 <h3 className="text-xl font-semibold text-gray-800 font-['Inter']">
                   {userProfile.name}
                 </h3>
-                <p className="text-gray-600 font-['Inter']">
-                  Member since {userProfile.joinDate}
-                </p>
+              
               </div>
             </div>
 
