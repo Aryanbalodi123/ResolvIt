@@ -108,6 +108,10 @@ const Register = () => {
       showAlert('Please select a role');
       return;
     }
+  if (!formData.email.endsWith("@chitkara.edu.in")) {
+    showAlert("Email must end with @chitkara.edu.in");
+    return;
+  }
 
     if (formData.password !== confirmPassword) {
       showAlert('Passwords do not match');
@@ -155,10 +159,12 @@ const Register = () => {
     <div className="flex h-screen overflow-hidden bg-white font-['Poppins',sans-serif]">
       {/* Left Section */}
       <div className="flex-1 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white rounded-br-[50px] rounded-tr-[50px] flex flex-col justify-center items-center relative overflow-hidden">
-        <img 
-          src="https://niceillustrations.com/wp-content/uploads/2021/12/Call-Center-color-800px.png" 
-          alt="Illustration" 
-        />
+      <img
+  src="https://niceillustrations.com/wp-content/uploads/2021/12/Call-Center-color-800px.png"
+  alt="Illustration"
+  className="w-[260px] md:w-[320px] lg:w-[380px] object-contain"
+/>
+
         <div className="text-center mt-4">
           <h1 className="text-2xl font-bold mb-2">Join ResolvIt!</h1>
           <p className="text-sm opacity-90">Create your account to manage and resolve complaints efficiently</p>
