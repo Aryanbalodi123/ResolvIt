@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
-import { reportLostItem, reportFoundItem } from '../../services/LostFoundServices';
+import { reportLostItem, reportFoundItem, getLostItems, getFoundItems } from '../../services/LostFoundServices';
 import Modal from '../components/Modal'; 
 
 import { 
@@ -14,10 +14,10 @@ import {
   Image as ImageIcon,
   AlertTriangle,
   X,
-  Loader2 
+  Loader2,
+  PackageSearch,
+  PackageCheck
 } from 'lucide-react';
-
-
 
 const FormInput = ({ label, name, value, onChange, placeholder, required, type = "text" }) => (
   <div>
@@ -70,7 +70,6 @@ const FormSelect = ({ label, name, value, onChange, children, required }) => (
   </div>
 );
 
-
 const LostFound = () => {
   const navigate = useNavigate();
 
@@ -78,15 +77,19 @@ const LostFound = () => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login", { replace: true });
+    } else {
+      fetchAllItems();
     }
   }, [navigate]);
 
   const [isLostModalOpen, setIsLostModalOpen] = useState(false);
   const [isFoundModalOpen, setIsFoundModalOpen] = useState(false);
-  
-
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Separate states for lost and found items
+  const [lostItems, setLostItems] = useState([]);
+  const [foundItems, setFoundItems] = useState([]);
 
   const [lostFormData, setLostFormData] = useState({
     title: '',
@@ -99,7 +102,6 @@ const LostFound = () => {
     distinguishingFeatures: ''
   });
 
-  
   const [foundFormData, setFoundFormData] = useState({
     title: '',
     description: '',
@@ -110,34 +112,69 @@ const LostFound = () => {
     contactDetails: ''
   });
 
-  const lostFoundItems = [
- 
-    {
-      id: 'LF001',
-      title: 'iPhone 13 Pro',
-      type: 'lost',
-      category: 'Electronics',
-      date: '2024-08-20',
-      location: 'Central Park, Near Fountain',
-      description: 'Lost my iPhone 13 Pro in midnight green color with a black case.',
-      timeAgo: '4 hours ago',
-      status: 'active',
-      images: 1
-    },
-    {
-      id: 'LF003',
-      title: 'Blue Backpack',
-      type: 'lost',
-      category: 'Bags',
-      date: '2024-08-18',
-      location: 'Metro Station, Platform 2',
-      description: 'Lost my blue Nike backpack containing laptop, books, and documents.',
-      timeAgo: '2 days ago',
-      status: 'active',
-      images: 1
+  // Fetch both lost and found items
+  const fetchAllItems = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Fetch lost items
+      const lostData = await getLostItems();
+      const transformedLostItems = lostData.map(item => ({
+        id: item.lost_id,
+        title: item.title,
+        type: 'lost',
+        category: item.category || 'Other',
+        date: item.date_lost,
+        location: item.location,
+        description: item.description,
+        timeAgo: formatTimeAgo(item.date_lost),
+        status: item.isResolved ? 'resolved' : 'active',
+        images: item.lostimage ? 1 : 0,
+        distinguishingFeatures: item.distinguishing_features,
+        contactDetails: item.contact_details
+      }));
+      setLostItems(transformedLostItems);
+      
+      // Fetch found items
+      const foundData = await getFoundItems();
+      const transformedFoundItems = foundData.map(item => ({
+        id: item.lost_id,
+        title: item.title,
+        type: 'found',
+        category: item.category || 'Other',
+        date: item.date_lost,
+        location: item.location,
+        description: item.description,
+        timeAgo: formatTimeAgo(item.date_lost),
+        status: item.isResolved ? 'resolved' : 'active',
+        images: item.lostimage ? 1 : 0,
+        distinguishingFeatures: item.distinguishing_features,
+        contactDetails: item.contact_details
+      }));
+      setFoundItems(transformedFoundItems);
+      
+    } catch (error) {
+      console.error("Failed to fetch items:", error);
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
 
+  // Helper function to format time ago
+  const formatTimeAgo = (dateString) => {
+    if (!dateString) return 'Unknown';
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = now - date;
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    
+    if (diffInDays === 0) return 'Today';
+    if (diffInDays === 1) return '1 day ago';
+    if (diffInDays < 7) return `${diffInDays} days ago`;
+    if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
+    return `${Math.floor(diffInDays / 30)} months ago`;
+  };
 
   const handleLostModalOpen = () => setIsLostModalOpen(true);
   const handleFoundModalOpen = () => setIsFoundModalOpen(true);
@@ -171,7 +208,6 @@ const LostFound = () => {
     });
   };
 
-
   const handleLostInputChange = (e) => {
     const { name, value } = e.target;
     setLostFormData(prev => ({ ...prev, [name]: value }));
@@ -182,14 +218,18 @@ const LostFound = () => {
     setFoundFormData(prev => ({ ...prev, [name]: value }));
   };
 
-
   const handleLostSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await reportLostItem(lostFormData);
+      const userId = localStorage.getItem("userId");
+      await reportLostItem({
+        ...lostFormData,
+        user_id: userId
+      });
       alert("Lost item reported successfully!");
       handleLostModalClose();
+      fetchAllItems();
     } catch (error) {
       console.error("Failed to report lost item:", error.message);
       alert("Error: " + error.message);
@@ -202,9 +242,14 @@ const LostFound = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await reportFoundItem(foundFormData);
+      const userId = localStorage.getItem("userId");
+      await reportFoundItem({
+        ...foundFormData,
+        user_id: userId
+      });
       alert("Found item reported successfully!");
       handleFoundModalClose();
+      fetchAllItems();
     } catch (error) {
       console.error("Failed to report found item:", error.message);
       alert("Error: " + error.message);
@@ -212,8 +257,6 @@ const LostFound = () => {
       setIsSubmitting(false);
     }
   };
-  
-
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -232,7 +275,7 @@ const LostFound = () => {
           </button>
           <button 
             onClick={handleLostModalOpen}
-            className="bg-gradient-to-r from-emerald-400 to-green-500 text-white px-4 py-2 rounded-xl shadow-md flex items-center btn-animate font-['Inter']"
+            className="bg-gradient-to-r from-pink-400 to-red-400 text-white px-4 py-2 rounded-xl shadow-md flex items-center btn-animate font-['Inter']"
           >
             <Plus className="w-4 h-4 mr-2" />
             Report Lost Item
@@ -240,37 +283,111 @@ const LostFound = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {lostFoundItems.map((item) => (
-          <div key={item.id} className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-6 card-hover">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-medium text-gray-800 font-['Inter']">{item.title}</h3>
-                <div className="flex space-x-2 mt-1 flex-wrap gap-y-2">
-                  <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
-                    item.type === 'lost' ? 'bg-red-100/80 text-red-700 border-red-200/60' : 'bg-emerald-100/80 text-emerald-700 border-emerald-200/60'
-                  }`}>{item.type}</span>
-                  <span className="px-2 py-1 rounded-lg text-xs font-medium bg-gray-100/80 text-gray-700 border-gray-200/60">{item.status}</span>
-                </div>
+      {isLoading ? (
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+        </div>
+      ) : (
+        <>
+          {/* Lost Items Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <PackageSearch className="w-6 h-6 text-red-500" />
+              <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">Lost Items</h2>
+              <span className="text-sm text-gray-500 font-['Inter']">({lostItems.length})</span>
+            </div>
+            
+            {lostItems.length === 0 ? (
+              <div className="bg-red-50/50 backdrop-blur-sm rounded-xl border border-red-100/60 p-8 text-center">
+                <p className="text-gray-500 font-['Inter']">No lost items reported yet.</p>
               </div>
-              <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded-lg">
-                <MoreVertical className="w-4 h-4" />
-              </button>
-            </div>
-            <p className="text-gray-600 mb-4 font-['Inter']">{item.description}</p>
-            <div className="space-y-2 text-sm text-gray-600 mb-4">
-              <div className="flex items-center font-['Inter']"><MapPin className="w-4 h-4 mr-2 text-gray-500" /> {item.location}</div>
-              <div className="flex items-center font-['Inter']"><Calendar className="w-4 h-4 mr-2 text-gray-500" /> {item.timeAgo}</div>
-              <div className="flex items-center font-['Inter']"><Tag className="w-4 h-4 mr-2 text-gray-500" /> {item.category}</div>
-              {item.images > 0 && <div className="flex items-center font-['Inter']"><ImageIcon className="w-4 h-4 mr-2 text-gray-500" /> {item.images} photo(s)</div>}
-            </div>
-        
-            <div className="flex justify-between items-center border-t border-white/30 pt-4">
-              <span className="text-xs text-gray-500 font-['Inter']">ID: {item.id}</span>
-            </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {lostItems.map((item) => (
+                  <div key={item.id} className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-6 card-hover">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-800 font-['Inter']">{item.title}</h3>
+                        <div className="flex space-x-2 mt-1 flex-wrap gap-y-2">
+                          <span className="px-2 py-1 rounded-lg text-xs font-medium bg-red-100/80 text-red-700 border border-red-200/60">
+                            Lost
+                          </span>
+                          <span className="px-2 py-1 rounded-lg text-xs font-medium bg-gray-100/80 text-gray-700 border border-gray-200/60">
+                            {item.status}
+                          </span>
+                        </div>
+                      </div>
+                      <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded-lg">
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <p className="text-gray-600 mb-4 font-['Inter']">{item.description}</p>
+                    <div className="space-y-2 text-sm text-gray-600 mb-4">
+                      <div className="flex items-center font-['Inter']"><MapPin className="w-4 h-4 mr-2 text-gray-500" /> {item.location}</div>
+                      <div className="flex items-center font-['Inter']"><Calendar className="w-4 h-4 mr-2 text-gray-500" /> {item.timeAgo}</div>
+                      <div className="flex items-center font-['Inter']"><Tag className="w-4 h-4 mr-2 text-gray-500" /> {item.category}</div>
+                      {item.distinguishingFeatures && (
+                        <div className="flex items-start font-['Inter']">
+                          <CheckCircle className="w-4 h-4 mr-2 text-gray-500 mt-0.5" /> 
+                          <span className="text-xs">{item.distinguishingFeatures}</span>
+                        </div>
+                      )}
+                      {item.images > 0 && <div className="flex items-center font-['Inter']"><ImageIcon className="w-4 h-4 mr-2 text-gray-500" /> {item.images} photo(s)</div>}
+                    </div>
+                
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        ))}
-      </div>
+
+          {/* Found Items Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <PackageCheck className="w-6 h-6 text-emerald-500" />
+              <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">Found Items</h2>
+              <span className="text-sm text-gray-500 font-['Inter']">({foundItems.length})</span>
+            </div>
+            
+            {foundItems.length === 0 ? (
+              <div className="bg-emerald-50/50 backdrop-blur-sm rounded-xl border border-emerald-100/60 p-8 text-center">
+                <p className="text-gray-500 font-['Inter']">No found items reported yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {foundItems.map((item) => (
+                  <div key={item.id} className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-6 card-hover">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-800 font-['Inter']">{item.title}</h3>
+                        <div className="flex space-x-2 mt-1 flex-wrap gap-y-2">
+                          <span className="px-2 py-1 rounded-lg text-xs font-medium bg-emerald-100/80 text-emerald-700 border border-emerald-200/60">
+                            Found
+                          </span>
+                          <span className="px-2 py-1 rounded-lg text-xs font-medium bg-gray-100/80 text-gray-700 border border-gray-200/60">
+                            {item.status}
+                          </span>
+                        </div>
+                      </div>
+                      <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded-lg">
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <p className="text-gray-600 mb-4 font-['Inter']">{item.description}</p>
+                    <div className="space-y-2 text-sm text-gray-600 mb-4">
+                      <div className="flex items-center font-['Inter']"><MapPin className="w-4 h-4 mr-2 text-gray-500" /> {item.location}</div>
+                      <div className="flex items-center font-['Inter']"><Calendar className="w-4 h-4 mr-2 text-gray-500" /> {item.timeAgo}</div>
+                      <div className="flex items-center font-['Inter']"><Tag className="w-4 h-4 mr-2 text-gray-500" /> {item.category}</div>
+                      {item.images > 0 && <div className="flex items-center font-['Inter']"><ImageIcon className="w-4 h-4 mr-2 text-gray-500" /> {item.images} photo(s)</div>}
+                    </div>
+                 
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </>
+      )}
 
       <div className="bg-emerald-50/50 border border-emerald-100/60 rounded-xl p-6 backdrop-blur-sm">
         <h3 className="text-lg font-medium text-emerald-800 mb-3 flex items-center font-['Inter']">
@@ -327,7 +444,6 @@ const LostFound = () => {
         </form>
       </Modal>
 
-      {/* Report Found Item Modal */}
       <Modal isOpen={isFoundModalOpen} onClose={handleFoundModalClose}>
         <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
           <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">Report Found Item</h2>
