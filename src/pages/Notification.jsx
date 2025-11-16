@@ -260,22 +260,6 @@ export default function Notifications() {
             </div>
           </div>
 
-          {/* Desktop actions */}
-          <div className="hidden sm:flex items-center gap-2">
-            <button
-              onClick={markAllRead}
-              className="px-4 py-2 rounded-lg bg-white hover:bg-emerald-50 border border-emerald-200 text-sm font-medium text-emerald-700 hover:shadow-md transition"
-            >
-              Mark all read
-            </button>
-            <button
-              onClick={clearDismissed}
-              className="px-4 py-2 rounded-lg bg-white hover:bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700 hover:shadow-md transition"
-              title="Restore dismissed notifications"
-            >
-              Restore dismissed
-            </button>
-          </div>
         </div>
 
         {/* MOBILE QUICK ACTIONS */}
