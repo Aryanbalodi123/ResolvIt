@@ -283,7 +283,25 @@ const Dashboard = () => {
     }));
   };
 
+  const isOnlyWhitespace = (text) => !text.trim();
+
+const isOnlyNumbers = (text) => /^[0-9]+$/.test(text.trim());
+
+
   const handleComplaintSubmit = async (e) => {
+
+    const { title, description } = complaintFormData;
+
+if (isOnlyWhitespace(title) || isOnlyWhitespace(description)) {
+  alert("Title and Description cannot be empty or only spaces.");
+  return;
+}
+
+if (isOnlyNumbers(title) || isOnlyNumbers(description)) {
+  alert("Title and Description cannot contain only numbers.");
+  return;
+}
+
     e.preventDefault();
     setIsSubmitting(true);
     try {
