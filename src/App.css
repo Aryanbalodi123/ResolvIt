@@ -67,30 +67,21 @@
 
 /* Enhanced Glass Effect Container - Shows Minimal Background */
 .translucent-container {
-  /* Strong glass morphism effect */
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
-  
-  /* Subtle borders for depth */
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 32px;
-  
-  /* Layered shadows for elevation */
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.08),
     0 4px 16px rgba(0, 0, 0, 0.04),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
     inset 0 -1px 0 0 rgba(255, 255, 255, 0.2);
-  
-  /* Layout */
   width: 100%;
   min-height: calc(100vh - 4rem);
   position: relative;
   overflow: hidden;
-  
-  /* Inner glow effect */
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.08),
     0 0 0 1px rgba(255, 255, 255, 0.2) inset;
 }
@@ -121,14 +112,21 @@
   opacity: 0.5;
 }
 
-/* Main Content */
+/* Main Content - FIXED FOR NO SCROLLING */
 .main-content {
   flex: 1;
-  min-height: calc(100vh - 4rem);
-  overflow-x: hidden;
-  background: transparent;
+  height: calc(100vh - 4rem);
+  max-height: calc(100vh - 4rem);
+  overflow: hidden;
   position: relative;
   z-index: 1;
+}
+
+/* Dashboard content wrapper - allows internal scrolling */
+.main-content > div {
+  height: 100%;
+  overflow-y: auto;
+  padding: 1.25rem;
 }
 
 /* Fade in animation */
@@ -174,7 +172,7 @@ input:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(127, 219, 170, 0.3);
+  box-shadow: 0 0 0 3px rgba(127, 219, 170, 0.25);
 }
 
 /* Enhanced Card hover effects with glass */
@@ -189,7 +187,7 @@ textarea:focus {
 
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 
+  box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.1),
     0 1px 3px rgba(127, 219, 170, 0.1);
   background: rgba(255, 255, 255, 0.35);
@@ -215,7 +213,7 @@ textarea:focus {
   -webkit-backdrop-filter: blur(30px) saturate(150%);
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 
+  box-shadow:
     0 4px 16px rgba(0, 0, 0, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
@@ -319,19 +317,24 @@ textarea:focus {
   .app-container {
     padding: 1rem;
   }
-  
+
   .main-content {
+    height: calc(100vh - 2rem);
+    max-height: calc(100vh - 2rem);
+  }
+
+  .main-content > div {
     padding: 1rem;
   }
-  
+
   .card-hover:hover {
     transform: none;
   }
-  
+
   .btn-animate:hover {
     transform: none;
   }
-  
+
   .translucent-container {
     min-height: calc(100vh - 2rem);
     border-radius: 24px;
@@ -463,4 +466,300 @@ h1, h2, h3, h4, h5, h6 {
   );
   background-size: 1000px 100%;
   animation: shimmer 3s infinite;
+}
+
+/* ----------------- Drawer, Mobile nav & spacing ----------------- */
+
+/* Drawer open/close handled via transform in Sidebar.jsx */
+aside[aria-hidden="false"] {
+  will-change: transform;
+}
+
+/* Ensure mobile fixed hamburger button has adequate z-index */
+button[aria-label="Open menu"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent the fixed bottom nav from overlapping content on mobile */
+@media (max-width: 768px) {
+  .main-content > div {
+    padding-bottom: 6rem; /* Add extra padding at bottom for floating nav */
+  }
+
+  .translucent-container {
+    padding: 0.5rem;
+  }
+
+  .card-hover {
+    padding: 0.875rem;
+  }
+}
+
+/* Make mobile nav tap targets larger */
+@media (max-width: 640px) {
+  nav[aria-label="Primary"] a {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Ensure the fixed mobile nav sits above any translucent container shadows */
+nav[aria-label="Primary"] {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* Hide decorative circles on smaller screens to reduce clutter */
+@media (max-width: 1024px) {
+  .decorative-circles { display: none; }
+}
+
+/* Drawer-specific tweaks */
+@media (max-width: 1024px) {
+  aside[aria-hidden="false"] {
+    background: rgba(255,255,255,0.87);
+    backdrop-filter: blur(8px);
+  }
+
+  aside[aria-hidden="true"] {
+    background: rgba(255,255,255,0.0);
+  }
+}
+
+/* Fallback for multi-line clamp without tailwind plugin */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Truncate long words gracefully */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- Final Mobile-Only Styles --- */
+@media (max-width: 768px) {
+  /* 1. REMOVE MAIN CONTAINER */
+  .app-container {
+    padding: 0;
+  }
+
+  .translucent-container {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  /* 2. FLOATING CENTERED PILL NAVIGATION BAR */
+  .w-72.bg-gradient-to-b.from-emerald-50\/80 {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: auto !important;
+    max-width: 280px !important;
+    min-height: auto !important;
+    height: 64px;
+    top: auto;
+    right: auto;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 9999px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 0 16px;
+  }
+
+  /* Hide the desktop sidebar header */
+  .w-72 .p-6.border-b {
+    display: none;
+  }
+
+  /* Container for main menu items */
+  .w-72 nav.flex-1 {
+    flex: 1;
+    height: 100%;
+    padding: 0;
+  }
+
+  /* NAV LIST → HORIZONTAL WITH EVEN SPACING */
+  .w-72 nav.flex-1 .space-y-2 {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    height: 100%;
+    margin: 0;
+    gap: 8px !important;
+    --tw-space-y-reverse: 0;
+    width: 100% !important;
+  }
+
+  .w-72 nav.flex-1 .space-y-2 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0;
+  }
+
+  /* SETTINGS LINK */
+  .w-72 .p-4.border-t {
+    display: flex;
+    align-items: center;
+    border-top: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* ALL ICON BUTTONS ARE PERFECT CIRCLES */
+  .w-72 nav.flex-1 .space-y-2 > a,
+  .w-72 .p-4.border-t > a {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex: 0 0 48px !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #374151 !important;
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* PERFECT CENTERING OF SVG */
+  .w-72 nav.flex-1 .space-y-2 > a svg,
+  .w-72 .p-4.border-t > a svg {
+    margin: 0 auto !important;
+    width: 22px !important;
+    height: 22px !important;
+    display: block !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* Hide all text spans inside nav buttons */
+  .w-72 nav.flex-1 .space-y-2 > a span:not(.ml-auto),
+  .w-72 .p-4.border-t > a span:not(.ml-auto) {
+    display: none !important;
+  }
+
+  /* ACTIVE ICON → GREEN CIRCLE */
+  .w-72 nav.flex-1 .space-y-2 > a.active,
+  .w-72 .p-4.border-t > a.active {
+    background-color: #10b981 !important;
+    color: white !important;
+  }
+
+  /* Hide badge */
+  .w-72 nav.flex-1 .space-y-2 > a .ml-auto {
+    display: none !important;
+  }
+
+  /* FLOATING ACTION BUTTON */
+  .mb-10 .flex.space-x-4 {
+    position: fixed;
+    bottom: 96px;
+    right: 16px;
+    z-index: 1000;
+  }
+
+  .mb-10 .flex.space-x-4 button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    background-color: #10b981;
+    color: white;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-size: 0;
+  }
+
+  .mb-10 .flex.space-x-4 button svg {
+    width: 28px;
+    height: 28px;
+    margin-right: 0;
+  }
+
+  /* MAIN CONTENT SPACING - Items scroll behind floating elements */
+  .main-content > div {
+    padding-bottom: 7rem !important; /* Space for both FAB and nav bar */
+  }
+
+  /* PERFORMANCE FIXES */
+  .card-hover,
+  .glass-effect,
+  .glass-light,
+  .glass-medium,
+  .glass-heavy {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  /* DASHBOARD UI TWEAKS */
+  .p-8 {
+    padding: 1rem;
+  }
+  .mb-10 .text-3xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+  .mb-10 .text-lg {
+    font-size: 0.9rem;
+  }
+  .p-6 {
+    padding: 1rem;
+  }
+  .p-3\.5 {
+    padding: 0.6rem;
+    border-radius: 0.75rem;
+  }
+  .text-2xl {
+    font-size: 1.5rem;
+  }
+  .h-\[calc\(100vh-24rem\)\] {
+    height: auto;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .p-5 {
+    padding: 1rem;
+  }
+  .text-base {
+    font-size: 0.9rem;
+  }
+  .text-sm {
+    font-size: 0.8rem;
+  }
+  .gap-4 {
+    gap: 0.5rem;
+  }
+  .text-xs {
+    font-size: 11px;
+  }
+  .lg\:col-span-2 {
+    grid-column: span 1 / span 1 !important;
+  }
 }
