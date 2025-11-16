@@ -1,230 +1,174 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { reportLostItem, reportFoundItem } from '../../services/LostFoundServices'; 
-
-import { 
-  Plus, 
-  Search, 
-  MapPin, 
-  Calendar, 
+import { getLostItems, getFoundItems } from "../../services/LostFoundServices";
+import {
+  MapPin,
+  Calendar,
   Tag,
-  CheckCircle,
-  MoreVertical,
   Image as ImageIcon,
-  AlertTriangle,
-  X
-} from 'lucide-react';
+  PackageSearch,
+  PackageCheck,
+  Loader2,
+} from "lucide-react";
 
-const LostFound = () => {
+export default function LostFound() {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [lostItems, setLostItems] = useState([]);
+  const [foundItems, setFoundItems] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login", { replace: true });
-    }
-  }, [navigate]);
+    if (!token) navigate("/login");
+    else fetchAllItems();
+  }, []);
 
-  const [isLostModalOpen, setIsLostModalOpen] = useState(false);
-  const [isFoundModalOpen, setIsFoundModalOpen] = useState(false);
-  
-  // 🔹 Lost item form state
-  const [lostFormData, setLostFormData] = useState({
-    title: '',
-    description: '',
-    location: '',
-    category: 'Personal Items',
-    contactMethod: 'email',
-    contactDetails: '',
-    dateLost: '',
-    distinguishingFeatures: ''
-  });
-
-  // 🔹 Found item form state
-  const [foundFormData, setFoundFormData] = useState({
-    title: '',
-    description: '',
-    location: '',
-    category: 'General',
-    dateFound: '',
-    contactMethod: 'email',
-    contactDetails: ''
-  });
-
-  const lostFoundItems = [
-    {
-      id: 'LF001',
-      title: 'iPhone 13 Pro',
-      type: 'lost',
-      category: 'Electronics',
-      date: '2024-08-20',
-      location: 'Central Park, Near Fountain',
-      description: 'Lost my iPhone 13 Pro in midnight green color with a black case.',
-      timeAgo: '4 hours ago',
-      status: 'active',
-      images: 1
-    },
-    {
-      id: 'LF003',
-      title: 'Blue Backpack',
-      type: 'lost',
-      category: 'Bags',
-      date: '2024-08-18',
-      location: 'Metro Station, Platform 2',
-      description: 'Lost my blue Nike backpack containing laptop, books, and documents.',
-      timeAgo: '2 days ago',
-      status: 'active',
-      images: 1
-    }
-  ];
-
-  // 🔹 Modal handlers
-  const handleLostModalOpen = () => setIsLostModalOpen(true);
-  const handleFoundModalOpen = () => setIsFoundModalOpen(true);
-
-  const handleLostModalClose = () => {
-    setIsLostModalOpen(false);
-    setLostFormData({
-      title: '',
-      description: '',
-      location: '',
-      category: 'Personal Items',
-      contactMethod: 'email',
-      contactDetails: '',
-      dateLost: '',
-      distinguishingFeatures: ''
-    });
-  };
-
-  const handleFoundModalClose = () => {
-    setIsFoundModalOpen(false);
-    setFoundFormData({
-      title: '',
-      description: '',
-      location: '',
-      category: 'General',
-      dateFound: '',
-      contactMethod: 'email',
-      contactDetails: ''
-    });
-  };
-
-  // 🔹 Input handlers
-  const handleLostInputChange = (e) => {
-    const { name, value } = e.target;
-    setLostFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleFoundInputChange = (e) => {
-    const { name, value } = e.target;
-    setFoundFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  // 🔹 Submit handlers
-  const handleLostSubmit = async (e) => {
-    e.preventDefault();
+  const fetchAllItems = async () => {
     try {
-      await reportLostItem(lostFormData);
-      alert("Lost item reported successfully!");
-      handleLostModalClose();
-    } catch (error) {
-      console.error("Failed to report lost item:", error.message);
+      setIsLoading(true);
+
+      const lost = await getLostItems();
+      setLostItems(
+        lost.map((item) => ({
+          id: item.lost_id,
+          title: item.title,
+          category: item.category || "Other",
+          timeAgo: timeAgo(item.date_lost),
+          location: item.location,
+          description: item.description,
+          images: item.lostimage ? 1 : 0,
+        }))
+      );
+
+      const found = await getFoundItems();
+      setFoundItems(
+        found.map((item) => ({
+          id: item.lost_id,
+          title: item.title,
+          category: item.category || "Other",
+          timeAgo: timeAgo(item.date_lost),
+          location: item.location,
+          description: item.description,
+          images: item.lostimage ? 1 : 0,
+        }))
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleFoundSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await reportFoundItem(foundFormData);
-      alert("Found item reported successfully!");
-      handleFoundModalClose();
-    } catch (error) {
-      console.error("Failed to report found item:", error.message);
-    }
+  const timeAgo = (dateStr) => {
+    if (!dateStr) return "Unknown";
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diff = now - d;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    if (days === 0) return "Today";
+    if (days === 1) return "1 day ago";
+    if (days < 7) return `${days} days ago`;
+    if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
+    return `${Math.floor(days / 30)} months ago`;
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-800">Lost & Found Queries</h1>
-        </div>
-     
-      </div>
+    <div className="p-6 max-w-7xl mx-auto space-y-8">
 
-      {/* Items List */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {lostFoundItems.map((item) => (
-          <div key={item.id} className="bg-white/40 backdrop-blur-sm rounded-xl border p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-medium text-gray-800">{item.title}</h3>
-                <div className="flex space-x-2 mt-1">
-                  <span className="px-2 py-1 rounded-lg text-xs bg-emerald-100 text-emerald-800 border border-emerald-200">{item.type}</span>
-                  <span className="px-2 py-1 rounded-lg text-xs bg-emerald-200 text-emerald-800 border border-emerald-300">{item.status}</span>
-                </div>
-              </div>
-              <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded">
-                <MoreVertical className="w-4 h-4" />
-              </button>
-            </div>
-            <p className="text-gray-600 mb-4">{item.description}</p>
-            <div className="space-y-2 text-sm text-gray-600 mb-4">
-              <div className="flex items-center"><MapPin className="w-4 h-4 mr-2" /> {item.location}</div>
-              <div className="flex items-center"><Calendar className="w-4 h-4 mr-2" /> {item.timeAgo}</div>
-              <div className="flex items-center"><Tag className="w-4 h-4 mr-2" /> {item.category}</div>
-              {item.images > 0 && <div className="flex items-center"><ImageIcon className="w-4 h-4 mr-2" /> {item.images} photo(s)</div>}
-            </div>
-      
-            <div className="flex justify-between items-center border-t pt-4">
-              <span className="text-xs text-gray-500">ID: {item.id}</span>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* Page Title */}
+      <h1 className="text-3xl font-semibold text-gray-800">Lost & Found</h1>
 
-      {/* Report Lost Item Modal */}
-      {isLostModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-semibold text-gray-800">Report Lost Item</h2>
-              <button onClick={handleLostModalClose} className="p-2 text-gray-500 hover:text-gray-700 rounded">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleLostSubmit} className="p-6 space-y-4">
-              <input type="text" name="title" value={lostFormData.title} onChange={handleLostInputChange} placeholder="Item Title" required className="w-full border rounded p-2" />
-              <textarea name="description" value={lostFormData.description} onChange={handleLostInputChange} placeholder="Description" required className="w-full border rounded p-2" />
-              <input type="text" name="location" value={lostFormData.location} onChange={handleLostInputChange} placeholder="Location" required className="w-full border rounded p-2" />
-              <button type="submit" className="w-full bg-pink-400 text-white py-2 rounded">Submit</button>
-            </form>
-          </div>
+      {/* Loader */}
+      {isLoading ? (
+        <div className="flex justify-center py-20">
+          <Loader2 className="w-10 h-10 animate-spin text-gray-400" />
         </div>
+      ) : (
+        <>
+          {/* LOST ITEMS */}
+          <Section
+            icon={<PackageSearch className="w-6 h-6 text-red-500" />}
+            title="Lost Items"
+            count={lostItems.length}
+            items={lostItems}
+            badgeColor="bg-red-100/80 text-red-700 border-red-200/60"
+          />
+
+          {/* FOUND ITEMS */}
+          <Section
+            icon={<PackageCheck className="w-6 h-6 text-emerald-500" />}
+            title="Found Items"
+            count={foundItems.length}
+            items={foundItems}
+            badgeColor="bg-emerald-100/80 text-emerald-700 border-emerald-200/60"
+          />
+        </>
       )}
+    </div>
+  );
+}
 
-      {/* Report Found Item Modal */}
-      {isFoundModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-semibold text-gray-800">Report Found Item</h2>
-              <button onClick={handleFoundModalClose} className="p-2 text-gray-500 hover:text-gray-700 rounded">
-                <X className="w-5 h-5" />
-              </button>
+/* Smaller reusable component */
+function Section({ icon, title, count, items, badgeColor }) {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        {icon}
+        <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+        <span className="text-sm text-gray-500">({count})</span>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="bg-white/50 backdrop-blur-md border p-8 rounded-xl text-center">
+          <p className="text-gray-500">No items reported yet.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {items.map((item) => (
+            <div
+              key={item.id}
+              className="bg-white/40 backdrop-blur-xl rounded-xl border border-white/40 p-6 shadow-md hover:shadow-lg transition"
+            >
+              <div className="flex items-start justify-between mb-3">
+                <h3 className="text-lg font-medium text-gray-800">
+                  {item.title}
+                </h3>
+                <span
+                  className={`px-2 py-1 text-xs rounded-lg font-medium border ${badgeColor}`}
+                >
+                  {title === "Lost Items" ? "Lost" : "Found"}
+                </span>
+              </div>
+
+              <p className="text-gray-600 mb-3">{item.description}</p>
+
+              <div className="space-y-1 text-sm text-gray-600">
+                <p className="flex items-center">
+                  <MapPin className="w-4 h-4 mr-2 text-gray-500" />
+                  {item.location}
+                </p>
+
+                <p className="flex items-center">
+                  <Calendar className="w-4 h-4 mr-2 text-gray-500" />
+                  {item.timeAgo}
+                </p>
+
+                <p className="flex items-center">
+                  <Tag className="w-4 h-4 mr-2 text-gray-500" />
+                  {item.category}
+                </p>
+
+                {item.images > 0 && (
+                  <p className="flex items-center">
+                    <ImageIcon className="w-4 h-4 mr-2 text-gray-500" />
+                    {item.images} photo(s)
+                  </p>
+                )}
+              </div>
             </div>
-            <form onSubmit={handleFoundSubmit} className="p-6 space-y-4">
-              <input type="text" name="title" value={foundFormData.title} onChange={handleFoundInputChange} placeholder="Item Title" required className="w-full border rounded p-2" />
-              <textarea name="description" value={foundFormData.description} onChange={handleFoundInputChange} placeholder="Description" required className="w-full border rounded p-2" />
-              <input type="text" name="location" value={foundFormData.location} onChange={handleFoundInputChange} placeholder="Location" required className="w-full border rounded p-2" />
-              <button type="submit" className="w-full bg-indigo-400 text-white py-2 rounded">Submit</button>
-            </form>
-          </div>
+          ))}
         </div>
       )}
     </div>
   );
-};
-
-export default LostFound;
+}

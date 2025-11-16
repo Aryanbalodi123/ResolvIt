@@ -6,6 +6,7 @@ import {
   Search,
   Settings,
   User,
+  Bell
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -33,6 +34,11 @@ const Sidebar = () => {
             icon: Search,
             path: "/lost-found",
           },
+          { id: "notifications",
+            label: "Notifications",
+            icon: Bell,
+            path: "/notifications",
+          }
         ]
       : [
           {
@@ -54,6 +60,11 @@ const Sidebar = () => {
             icon: Search,
             path: "/admin/lost-found",
           },
+              { id: "notifications",
+            label: "Notifications",
+            icon: Bell,
+            path: "/notifications",
+          }
         ];
 
   return (

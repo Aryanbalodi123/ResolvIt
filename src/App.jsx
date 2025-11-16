@@ -18,6 +18,7 @@ import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLostFound from "./pages/AdminLostFound";
 import AdminComplaints from "./pages/AdminComplaints.jsx";
+import Notifications from "./pages/Notification.jsx";
 
 import "./App.css";
 
@@ -43,11 +44,13 @@ const App = () => {
           <Route path="/complaints" element={<Complaints />} />
           <Route path="/lost-found" element={<LostFound />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/notifications" element={<Notifications />} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/all-complaints" element={<AdminComplaints />} />
           <Route path="/admin/lost-found" element={<AdminLostFound />} />
+          <Route path="/notifications" element={<Notifications />} />
         </Route>
 
         {/* Default Routes */}
@@ -55,7 +58,7 @@ const App = () => {
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
-  );
+  );x``
 };
 
 export default App;
