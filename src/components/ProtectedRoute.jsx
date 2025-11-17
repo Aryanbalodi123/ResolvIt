@@ -1,6 +1,5 @@
 import { Navigate } from 'react-router-dom';
 
-{/* Authentication wrapper component to protect routes */}
 const ProtectedRoute = ({ children }) => {
     const userRole = localStorage.getItem('role');
     

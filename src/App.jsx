@@ -31,14 +31,16 @@ const App = () => {
         <Route path="/register" element={<AuthLayout><Register /></AuthLayout>} />
 
         {/* Protected Routes */}
-        <Route element={
-          <ProtectedRoute>
-            <MainLayout>
-              <div className="circle-top" aria-hidden="true"></div>
-              <div className="circle-bottom" aria-hidden="true"></div>
-            </MainLayout>
-          </ProtectedRoute>
-        }>
+        <Route
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <div className="circle-top" aria-hidden="true"></div>
+                <div className="circle-bottom" aria-hidden="true"></div>
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        >
           {/* Student Routes */}
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/complaints" element={<Complaints />} />
@@ -50,7 +52,6 @@ const App = () => {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/all-complaints" element={<AdminComplaints />} />
           <Route path="/admin/lost-found" element={<AdminLostFound />} />
-          <Route path="/notifications" element={<Notifications />} />
         </Route>
 
         {/* Default Routes */}
@@ -58,7 +59,7 @@ const App = () => {
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
-  );x``
+  );
 };
 
 export default App;
