@@ -87,7 +87,7 @@ const LostFound = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Separate states for lost and found items
+
   const [lostItems, setLostItems] = useState([]);
   const [foundItems, setFoundItems] = useState([]);
 
@@ -112,12 +112,11 @@ const LostFound = () => {
     contactDetails: ''
   });
 
-  // Fetch both lost and found items
+
   const fetchAllItems = async () => {
     try {
       setIsLoading(true);
       
-      // Fetch lost items
       const lostData = await getLostItems();
       const transformedLostItems = lostData.map(item => ({
         id: item.lost_id,
@@ -135,7 +134,7 @@ const LostFound = () => {
       }));
       setLostItems(transformedLostItems);
       
-      // Fetch found items
+    
       const foundData = await getFoundItems();
       const transformedFoundItems = foundData.map(item => ({
         id: item.lost_id,
@@ -160,7 +159,6 @@ const LostFound = () => {
     }
   };
 
-  // Helper function to format time ago
   const formatTimeAgo = (dateString) => {
     if (!dateString) return 'Unknown';
     
