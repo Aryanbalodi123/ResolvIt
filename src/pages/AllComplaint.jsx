@@ -21,10 +21,8 @@ const Complaints = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Modal states
   const [isComplaintModalOpen, setIsComplaintModalOpen] = useState(false);
 
-  // Form data states
   const [complaintFormData, setComplaintFormData] = useState({
     title: "",
     description: "",
@@ -33,56 +31,7 @@ const Complaints = () => {
     category: "infrastructure",
   });
 
-  const userComplaints = [
-    {
-      id: 'C001',
-      title: 'Street Light Not Working',
-      status: 'pending',
-      priority: 'medium',
-      date: '2024-08-15',
-      location: 'Main Street, Block A',
-      description: 'Street light has been out for 3 days, causing safety concerns for pedestrians during night hours.',
-      category: 'Infrastructure',
-      timeAgo: '3 days ago',
-      responses: 0
-    },
-    {
-      id: 'C002',
-      title: 'Water Supply Issue',
-      status: 'in-progress',
-      priority: 'high',
-      date: '2024-08-12',
-      location: 'Park Avenue, Sector 5',
-      description: 'Inconsistent water supply for the past week. Water pressure is very low during morning hours.',
-      category: 'Utilities',
-      timeAgo: '6 days ago',
-      responses: 2
-    },
-    {
-      id: 'C003',
-      title: 'Noise Complaint',
-      status: 'resolved',
-      priority: 'low',
-      date: '2024-08-08',
-      location: 'Green Valley Apartments',
-      description: 'Construction noise during restricted hours (after 6 PM). Issue has been resolved by local authorities.',
-      category: 'Noise',
-      timeAgo: '1 week ago',
-      responses: 5
-    },
-    {
-      id: 'C004',
-      title: 'Garbage Collection Delay',
-      status: 'pending',
-      priority: 'medium',
-      date: '2024-08-18',
-      location: 'Rose Garden Colony',
-      description: 'Garbage has not been collected for 4 days. Starting to cause hygiene issues in the area.',
-      category: 'Sanitation',
-      timeAgo: '1 day ago',
-      responses: 1
-    }
-  ];
+ 
 
   const getStatusColor = (status) => {
     switch (status) {

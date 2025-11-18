@@ -108,7 +108,6 @@ export default function LostFound() {
   );
 }
 
-/* Smaller reusable component */
 function Section({ icon, title, count, items, badgeColor }) {
   return (
     <div className="space-y-4">

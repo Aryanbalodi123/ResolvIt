@@ -57,9 +57,7 @@ export async function loginAdmin(rollNumber, password) {
         .eq("rollNumber", rollNumber)
         .single();
 
-    // --- FIX: Specific Error Handling ---
     if (error) {
-        // This code specifically checks for the Supabase "row not found" error
         if (error.code === 'PGRST116') {
             throw new Error("User not found");
         }
