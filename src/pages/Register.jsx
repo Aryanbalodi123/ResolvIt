@@ -149,7 +149,7 @@ const Register = () => {
       return false;
     }
 
-    if (passwordStrength.level <= 2) { // 2 corresponds to 'Weak'
+    if (passwordStrength.level <= 2) { 
       showAlert('Password is too weak. Please include a mix of cases, numbers, and symbols.');
       return false;
     }
@@ -161,12 +161,12 @@ const Register = () => {
     
     return true;
   };
-  // --- END FIX ---
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Run all validations first
+    
     if (!validateRegistrationForm()) {
       return;
     }
@@ -193,22 +193,21 @@ const Register = () => {
       }, 2000); 
 
     } catch (err) {
-      // --- FIX: Robust error handling for all cases ---
-      console.error("Registration Error:", err); // For developer debugging
+      console.error("Registration Error:", err); 
       
       const errorMessage = err.message ? err.message.toLowerCase() : '';
       
       if (errorMessage.includes('already exists') || errorMessage.includes('duplicate') || errorMessage.includes('in use')) {
-        // Known, specific backend error
+        
         showAlert('A user with this email or roll number already exists.', 'error');
       } else if (err.name === 'TypeError' || errorMessage.includes('failed to fetch') || errorMessage.includes('network request failed')) {
-        // Network or connection error
+       
         showAlert('Network error. Please check your internet connection.', 'error');
       } else {
-        // All other errors (500s, DB errors, unexpected issues)
+ 
         showAlert('Registration failed. An unexpected error occurred. Please try again later.', 'error');
       }
-      // --- END FIX ---
+      
     } finally {
       setIsLoading(false);
     }
