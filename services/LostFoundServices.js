@@ -1,6 +1,5 @@
 import { supabase } from "../lib/SupabaseClient";
 
-// Report a lost item
 export async function reportLostItem(payload) {
   const { data, error } = await supabase
     .from("lost_found")
@@ -14,7 +13,7 @@ export async function reportLostItem(payload) {
       distinguishing_features: payload.distinguishingFeatures,
       isResolved: false,
       user_id: payload.user_id,
-      type: 'lost' // Mark as lost item
+      type: 'lost'
     }])
     .select();
 
@@ -22,7 +21,6 @@ export async function reportLostItem(payload) {
   return data;
 }
 
-// Report a found item
 export async function reportFoundItem(payload) {
   const { data, error } = await supabase
     .from("lost_found")
@@ -35,7 +33,7 @@ export async function reportFoundItem(payload) {
       date_lost: payload.dateFound,
       isResolved: false,
       user_id: payload.user_id,
-      type: 'found' // Mark as found item
+      type: 'found'
     }])
     .select();
 
@@ -43,7 +41,6 @@ export async function reportFoundItem(payload) {
   return data;
 }
 
-// Delete a lost item
 export async function deleteLostItem(id) {
   const { error } = await supabase
     .from('lost_found')
@@ -53,7 +50,6 @@ export async function deleteLostItem(id) {
   if (error) throw error;
 }
 
-// Get only lost items
 export async function getLostItems() {
   const { data, error } = await supabase
     .from('lost_found')
@@ -65,7 +61,6 @@ export async function getLostItems() {
   return data || [];
 }
 
-// Get only found items
 export async function getFoundItems() {
   const { data, error } = await supabase
     .from('lost_found')

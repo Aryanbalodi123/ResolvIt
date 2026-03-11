@@ -26,26 +26,19 @@ export async function loginUser(rollNumber, password) {
         .eq("rollNumber", rollNumber)
         .single();
 
-    // --- FIX: Specific Error Handling ---
     if (error) {
-        // This code specifically checks for the Supabase "row not found" error
         if (error.code === 'PGRST116') {
             throw new Error("User not found");
         }
-        // Throw any other unexpected database error
         throw error;
     }
 
-    // User was found, now check password
     const valid = await bcrypt.compare(password, data.password);
     
     if (!valid) {
-        // This is the "wrong password" case
         throw new Error("Invalid password");
     }
-    // --- END FIX ---
 
-    // Login is valid, return user data (without password)
     const { password: _, ...user } = data;
     return user;
 }
@@ -61,20 +54,15 @@ export async function loginAdmin(rollNumber, password) {
         if (error.code === 'PGRST116') {
             throw new Error("User not found");
         }
-        // Throw any other unexpected database error
         throw error;
     }
 
-    // User was found, now check password
     const valid = await bcrypt.compare(password, data.password);
     
     if (!valid) {
-        // This is the "wrong password" case
         throw new Error("Invalid password");
     }
-    // --- END FIX ---
 
-    // Login is valid, return user data (without password)
     const { password: _, ...user } = data;
     return user;
 }
