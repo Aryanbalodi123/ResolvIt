@@ -132,7 +132,7 @@ const Login = () => {
       <div className="flex-1 flex justify-center items-center bg-white rounded-tl-[60px] rounded-bl-[60px] md:-ml-16 md:pl-24 px-4 py-8 relative z-10">
         <div className="w-full max-w-xs mx-auto">
           <div className="text-center text-4xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 bg-clip-text text-transparent mb-8 relative">
-            ResolvIt
+            ComplaintUs
             <div className="absolute bottom-[-8px] left-1/2 transform -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-sm"></div>
           </div>
 

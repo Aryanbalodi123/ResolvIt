@@ -76,7 +76,7 @@ const Sidebar = () => {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-emerald-900">
-              ResolvIt
+              ComplaintUs
             </h2>
             <p className="text-sm text-emerald-600">
               {localStorage.getItem("role") === "user"

@@ -234,7 +234,7 @@ const Register = () => {
           className="w-[260px] md:w-[320px] lg:w-[380px] object-contain"
         />
         <div className="text-center mt-4">
-          <h1 className="text-2xl font-bold mb-2">Join ResolvIt!</h1>
+          <h1 className="text-2xl font-bold mb-2">Join ComplaintUs!</h1>
           <p className="text-sm opacity-90">Create your account to manage and resolve complaints efficiently</p>
         </div>
       </div>
@@ -244,7 +244,7 @@ const Register = () => {
         <div className="w-full max-w-[300px]">
           {/* Logo */}
           <div className="text-center text-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 bg-clip-text text-transparent mb-3 relative">
-            ResolvIt
+            ComplaintUs
           </div>
           
           <h2 className="text-base mb-2 font-semibold">Create Account</h2>
