@@ -14,8 +14,11 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import { getUserDetails, getUserComplaints } from "../../services/UserServices";
-import { supabase } from "../../lib/SupabaseClient";
+import {
+  getUserDetails,
+  getUserComplaints,
+  updateUserDetails,
+} from "../../services/UserServices";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -82,15 +85,10 @@ const Settings = () => {
   const handleSave = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase
-        .from("users")
-        .update({
-          name: editedProfile.name,
-          email: editedProfile.email,
-        })
-        .eq("rollNumber", localStorage.getItem("rollNumber"));
-
-      if (error) throw error;
+      await updateUserDetails(localStorage.getItem("rollNumber"), {
+        name: editedProfile.name,
+        email: editedProfile.email,
+      });
 
       setUserProfile(editedProfile);
       setIsEditing(false);

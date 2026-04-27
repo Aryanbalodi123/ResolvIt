@@ -70,6 +70,7 @@ const Login = () => {
         rollNumber: userData.rollNumber,
         name: userData.name
       }));
+      localStorage.setItem("authToken", userData.token);
       localStorage.setItem("role", selectedRole);
       localStorage.setItem("rollNumber", userData.rollNumber);
       localStorage.setItem("name", userData.name);

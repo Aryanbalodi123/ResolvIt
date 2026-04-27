@@ -220,7 +220,7 @@ const LostFound = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const userId = localStorage.getItem("userId");
+      const userId = localStorage.getItem("rollNumber") || localStorage.getItem("userId");
       await reportLostItem({
         ...lostFormData,
         user_id: userId
@@ -240,7 +240,7 @@ const LostFound = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const userId = localStorage.getItem("userId");
+      const userId = localStorage.getItem("rollNumber") || localStorage.getItem("userId");
       await reportFoundItem({
         ...foundFormData,
         user_id: userId

@@ -1,20 +1,12 @@
-import { supabase } from "../lib/SupabaseClient";
+import { apiRequest } from "./apiClient";
 
 export async function sendComplaint(complaintPayload) {
-    
-    const {data,error} = await supabase
-    .from('complaints')
-    .insert([complaintPayload])
-
-    if (error) throw error;
-    return data;
+    return apiRequest("/complaints", {
+        method: "POST",
+        body: JSON.stringify(complaintPayload),
+    });
 }
 
 export async function retrieveComplaint() {
-    const {data,error} = await supabase
-    .from('complaints')
-    .select("*")
-
-    if(error) throw error
-    return data;
+    return apiRequest("/complaints");
 }

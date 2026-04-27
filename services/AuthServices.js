@@ -1,68 +1,29 @@
-import { supabase } from "../lib/SupabaseClient";
-import bcrypt from "bcryptjs";
+import { apiRequest } from "./apiClient";
 
 export async function registerAdmin(registerAdminPayload) {
-    const {data, error} = await supabase
-        .from('admin')
-        .insert([registerAdminPayload])
-    
-        if (error) throw error;
-        return data;
+  return apiRequest("/auth/register/admin", {
+    method: "POST",
+    body: JSON.stringify(registerAdminPayload),
+  });
 }
 
 export async function registerUser(registerUserPayload) {
-    const {data, error} = await supabase
-        .from('users')
-        .insert([registerUserPayload])
-    
-        if (error) throw error;
-        return data;
+  return apiRequest("/auth/register/user", {
+    method: "POST",
+    body: JSON.stringify(registerUserPayload),
+  });
 }
 
 export async function loginUser(rollNumber, password) {
-    const { data, error } = await supabase
-        .from('users')
-        .select("rollNumber, email, password, name")
-        .eq("rollNumber", rollNumber)
-        .single();
-
-    if (error) {
-        if (error.code === 'PGRST116') {
-            throw new Error("User not found");
-        }
-        throw error;
-    }
-
-    const valid = await bcrypt.compare(password, data.password);
-    
-    if (!valid) {
-        throw new Error("Invalid password");
-    }
-
-    const { password: _, ...user } = data;
-    return user;
+  return apiRequest("/auth/login/user", {
+    method: "POST",
+    body: JSON.stringify({ rollNumber, password }),
+  });
 }
 
 export async function loginAdmin(rollNumber, password) {
-    const { data, error } = await supabase
-        .from('admin')
-        .select("rollNumber, email, password, name")
-        .eq("rollNumber", rollNumber)
-        .single();
-
-    if (error) {
-        if (error.code === 'PGRST116') {
-            throw new Error("User not found");
-        }
-        throw error;
-    }
-
-    const valid = await bcrypt.compare(password, data.password);
-    
-    if (!valid) {
-        throw new Error("Invalid password");
-    }
-
-    const { password: _, ...user } = data;
-    return user;
+  return apiRequest("/auth/login/admin", {
+    method: "POST",
+    body: JSON.stringify({ rollNumber, password }),
+  });
 }

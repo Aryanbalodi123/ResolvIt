@@ -1,73 +1,31 @@
-import { supabase } from "../lib/SupabaseClient";
+import { apiRequest } from "./apiClient";
 
 export async function reportLostItem(payload) {
-  const { data, error } = await supabase
-    .from("lost_found")
-    .insert([{
-      title: payload.title,
-      description: payload.description,
-      location: payload.location,
-      category: payload.category,
-      contact_details: payload.contactDetails,
-      date_lost: payload.dateLost,
-      distinguishing_features: payload.distinguishingFeatures,
-      isResolved: false,
-      user_id: payload.user_id,
-      type: 'lost'
-    }])
-    .select();
-
-  if (error) throw error;
-  return data;
+  return apiRequest("/lost-found/lost", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
 
 export async function reportFoundItem(payload) {
-  const { data, error } = await supabase
-    .from("lost_found")
-    .insert([{
-      title: payload.title,
-      description: payload.description,
-      location: payload.location,
-      category: payload.category,
-      contact_details: payload.contactDetails,
-      date_lost: payload.dateFound,
-      isResolved: false,
-      user_id: payload.user_id,
-      type: 'found'
-    }])
-    .select();
-
-  if (error) throw error;
-  return data;
+  return apiRequest("/lost-found/found", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
 
 export async function deleteLostItem(id) {
-  const { error } = await supabase
-    .from('lost_found')
-    .delete()
-    .eq('lost_id', id);
-
-  if (error) throw error;
+  await apiRequest(`/lost-found/${id}`, {
+    method: "DELETE",
+  });
 }
 
 export async function getLostItems() {
-  const { data, error } = await supabase
-    .from('lost_found')
-    .select('*')
-    .eq('type', 'lost')
-    .order('lost_id', { ascending: false });
-
-  if (error) throw error;
+  const data = await apiRequest("/lost-found/lost");
   return data || [];
 }
 
 export async function getFoundItems() {
-  const { data, error } = await supabase
-    .from('lost_found')
-    .select('*')
-    .eq('type', 'found')
-    .order('lost_id', { ascending: false });
-
-  if (error) throw error;
+  const data = await apiRequest("/lost-found/found");
   return data || [];
 }
