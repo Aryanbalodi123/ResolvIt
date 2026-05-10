@@ -20,6 +20,7 @@ const AdminLostFound = React.lazy(() => import("./pages/AdminLostFound"));
 const AdminComplaints = React.lazy(() => import("./pages/AdminComplaints.jsx"));
 const Notifications = React.lazy(() => import("./pages/Notification.jsx"));
 import AuthLayout from "./components/AuthLayout";
+import LandingPage from "./pages/LandingPage";
 
 import "./App.css";
 
@@ -35,6 +36,9 @@ export default App;
 
 export const AppRoutes = () => (
   <Routes>
+    {/* Landing Page */}
+    <Route path="/" element={<LandingPage />} />
+
     {/* Public Routes */}
     <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
     <Route path="/register" element={<AuthLayout><Register /></AuthLayout>} />
@@ -63,9 +67,8 @@ export const AppRoutes = () => (
       <Route path="/admin/lost-found" element={<Suspense fallback={null}><AdminLostFound /></Suspense>} />
     </Route>
 
-    {/* Default Routes */}
-    <Route path="/" element={<Navigate to="/login" replace />} />
-    <Route path="*" element={<Navigate to="/login" replace />} />
+    {/* Fallback */}
+    <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );
 
