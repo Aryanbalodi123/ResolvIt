@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
-import { reportLostItem, reportFoundItem, getLostItems, getFoundItems } from '../../services/LostFoundServices';
+import { reportLostItem, reportFoundItem, getLostItems, getFoundItems, deleteLostItem } from '../../services/LostFoundServices';
 import Modal from '../components/Modal'; 
 
 import { 
@@ -16,7 +16,10 @@ import {
   X,
   Loader2,
   PackageSearch,
-  PackageCheck
+  PackageCheck,
+  Filter,
+  Trash2,
+  Mail
 } from 'lucide-react';
 
 const FormInput = ({ label, name, value, onChange, placeholder, required, type = "text" }) => (
@@ -70,6 +73,49 @@ const FormSelect = ({ label, name, value, onChange, children, required }) => (
   </div>
 );
 
+const FormImageInput = ({ label, value, onChange }) => {
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Image must be smaller than 5MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onChange(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      onChange(null);
+    }
+  };
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+        {label}
+      </label>
+      <div className="flex items-center justify-center w-full">
+        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-white/50 hover:bg-gray-50/80 transition-colors overflow-hidden relative">
+          {value ? (
+            <img src={value} alt="Preview" className="w-full h-full object-cover" />
+          ) : (
+            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+              <ImageIcon className="w-8 h-8 mb-3 text-gray-400" />
+              <p className="mb-2 text-sm text-gray-500 font-['Inter']">
+                <span className="font-semibold">Click to upload</span> or drag and drop
+              </p>
+              <p className="text-xs text-gray-500 font-['Inter']">PNG, JPG, JPEG (MAX. 5MB)</p>
+            </div>
+          )}
+          <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+        </label>
+      </div>
+    </div>
+  );
+};
+
 const LostFound = () => {
   const navigate = useNavigate();
 
@@ -87,9 +133,15 @@ const LostFound = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-
   const [lostItems, setLostItems] = useState([]);
   const [foundItems, setFoundItems] = useState([]);
+
+  // New Features State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [contactModalData, setContactModalData] = useState(null);
+  
+  const currentUser = localStorage.getItem("rollNumber") || localStorage.getItem("userId");
 
   const [lostFormData, setLostFormData] = useState({
     title: '',
@@ -99,7 +151,8 @@ const LostFound = () => {
     contactMethod: 'email', 
     contactDetails: '',
     dateLost: '',
-    distinguishingFeatures: ''
+    distinguishingFeatures: '',
+    image: null
   });
 
   const [foundFormData, setFoundFormData] = useState({
@@ -109,7 +162,8 @@ const LostFound = () => {
     category: 'General',
     dateFound: '',
     contactMethod: 'email', 
-    contactDetails: ''
+    contactDetails: '',
+    image: null
   });
 
 
@@ -128,9 +182,10 @@ const LostFound = () => {
         description: item.description,
         timeAgo: formatTimeAgo(item.date_lost),
         status: item.isResolved ? 'resolved' : 'active',
-        images: item.lostimage ? 1 : 0,
+        imageUrl: item.lostimage || null,
         distinguishingFeatures: item.distinguishing_features,
-        contactDetails: item.contact_details
+        contactDetails: item.contact_details,
+        user_id: item.user_id
       }));
       setLostItems(transformedLostItems);
       
@@ -146,9 +201,10 @@ const LostFound = () => {
         description: item.description,
         timeAgo: formatTimeAgo(item.date_lost),
         status: item.isResolved ? 'resolved' : 'active',
-        images: item.lostimage ? 1 : 0,
+        imageUrl: item.lostimage || null,
         distinguishingFeatures: item.distinguishing_features,
-        contactDetails: item.contact_details
+        contactDetails: item.contact_details,
+        user_id: item.user_id
       }));
       setFoundItems(transformedFoundItems);
       
@@ -188,7 +244,8 @@ const LostFound = () => {
       contactMethod: 'email',
       contactDetails: '',
       dateLost: '',
-      distinguishingFeatures: ''
+      distinguishingFeatures: '',
+      image: null
     });
   };
 
@@ -202,7 +259,8 @@ const LostFound = () => {
       category: 'General',
       dateFound: '',
       contactMethod: 'email',
-      contactDetails: ''
+      contactDetails: '',
+      image: null
     });
   };
 
@@ -256,6 +314,31 @@ const LostFound = () => {
     }
   };
 
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete your reported item?")) {
+      try {
+        await deleteLostItem(id);
+        setLostItems(prev => prev.filter(item => item.id !== id));
+        setFoundItems(prev => prev.filter(item => item.id !== id));
+      } catch (err) {
+        console.error(err);
+        alert("Failed to delete record.");
+      }
+    }
+  };
+
+  const filteredLostItems = lostItems.filter(item => {
+    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || item.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = categoryFilter === 'All' || item.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
+
+  const filteredFoundItems = foundItems.filter(item => {
+    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || item.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = categoryFilter === 'All' || item.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -281,6 +364,36 @@ const LostFound = () => {
         </div>
       </div>
 
+      {/* Search and Filters */}
+      <div className="bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center">
+        <div className="relative flex-1 w-full">
+          <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input 
+            type="text" 
+            placeholder="Search for items..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent font-['Inter'] transition-all"
+          />
+        </div>
+        <div className="relative w-full md:w-64">
+          <Filter className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <select 
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="w-full pl-9 pr-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-transparent font-['Inter'] transition-all appearance-none"
+          >
+            <option value="All">All Categories</option>
+            <option value="General">General</option>
+            <option value="Personal Items">Personal Items</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Apparel">Apparel</option>
+            <option value="Documents">Documents</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
       {isLoading ? (
         <div className="flex justify-center items-center py-12">
           <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
@@ -295,44 +408,85 @@ const LostFound = () => {
               <span className="text-sm text-gray-500 font-['Inter']">({lostItems.length})</span>
             </div>
             
-            {lostItems.length === 0 ? (
+            {filteredLostItems.length === 0 ? (
               <div className="bg-red-50/50 backdrop-blur-sm rounded-xl border border-red-100/60 p-8 text-center">
-                <p className="text-gray-500 font-['Inter']">No lost items reported yet.</p>
+                <p className="text-gray-500 font-['Inter']">No lost items match your filters.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {lostItems.map((item) => (
-                  <div key={item.id} className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-6 card-hover">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-lg font-medium text-gray-800 font-['Inter']">{item.title}</h3>
-                        <div className="flex space-x-2 mt-1 flex-wrap gap-y-2">
-                          <span className="px-2 py-1 rounded-lg text-xs font-medium bg-red-100/80 text-red-700 border border-red-200/60">
-                            Lost
-                          </span>
-                          <span className="px-2 py-1 rounded-lg text-xs font-medium bg-gray-100/80 text-gray-700 border border-gray-200/60">
-                            {item.status}
-                          </span>
-                        </div>
-                      </div>
-                      <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded-lg">
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <p className="text-gray-600 mb-4 font-['Inter']">{item.description}</p>
-                    <div className="space-y-2 text-sm text-gray-600 mb-4">
-                      <div className="flex items-center font-['Inter']"><MapPin className="w-4 h-4 mr-2 text-gray-500" /> {item.location}</div>
-                      <div className="flex items-center font-['Inter']"><Calendar className="w-4 h-4 mr-2 text-gray-500" /> {item.timeAgo}</div>
-                      <div className="flex items-center font-['Inter']"><Tag className="w-4 h-4 mr-2 text-gray-500" /> {item.category}</div>
-                      {item.distinguishingFeatures && (
-                        <div className="flex items-start font-['Inter']">
-                          <CheckCircle className="w-4 h-4 mr-2 text-gray-500 mt-0.5" /> 
-                          <span className="text-xs">{item.distinguishingFeatures}</span>
+                {filteredLostItems.map((item) => (
+                  <div key={item.id} className="relative group rounded-3xl overflow-hidden h-[420px] shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer">
+                    {/* Background Image / Gradient */}
+                    <div className="absolute inset-0 bg-gray-900">
+                      {item.imageUrl ? (
+                        <img 
+                          src={item.imageUrl} 
+                          alt={item.title} 
+                          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out opacity-90 group-hover:opacity-100" 
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-rose-500 to-orange-400 flex items-center justify-center opacity-90 group-hover:opacity-100 transition-opacity duration-500">
+                           <ImageIcon className="w-32 h-32 text-white/20 transform group-hover:scale-110 transition-transform duration-700" />
                         </div>
                       )}
-                      {item.images > 0 && <div className="flex items-center font-['Inter']"><ImageIcon className="w-4 h-4 mr-2 text-gray-500" /> {item.images} photo(s)</div>}
                     </div>
-                
+
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-500" />
+
+                    {/* Top Badges */}
+                    <div className="absolute top-5 left-5 flex gap-2 z-10">
+                      <span className="px-4 py-1.5 rounded-full text-xs font-bold text-white uppercase tracking-wider bg-red-500/90 backdrop-blur-md shadow-lg border border-white/10">
+                        Lost
+                      </span>
+                      <span className="px-4 py-1.5 rounded-full text-xs font-bold text-gray-900 uppercase tracking-wider bg-white/95 backdrop-blur-md shadow-lg">
+                        {item.status}
+                      </span>
+                    </div>
+
+                    {/* Hover Sliding Content */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end z-10 h-full">
+                      <div className="mt-auto transform transition-transform duration-500 group-hover:-translate-y-2">
+                        <h3 className="text-2xl font-black text-white tracking-tight mb-2 drop-shadow-md line-clamp-2">{item.title}</h3>
+                        <div className="flex items-center text-sm text-gray-300 font-medium mb-1 drop-shadow-sm">
+                          <MapPin className="w-4 h-4 mr-1.5 text-red-400" /> {item.location}
+                        </div>
+                        <div className="flex items-center text-sm text-gray-300 font-medium drop-shadow-sm mb-4">
+                          <Calendar className="w-4 h-4 mr-1.5 text-red-400" /> {item.timeAgo}
+                        </div>
+                      </div>
+                      
+                      <div className="max-h-0 opacity-0 group-hover:max-h-[250px] group-hover:opacity-100 transition-all duration-500 ease-in-out overflow-hidden">
+                        <p className="text-gray-200 text-sm mb-4 line-clamp-2 leading-relaxed">{item.description}</p>
+                        
+                        <div className="flex flex-wrap gap-2 mb-5">
+                          <span className="text-xs font-semibold bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-lg text-white flex items-center border border-white/10">
+                            <Tag className="w-3 h-3 mr-1.5 text-red-400" /> {item.category}
+                          </span>
+                          {item.distinguishingFeatures && (
+                            <span className="text-xs font-semibold bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-lg text-white flex items-center border border-white/10 line-clamp-1">
+                              <CheckCircle className="w-3 h-3 mr-1.5 text-red-400" /> {item.distinguishingFeatures}
+                            </span>
+                          )}
+                        </div>
+
+                        {item.user_id === currentUser ? (
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+                            className="w-full py-3.5 rounded-xl font-bold transition-all shadow-lg text-red-100 bg-red-600/80 hover:bg-red-500 flex items-center justify-center font-['Inter'] hover:shadow-red-500/25 border border-red-500/50"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" /> Delete Report
+                          </button>
+                        ) : (
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); setContactModalData(item); }}
+                            className="w-full py-3.5 rounded-xl font-bold transition-all shadow-lg text-white bg-red-500 hover:bg-red-400 flex items-center justify-center font-['Inter'] hover:shadow-red-500/25 border border-red-400/50"
+                          >
+                            <Mail className="w-4 h-4 mr-2" /> Contact Finder
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -347,38 +501,80 @@ const LostFound = () => {
               <span className="text-sm text-gray-500 font-['Inter']">({foundItems.length})</span>
             </div>
             
-            {foundItems.length === 0 ? (
+            {filteredFoundItems.length === 0 ? (
               <div className="bg-emerald-50/50 backdrop-blur-sm rounded-xl border border-emerald-100/60 p-8 text-center">
-                <p className="text-gray-500 font-['Inter']">No found items reported yet.</p>
+                <p className="text-gray-500 font-['Inter']">No found items match your filters.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {foundItems.map((item) => (
-                  <div key={item.id} className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-6 card-hover">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-lg font-medium text-gray-800 font-['Inter']">{item.title}</h3>
-                        <div className="flex space-x-2 mt-1 flex-wrap gap-y-2">
-                          <span className="px-2 py-1 rounded-lg text-xs font-medium bg-emerald-100/80 text-emerald-700 border border-emerald-200/60">
-                            Found
-                          </span>
-                          <span className="px-2 py-1 rounded-lg text-xs font-medium bg-gray-100/80 text-gray-700 border border-gray-200/60">
-                            {item.status}
-                          </span>
+                {filteredFoundItems.map((item) => (
+                  <div key={item.id} className="relative group rounded-3xl overflow-hidden h-[420px] shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer">
+                    {/* Background Image / Gradient */}
+                    <div className="absolute inset-0 bg-gray-900">
+                      {item.imageUrl ? (
+                        <img 
+                          src={item.imageUrl} 
+                          alt={item.title} 
+                          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out opacity-90 group-hover:opacity-100" 
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-teal-400 flex items-center justify-center opacity-90 group-hover:opacity-100 transition-opacity duration-500">
+                           <ImageIcon className="w-32 h-32 text-white/20 transform group-hover:scale-110 transition-transform duration-700" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-500" />
+
+                    {/* Top Badges */}
+                    <div className="absolute top-5 left-5 flex gap-2 z-10">
+                      <span className="px-4 py-1.5 rounded-full text-xs font-bold text-white uppercase tracking-wider bg-emerald-500/90 backdrop-blur-md shadow-lg border border-white/10">
+                        Found
+                      </span>
+                      <span className="px-4 py-1.5 rounded-full text-xs font-bold text-gray-900 uppercase tracking-wider bg-white/95 backdrop-blur-md shadow-lg">
+                        {item.status}
+                      </span>
+                    </div>
+
+                    {/* Hover Sliding Content */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end z-10 h-full">
+                      <div className="mt-auto transform transition-transform duration-500 group-hover:-translate-y-2">
+                        <h3 className="text-2xl font-black text-white tracking-tight mb-2 drop-shadow-md line-clamp-2">{item.title}</h3>
+                        <div className="flex items-center text-sm text-gray-300 font-medium mb-1 drop-shadow-sm">
+                          <MapPin className="w-4 h-4 mr-1.5 text-emerald-400" /> {item.location}
+                        </div>
+                        <div className="flex items-center text-sm text-gray-300 font-medium drop-shadow-sm mb-4">
+                          <Calendar className="w-4 h-4 mr-1.5 text-emerald-400" /> {item.timeAgo}
                         </div>
                       </div>
-                      <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-white/40 rounded-lg">
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
+                      
+                      <div className="max-h-0 opacity-0 group-hover:max-h-[250px] group-hover:opacity-100 transition-all duration-500 ease-in-out overflow-hidden">
+                        <p className="text-gray-200 text-sm mb-4 line-clamp-2 leading-relaxed">{item.description}</p>
+                        
+                        <div className="flex flex-wrap gap-2 mb-5">
+                          <span className="text-xs font-semibold bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-lg text-white flex items-center border border-white/10">
+                            <Tag className="w-3 h-3 mr-1.5 text-emerald-400" /> {item.category}
+                          </span>
+                        </div>
+
+                        {item.user_id === currentUser ? (
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+                            className="w-full py-3.5 rounded-xl font-bold transition-all shadow-lg text-red-100 bg-red-600/80 hover:bg-red-500 flex items-center justify-center font-['Inter'] hover:shadow-red-500/25 border border-red-500/50"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" /> Delete Report
+                          </button>
+                        ) : (
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); setContactModalData(item); }}
+                            className="w-full py-3.5 rounded-xl font-bold transition-all shadow-lg text-white bg-emerald-500 hover:bg-emerald-400 flex items-center justify-center font-['Inter'] hover:shadow-emerald-500/25 border border-emerald-400/50"
+                          >
+                            <Mail className="w-4 h-4 mr-2" /> Claim Item
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-gray-600 mb-4 font-['Inter']">{item.description}</p>
-                    <div className="space-y-2 text-sm text-gray-600 mb-4">
-                      <div className="flex items-center font-['Inter']"><MapPin className="w-4 h-4 mr-2 text-gray-500" /> {item.location}</div>
-                      <div className="flex items-center font-['Inter']"><Calendar className="w-4 h-4 mr-2 text-gray-500" /> {item.timeAgo}</div>
-                      <div className="flex items-center font-['Inter']"><Tag className="w-4 h-4 mr-2 text-gray-500" /> {item.category}</div>
-                      {item.images > 0 && <div className="flex items-center font-['Inter']"><ImageIcon className="w-4 h-4 mr-2 text-gray-500" /> {item.images} photo(s)</div>}
-                    </div>
-                 
                   </div>
                 ))}
               </div>
@@ -421,6 +617,7 @@ const LostFound = () => {
             <option>Other</option>
           </FormSelect>
           <FormInput label="Contact Details" name="contactDetails" value={lostFormData.contactDetails} onChange={handleLostInputChange} placeholder="Your email or phone number" required />
+          <FormImageInput label="What does the item look like?" value={lostFormData.image} onChange={(base64) => setLostFormData(prev => ({ ...prev, image: base64 }))} />
           
           <div className="flex space-x-3 pt-4">
             <button
@@ -467,6 +664,7 @@ const LostFound = () => {
             <option>Other</option>
           </FormSelect>
           <FormInput label="Your Contact Details (Optional)" name="contactDetails" value={foundFormData.contactDetails} onChange={handleFoundInputChange} placeholder="Your email or phone (if willing)" />
+          <FormImageInput label="What does the item look like?" value={foundFormData.image} onChange={(base64) => setFoundFormData(prev => ({ ...prev, image: base64 }))} />
 
           <div className="flex space-x-3 pt-4">
             <button
@@ -487,6 +685,42 @@ const LostFound = () => {
           </div>
         </form>
       </Modal>
+
+      {/* Contact Details Modal */}
+      <Modal isOpen={!!contactModalData} onClose={() => setContactModalData(null)}>
+        <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
+          <h2 className="text-xl font-semibold text-gray-800 font-['Inter']">Contact Information</h2>
+          <button
+            onClick={() => setContactModalData(null)}
+            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/60 rounded-xl transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="p-6 space-y-4 font-['Inter'] text-center">
+          <div className="w-16 h-16 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Mail className="w-8 h-8" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-800">
+            {contactModalData?.type === 'lost' ? "Reach out to the person who lost this item:" : "Reach out to claim this item:"}
+          </h3>
+          <p className="text-xl font-bold text-blue-600 bg-blue-50 p-4 rounded-xl border border-blue-100 break-all select-all">
+            {contactModalData?.contactDetails || "No contact info provided."}
+          </p>
+          <p className="text-sm text-gray-500 mt-4">
+            Mention the item "{contactModalData?.title}" when contacting them.
+          </p>
+          <div className="pt-4">
+            <button
+              onClick={() => setContactModalData(null)}
+              className="w-full px-4 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors font-medium shadow-md"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </Modal>
+
     </div>
   );
 };

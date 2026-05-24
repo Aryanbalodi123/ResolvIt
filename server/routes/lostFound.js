@@ -3,6 +3,7 @@ import { LostFound } from "../models/LostFound.js";
 import { getNextNumericId } from "../utils/nextId.js";
 import { asRollNumber } from "../utils/normalize.js";
 import { requireAuth } from "../middleware/auth.js";
+import { uploadImage } from "../utils/cloudinary.js";
 
 const router = express.Router();
 
@@ -31,8 +32,18 @@ router.post("/lost", async (req, res) => {
     }
 
     const lostId = await getNextNumericId(LostFound, "lost_id");
+    
+    let imageUrl = "";
+    if (req.body?.image) {
+      console.log(`[debug] /lost received image of length: ${req.body.image.length}`);
+      imageUrl = await uploadImage(req.body.image) || "";
+    } else {
+      console.log(`[debug] /lost received NO image`);
+    }
+
     const created = await LostFound.create({
       lost_id: lostId,
+      lostimage: imageUrl,
       ...mapPayload(req.body || {}, "lost"),
     });
 
@@ -50,8 +61,15 @@ router.post("/found", async (req, res) => {
     }
 
     const lostId = await getNextNumericId(LostFound, "lost_id");
+    
+    let imageUrl = "";
+    if (req.body?.image) {
+      imageUrl = await uploadImage(req.body.image) || "";
+    }
+
     const created = await LostFound.create({
       lost_id: lostId,
+      lostimage: imageUrl,
       ...mapPayload(req.body || {}, "found"),
     });
 

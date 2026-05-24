@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getLostItems, getFoundItems } from "../../services/LostFoundServices";
+import { getLostItems, getFoundItems, deleteLostItem } from "../../services/LostFoundServices";
 import {
   MapPin,
   Calendar,
@@ -36,7 +36,7 @@ export default function LostFound() {
           timeAgo: timeAgo(item.date_lost),
           location: item.location,
           description: item.description,
-          images: item.lostimage ? 1 : 0,
+          imageUrl: item.lostimage || null,
         }))
       );
 
@@ -49,13 +49,26 @@ export default function LostFound() {
           timeAgo: timeAgo(item.date_lost),
           location: item.location,
           description: item.description,
-          images: item.lostimage ? 1 : 0,
+          imageUrl: item.lostimage || null,
         }))
       );
     } catch (err) {
       console.error(err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to permanently delete this record?")) {
+      try {
+        await deleteLostItem(id);
+        setLostItems(prev => prev.filter(item => item.id !== id));
+        setFoundItems(prev => prev.filter(item => item.id !== id));
+      } catch (err) {
+        console.error(err);
+        alert("Failed to delete record.");
+      }
     }
   };
 
@@ -92,6 +105,7 @@ export default function LostFound() {
             count={lostItems.length}
             items={lostItems}
             badgeColor="bg-red-100/80 text-red-700 border-red-200/60"
+            onDelete={handleDelete}
           />
 
           {/* FOUND ITEMS */}
@@ -101,6 +115,7 @@ export default function LostFound() {
             count={foundItems.length}
             items={foundItems}
             badgeColor="bg-emerald-100/80 text-emerald-700 border-emerald-200/60"
+            onDelete={handleDelete}
           />
         </>
       )}
@@ -108,7 +123,7 @@ export default function LostFound() {
   );
 }
 
-function Section({ icon, title, count, items, badgeColor }) {
+function Section({ icon, title, count, items, badgeColor, onDelete }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
@@ -123,51 +138,73 @@ function Section({ icon, title, count, items, badgeColor }) {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {items.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white/40 backdrop-blur-xl rounded-xl border border-white/40 p-6 shadow-md hover:shadow-lg transition"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="text-lg font-medium text-gray-800">
-                  {item.title}
-                </h3>
-                <span
-                  className={`px-2 py-1 text-xs rounded-lg font-medium border ${badgeColor}`}
-                >
-                  {title === "Lost Items" ? "Lost" : "Found"}
-                </span>
+          {items.map((item) => {
+            const isLost = title === "Lost Items";
+            const colorClass = isLost ? "pink" : "emerald";
+            const colorClassDark = isLost ? "red" : "emerald";
+            const badgeBg = isLost ? "bg-red-500" : "bg-emerald-500";
+            
+            return (
+              <div key={item.id} className="relative group rounded-3xl overflow-hidden h-[420px] shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer">
+                {/* Background Image / Gradient */}
+                <div className="absolute inset-0 bg-gray-900">
+                  {item.imageUrl ? (
+                    <img 
+                      src={item.imageUrl} 
+                      alt={item.title} 
+                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out opacity-90 group-hover:opacity-100" 
+                    />
+                  ) : (
+                    <div className={`w-full h-full bg-gradient-to-br ${isLost ? 'from-rose-500 to-orange-400' : 'from-emerald-500 to-teal-400'} flex items-center justify-center opacity-90 group-hover:opacity-100 transition-opacity duration-500`}>
+                       <ImageIcon className="w-32 h-32 text-white/20 transform group-hover:scale-110 transition-transform duration-700" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-500" />
+
+                {/* Top Badges */}
+                <div className="absolute top-5 left-5 flex gap-2 z-10">
+                  <span className={`px-4 py-1.5 rounded-full text-xs font-bold text-white uppercase tracking-wider ${isLost ? 'bg-red-500/90' : 'bg-emerald-500/90'} backdrop-blur-md shadow-lg border border-white/10`}>
+                    {isLost ? "Lost" : "Found"}
+                  </span>
+                  <span className="px-4 py-1.5 rounded-full text-xs font-bold text-gray-900 uppercase tracking-wider bg-white/95 backdrop-blur-md shadow-lg">
+                    {item.status || 'Active'}
+                  </span>
+                </div>
+
+                {/* Hover Sliding Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end z-10 h-full">
+                  <div className="mt-auto transform transition-transform duration-500 group-hover:-translate-y-2">
+                    <h3 className="text-2xl font-black text-white tracking-tight mb-2 drop-shadow-md line-clamp-2">{item.title}</h3>
+                    <div className="flex items-center text-sm text-gray-300 font-medium mb-1 drop-shadow-sm">
+                      <MapPin className={`w-4 h-4 mr-1.5 text-${colorClassDark}-400`} /> {item.location}
+                    </div>
+                    <div className="flex items-center text-sm text-gray-300 font-medium drop-shadow-sm mb-4">
+                      <Calendar className={`w-4 h-4 mr-1.5 text-${colorClassDark}-400`} /> {item.timeAgo}
+                    </div>
+                  </div>
+                  
+                  <div className="max-h-0 opacity-0 group-hover:max-h-[250px] group-hover:opacity-100 transition-all duration-500 ease-in-out overflow-hidden">
+                    <p className="text-gray-200 text-sm mb-4 line-clamp-2 leading-relaxed">{item.description}</p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-5">
+                      <span className="text-xs font-semibold bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-lg text-white flex items-center border border-white/10">
+                        <Tag className={`w-3 h-3 mr-1.5 text-${colorClassDark}-400`} /> {item.category}
+                      </span>
+                    </div>
+
+                    <button onClick={() => onDelete(item.id)} className="w-full py-3.5 rounded-xl font-bold transition-all shadow-lg text-red-100 bg-red-600/80 hover:bg-red-500 backdrop-blur-md flex items-center justify-center font-['Inter'] hover:shadow-red-500/25 border border-red-500/50">
+                      Delete Record
+                    </button>
+                  </div>
+                </div>
               </div>
-
-              <p className="text-gray-600 mb-3">{item.description}</p>
-
-              <div className="space-y-1 text-sm text-gray-600">
-                <p className="flex items-center">
-                  <MapPin className="w-4 h-4 mr-2 text-gray-500" />
-                  {item.location}
-                </p>
-
-                <p className="flex items-center">
-                  <Calendar className="w-4 h-4 mr-2 text-gray-500" />
-                  {item.timeAgo}
-                </p>
-
-                <p className="flex items-center">
-                  <Tag className="w-4 h-4 mr-2 text-gray-500" />
-                  {item.category}
-                </p>
-
-                {item.images > 0 && (
-                  <p className="flex items-center">
-                    <ImageIcon className="w-4 h-4 mr-2 text-gray-500" />
-                    {item.images} photo(s)
-                  </p>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-      )}
+    )}
     </div>
   );
 }
