@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 
 import Sidebar from "./components/Sidebar";
+import LiveToastContainer from "./components/LiveToast";
 const Dashboard = React.lazy(() => import("./pages/Dashboard.jsx"));
 const Complaints = React.lazy(() => import("./pages/Complaints.jsx"));
 const LostFound = React.lazy(() => import("./pages/LostFound.jsx"));
@@ -87,5 +88,7 @@ const MainLayout = () => (
         </div>
       </div>
     </div>
+    {/* Global live toast container — renders on every protected page */}
+    <LiveToastContainer />
   </div>
 );

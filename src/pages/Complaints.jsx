@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Plus,
   Eye,
@@ -14,11 +14,14 @@ import {
   MessageSquare,
   ExternalLink,
   X,
-  Loader2
+  Loader2,
+  Wifi,
+  WifiOff
 } from 'lucide-react';
 import { sendComplaint } from "../../services/ComplaintServices";
 import { getUserComplaints } from "../../services/UserServices";
 import Modal from '../components/Modal';
+import { useLiveComplaintList } from '../hooks/useComplaintUpdates';
 
 const Complaints = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
@@ -55,9 +58,18 @@ const Complaints = () => {
     };
 
     fetchComplaints();
-    const interval = setInterval(fetchComplaints, 60000);
-    return () => clearInterval(interval);
+    // Polling removed — live updates handled by WebSocket below
   }, []);
+
+  // ── Live real-time updates via Socket.io ──────────────────────────────
+  // When admin patches a complaint, the server pushes 'complaint:updated'
+  // and the hook patches the local state in-place — no full refetch needed.
+  const rollNumber = localStorage.getItem("rollNumber");
+  const { connected: socketConnected } = useLiveComplaintList(
+    complaints,
+    setComplaints,
+    { userRollNumber: rollNumber }
+  );
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -171,13 +183,30 @@ const Complaints = () => {
           <h1 className="text-2xl font-semibold text-gray-800 font-['Inter']">My Complaints</h1>
           <p className="text-gray-600 mt-1 font-['Inter']">Track and manage all your submitted complaints</p>
         </div>
-        <button
-          onClick={handleComplaintModalOpen}
-          className="bg-gradient-to-r from-emerald-400 to-green-500 text-white px-4 py-2 rounded-xl font-medium hover:from-emerald-500 hover:to-green-600 transition-all duration-200 font-['Inter'] flex items-center shadow-md btn-animate"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          New Complaint
-        </button>
+        <div className="flex items-center gap-3">
+          {/* Live connection badge */}
+          <div
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+              socketConnected
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                : 'bg-amber-50 text-amber-700 border-amber-200'
+            }`}
+            title={socketConnected ? 'Live updates active' : 'Connecting to live updates...'}
+          >
+            {socketConnected
+              ? <Wifi className="w-3.5 h-3.5" />
+              : <WifiOff className="w-3.5 h-3.5" />}
+            {socketConnected ? 'Live' : 'Reconnecting'}
+          </div>
+
+          <button
+            onClick={handleComplaintModalOpen}
+            className="bg-gradient-to-r from-emerald-400 to-green-500 text-white px-4 py-2 rounded-xl font-medium hover:from-emerald-500 hover:to-green-600 transition-all duration-200 font-['Inter'] flex items-center shadow-md btn-animate"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            New Complaint
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

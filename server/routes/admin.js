@@ -2,6 +2,7 @@ import express from "express";
 import { Complaint } from "../models/Complaint.js";
 import { User } from "../models/User.js";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
+import { emitComplaintUpdated } from "../socket/socketServer.js";
 
 const router = express.Router();
 
@@ -35,13 +36,19 @@ router.patch("/complaints/:complaintId", async (req, res) => {
     const complaintId = Number(req.params.complaintId);
     const updates = req.body || {};
 
+    // Get the original complaint to check if status is actually changing
+    const originalComplaint = await Complaint.findOne({ complaint_id: complaintId }).lean();
+    if (!originalComplaint) {
+      return res.status(404).json({ message: "Complaint not found" });
+    }
+
     const patch = {
       assigned_to: updates.assigned_to,
       status: updates.status,
       priority: updates.priority,
     };
 
-    if (patch.status === "resolved") {
+    if (patch.status === "resolved" && originalComplaint.status !== "resolved") {
       patch.resolved_at = new Date();
     }
 
@@ -56,7 +63,16 @@ router.patch("/complaints/:complaintId", async (req, res) => {
     }
 
     const withUser = await attachUserDetails([updated]);
-    res.json(withUser[0]);
+    const responsePayload = withUser[0];
+
+    // ── Real-time push ─────────────────────────────────────────────────────
+    try {
+      emitComplaintUpdated(updated);
+    } catch (socketErr) {
+      console.error("[socket] emitComplaintUpdated failed:", socketErr.message);
+    }
+
+    res.json(responsePayload);
   } catch (error) {
     res.status(500).json({ message: error.message || "Failed to update complaint" });
   }

@@ -3,13 +3,16 @@ import { createRoot, hydrateRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import { AppRoutes } from './App.jsx'
+import { SocketProvider } from './context/SocketContext.jsx'
 
 const root = document.getElementById('root')
 
 const app = (
   <StrictMode>
     <BrowserRouter>
-      <AppRoutes />
+      <SocketProvider>
+        <AppRoutes />
+      </SocketProvider>
     </BrowserRouter>
   </StrictMode>
 )
@@ -19,3 +22,4 @@ if (root?.dataset?.page === 'register' && root.hasChildNodes()) {
 } else {
   createRoot(root).render(app)
 }
+

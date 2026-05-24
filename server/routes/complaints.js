@@ -1,8 +1,10 @@
 import express from "express";
 import { Complaint } from "../models/Complaint.js";
+import { User } from "../models/User.js";
 import { getNextNumericId } from "../utils/nextId.js";
 import { asRollNumber } from "../utils/normalize.js";
 import { requireAuth } from "../middleware/auth.js";
+import { emitComplaintCreated } from "../socket/socketServer.js";
 
 const router = express.Router();
 
@@ -30,6 +32,13 @@ router.post("/", async (req, res) => {
       priority: payload.priority || "medium",
       assigned_to: payload.assigned_to || "",
     });
+
+    // ── Real-time push: notify admins a new complaint has arrived ─────────
+    try {
+      emitComplaintCreated(created.toObject());
+    } catch (socketErr) {
+      console.error("[socket] emitComplaintCreated failed:", socketErr.message);
+    }
 
     res.status(201).json(created);
   } catch (error) {

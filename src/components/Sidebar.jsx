@@ -1,5 +1,5 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   FileText,
@@ -8,9 +8,49 @@ import {
   User,
   Bell
 } from "lucide-react";
+import { useComplaintUpdates } from "../hooks/useComplaintUpdates";
 
 const Sidebar = () => {
   const role = localStorage.getItem("role");
+  const location = useLocation();
+
+  // ── Live unread badge ─────────────────────────────────────────────────────
+  const [liveUnread, setLiveUnread] = useState(() => {
+    try {
+      return Number(sessionStorage.getItem("liveUnread") || "0");
+    } catch {
+      return 0;
+    }
+  });
+
+  // Increment badge on every incoming complaint update
+  useComplaintUpdates({
+    onUpdated: () => {
+      setLiveUnread((prev) => {
+        const next = prev + 1;
+        try { sessionStorage.setItem("liveUnread", String(next)); } catch { }
+        return next;
+      });
+    },
+    onCreated: () => {
+      // Admins: new complaint badge
+      if (role === "admin") {
+        setLiveUnread((prev) => {
+          const next = prev + 1;
+          try { sessionStorage.setItem("liveUnread", String(next)); } catch { }
+          return next;
+        });
+      }
+    },
+  });
+
+  // Clear badge when user visits /notifications
+  useEffect(() => {
+    if (location.pathname === "/notifications") {
+      setLiveUnread(0);
+      try { sessionStorage.removeItem("liveUnread"); } catch { }
+    }
+  }, [location.pathname]);
 
   const menuItems =
     role === "user"
@@ -33,11 +73,13 @@ const Sidebar = () => {
             icon: Search,
             path: "/lost-found",
           },
-          { id: "notifications",
+          {
+            id: "notifications",
             label: "Notifications",
             icon: Bell,
             path: "/notifications",
-          }
+            liveBadge: true,
+          },
         ]
       : [
           {
@@ -50,8 +92,8 @@ const Sidebar = () => {
             id: "all-complaint",
             label: "All Complaints",
             icon: FileText,
-            badge: 2,
             path: "/all-complaints",
+            liveBadge: true,
           },
           {
             id: "lost-found",
@@ -59,11 +101,12 @@ const Sidebar = () => {
             icon: Search,
             path: "/admin/lost-found",
           },
-              { id: "notifications",
+          {
+            id: "notifications",
             label: "Notifications",
             icon: Bell,
             path: "/notifications",
-          }
+          },
         ];
 
   return (
@@ -92,12 +135,12 @@ const Sidebar = () => {
         <div className="space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const isDashboard = item.id === "dashboard"; // ✅ identify dashboard
+            const isDashboard = item.id === "dashboard";
             return (
               <NavLink
                 key={item.id}
                 to={item.path}
-                end={isDashboard} // ✅ exact match for dashboard only
+                end={isDashboard}
                 className={({ isActive }) =>
                   `w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-300 ${
                     isActive
@@ -106,13 +149,16 @@ const Sidebar = () => {
                   }`
                 }
               >
-                <Icon className="w-5 h-5" />
+                <div className="relative flex-shrink-0">
+                  <Icon className="w-5 h-5" />
+                  {/* Live pulsing badge */}
+                  {item.liveBadge && liveUnread > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 min-w-[1.1rem] h-[1.1rem] flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold shadow-md ring-2 ring-white animate-pulse">
+                      {liveUnread > 9 ? "9+" : liveUnread}
+                    </span>
+                  )}
+                </div>
                 <span className="font-medium text-sm">{item.label}</span>
-                {item.badge && (
-                  <span className="ml-auto bg-gradient-to-r from-emerald-500 to-green-600 text-white text-xs px-2.5 py-1 rounded-full font-medium shadow-md">
-                    {item.badge}
-                  </span>
-                )}
               </NavLink>
             );
           })}
@@ -141,3 +187,4 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+
