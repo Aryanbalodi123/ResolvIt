@@ -264,17 +264,17 @@ const LandingPage = () => {
         {/* ── Concentric rings background ── */}
         <div className="hero__rings" aria-hidden="true">
           {/* 1800×1800 viewBox, center 900,900 — inner rings fully visible, outer rings elegantly clipped */}
-          <svg viewBox="0 0 1800 1800" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle className="ring-1" cx="900" cy="900" r="100" stroke="#34d399" strokeWidth="1" />
-            <circle className="ring-2" cx="900" cy="900" r="195" stroke="#34d399" strokeWidth="1" />
-            <circle className="ring-3" cx="900" cy="900" r="290" stroke="#34d399" strokeWidth="1" />
-            <circle className="ring-4" cx="900" cy="900" r="385" stroke="#34d399" strokeWidth="1" />
-            <circle className="ring-5" cx="900" cy="900" r="480" stroke="#34d399" strokeWidth="1" />
-            <circle className="ring-6" cx="900" cy="900" r="575" stroke="#34d399" strokeWidth="1" />
-            <circle className="ring-7" cx="900" cy="900" r="670" stroke="#34d399" strokeWidth="1" />
-            <circle className="ring-8" cx="900" cy="900" r="760" stroke="#34d399" strokeWidth="1" />
-            <circle className="ring-9" cx="900" cy="900" r="845" stroke="#34d399" strokeWidth="1" />
-            <circle className="ring-10" cx="900" cy="900" r="880" stroke="#34d399" strokeWidth="0.7" />
+          <svg viewBox="0 0 1800 1800" fill="none" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <circle className="ring-1" cx="900" cy="900" r="90" stroke="#34d399" strokeWidth="1" />
+            <circle className="ring-2" cx="900" cy="900" r="175" stroke="#34d399" strokeWidth="1" />
+            <circle className="ring-3" cx="900" cy="900" r="260" stroke="#34d399" strokeWidth="1" />
+            <circle className="ring-4" cx="900" cy="900" r="345" stroke="#34d399" strokeWidth="1" />
+            <circle className="ring-5" cx="900" cy="900" r="430" stroke="#34d399" strokeWidth="1" />
+            <circle className="ring-6" cx="900" cy="900" r="515" stroke="#34d399" strokeWidth="1" />
+            <circle className="ring-7" cx="900" cy="900" r="600" stroke="#34d399" strokeWidth="1" />
+            <circle className="ring-8" cx="900" cy="900" r="685" stroke="#34d399" strokeWidth="1" />
+            <circle className="ring-9" cx="900" cy="900" r="770" stroke="#34d399" strokeWidth="1" />
+            <circle className="ring-10" cx="900" cy="900" r="855" stroke="#34d399" strokeWidth="1" />
           </svg>
         </div>
 

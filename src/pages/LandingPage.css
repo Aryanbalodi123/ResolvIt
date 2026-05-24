@@ -177,7 +177,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 32px;
+  gap: clamp(16px, 3vw, 32px);
 }
 
 /* Logo */
@@ -211,10 +211,10 @@
 
 .landing-nav__link {
   text-decoration: none;
-  font-size: 15px;
+  font-size: clamp(14px, 1.1vw, 15px);
   font-weight: 500;
   color: var(--ag-gray-600);
-  padding: 8px 16px;
+  padding: 8px clamp(8px, 1.2vw, 16px);
   border-radius: var(--ag-radius-full);
   transition: all 0.25s var(--ag-ease);
 }
@@ -349,13 +349,19 @@
   /* No overflow:hidden here – hero itself clips */
 }
 
+.hero__rings circle {
+  vector-effect: non-scaling-stroke;
+}
+
 .hero__rings svg {
   position: absolute;
   /* Perfectly centered in the hero so ALL rings are complete circles */
   top: 50%;
   left: 50%;
-  width: 1800px;
-  height: 1800px;
+  width: 100%;
+  height: 100%;
+  min-width: 1800px;
+  min-height: 1800px;
   /* translate only — rotation handled separately via animation */
   transform: translate(-50%, -50%);
   transform-origin: 900px 900px;
@@ -375,23 +381,23 @@
 
 /* Progressive fade: most opaque on outside rings, nearly invisible at center */
 .ring-1 {
-  opacity: 0.04;
+  opacity: 0.02;
 }
 
 .ring-2 {
-  opacity: 0.07;
+  opacity: 0.05;
 }
 
 .ring-3 {
-  opacity: 0.10;
+  opacity: 0.08;
 }
 
 .ring-4 {
-  opacity: 0.13;
+  opacity: 0.12;
 }
 
 .ring-5 {
-  opacity: 0.17;
+  opacity: 0.16;
 }
 
 .ring-6 {
@@ -399,19 +405,19 @@
 }
 
 .ring-7 {
-  opacity: 0.24;
+  opacity: 0.26;
 }
 
 .ring-8 {
-  opacity: 0.27;
+  opacity: 0.31;
 }
 
 .ring-9 {
-  opacity: 0.30;
+  opacity: 0.35;
 }
 
 .ring-10 {
-  opacity: 0.33;
+  opacity: 0.38;
 }
 
 /* Central radial glow – now centered */
@@ -451,10 +457,10 @@
 .hero__container {
   max-width: 1260px;
   margin: 0 auto;
-  padding: 140px 40px 80px;
+  padding: clamp(120px, 10vw, 160px) clamp(24px, 4vw, 48px) clamp(60px, 6vw, 100px);
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 56px;
+  gap: clamp(24px, 4vw, 56px);
   align-items: center;
   position: relative;
   z-index: 2;
@@ -533,6 +539,8 @@
 
 .hero__ctas {
   display: flex;
+  align-items: center;
+  justify-content: flex-start;
   gap: 16px;
   flex-wrap: wrap;
   animation: fadeSlideUp 0.6s 0.3s var(--ag-ease) both;
@@ -755,7 +763,8 @@
   gap: 16px;
   border: 1px solid rgba(0, 0, 0, 0.04);
   box-shadow: var(--ag-shadow-sm);
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: transform 0.4s var(--ag-ease), box-shadow 0.4s var(--ag-ease), background 0.4s var(--ag-ease), border-color 0.4s var(--ag-ease);
+  will-change: transform, box-shadow;
   animation: fadeSlideUp 0.5s var(--delay, 0s) var(--ag-ease) both;
   cursor: pointer;
 }
@@ -776,7 +785,8 @@
   align-items: center;
   justify-content: center;
   color: var(--ag-green-600);
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: background 0.4s var(--ag-ease), color 0.4s var(--ag-ease), transform 0.4s var(--ag-ease);
+  will-change: transform;
 }
 
 .service-card:hover .service-card__icon {
@@ -790,7 +800,7 @@
   font-weight: 700;
   letter-spacing: -0.3px;
   color: var(--ag-gray-900);
-  transition: color 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: color 0.4s var(--ag-ease);
 }
 
 .service-card:hover .service-card__title {
@@ -802,7 +812,7 @@
   line-height: 1.65;
   color: var(--ag-gray-400);
   flex: 1;
-  transition: color 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: color 0.4s var(--ag-ease);
 }
 
 .service-card:hover .service-card__desc {
@@ -817,7 +827,7 @@
   font-weight: 600;
   color: var(--ag-green-600);
   text-decoration: none;
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: color 0.4s var(--ag-ease), gap 0.4s var(--ag-ease);
   margin-top: auto;
 }
 
@@ -1520,5 +1530,29 @@
     grid-template-columns: 1fr;
     gap: 36px;
     padding: 40px 20px 32px;
+  }
+}
+
+/* Bulletproof horizontal scrollbar prevention */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Intermediate medium desktop adjustments to prevent card squishing */
+@media (max-width: 1200px) and (min-width: 1025px) {
+  .services__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* High-res laptop and desktop optimizations (1440px / 1920px+) to balance blank side margins */
+@media (min-width: 1440px) {
+  .landing-nav__inner,
+  .hero__container,
+  .services__grid,
+  .about__container,
+  .footer__inner {
+    max-width: 1400px;
   }
 }
