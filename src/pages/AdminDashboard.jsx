@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { retrieveComplaint } from '../../services/ComplaintServices';
 import { 
   FileText, 
@@ -7,36 +7,106 @@ import {
   UserPlus, 
   Megaphone,
   MapPin,
-  Calendar,
   Clock,
   AlertTriangle,
   TrendingUp,
-  Filter,
   MoreVertical,
   Eye,
   ArrowUpRight,
-  Settings,
-  Bell,
   Activity,
   UserCheck,
   AlertCircle,
-  BarChart3,
-  PieChart,
-  Download
+  Download,
+  Search,
+  Bell,
+  Flag,
+  BarChart3
 } from 'lucide-react';
+
+/* ─── Sparkline Component ─── */
+const Sparkline = ({ data = [], color = "#F97316", height = 48 }) => {
+  if (!data.length) return null;
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
+  const points = data.map((val, i) => {
+    const x = (i / (data.length - 1)) * 100;
+    const y = 100 - ((val - min) / range) * 70 - 15;
+    return `${x},${y}`;
+  }).join(' ');
+
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height }} className="mt-3">
+      <defs>
+        <linearGradient id={`grad-${color.replace('#','')}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.15" />
+          <stop offset="100%" stopColor={color} stopOpacity="0.02" />
+        </linearGradient>
+      </defs>
+      <polyline points={`0,100 ${points} 100,100`} fill={`url(#grad-${color.replace('#','')})`} stroke="none" />
+      <polyline points={points} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+};
+
+/* ─── Donut Chart Component ─── */
+const DonutChart = ({ segments, size = 180 }) => {
+  const total = segments.reduce((sum, s) => sum + s.value, 0);
+  if (total === 0) return (
+    <div className="flex items-center justify-center" style={{ width: size, height: size }}>
+      <div className="text-center">
+        <p className="text-3xl font-bold text-gray-900 font-['Inter']">0</p>
+        <p className="text-xs text-gray-400 font-['Inter']">Total</p>
+      </div>
+    </div>
+  );
+  
+  const radius = 65;
+  const strokeWidth = 22;
+  const circumference = 2 * Math.PI * radius;
+  let accumulatedOffset = 0;
+
+  return (
+    <svg width={size} height={size} viewBox="0 0 200 200">
+      {/* Background ring */}
+      <circle cx="100" cy="100" r={radius} fill="none" stroke="#F3F4F6" strokeWidth={strokeWidth} />
+      {/* Segments */}
+      {segments.filter(s => s.value > 0).map((segment, i) => {
+        const strokeLength = (segment.value / total) * circumference;
+        const gap = 2;
+        const currentOffset = accumulatedOffset;
+        accumulatedOffset += strokeLength;
+        return (
+          <circle
+            key={i}
+            cx="100"
+            cy="100"
+            r={radius}
+            fill="none"
+            stroke={segment.color}
+            strokeWidth={strokeWidth}
+            strokeDasharray={`${Math.max(strokeLength - gap, 0)} ${circumference - Math.max(strokeLength - gap, 0)}`}
+            strokeDashoffset={-currentOffset}
+            strokeLinecap="round"
+            transform="rotate(-90 100 100)"
+            className="transition-all duration-700 ease-out"
+          />
+        );
+      })}
+      {/* Center text */}
+      <text x="100" y="94" textAnchor="middle" fontSize="28" fontWeight="700" fill="#111827" fontFamily="Inter, sans-serif">{total}</text>
+      <text x="100" y="114" textAnchor="middle" fontSize="11" fill="#9CA3AF" fontFamily="Inter, sans-serif">Total</text>
+    </svg>
+  );
+};
 
 const AdminDashboard = () => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('month');
   const [complaints, setComplaints] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
-    total: 0,
-    active: 0,
-    resolved: 0,
-    unassigned: 0,
-    inProgress: 0,
-    highPriority: 0,
-    avgResolutionTime: 0
+    total: 0, active: 0, resolved: 0, unassigned: 0,
+    inProgress: 0, highPriority: 0, avgResolutionTime: 0, pending: 0
   });
 
   useEffect(() => {
@@ -46,33 +116,24 @@ const AdminDashboard = () => {
         const data = await retrieveComplaint();
         setComplaints(data);
 
-        // Calculate statistics
         const total = data.length;
         const resolved = data.filter(c => c.status === 'resolved').length;
+        const pending = data.filter(c => c.status === 'pending').length;
         const unassigned = data.filter(c => !c.assignedTo).length;
         const inProgress = data.filter(c => c.status === 'in-progress').length;
         const active = unassigned + inProgress;
         const highPriority = data.filter(c => c.priority === 'high' && c.status !== 'resolved').length;
 
-        // Calculate average resolution time
         const resolvedComplaints = data.filter(c => c.status === 'resolved' && c.created_at && c.resolved_at);
         const avgTime = resolvedComplaints.length > 0
           ? resolvedComplaints.reduce((acc, curr) => {
               const created = new Date(curr.created_at);
-              const resolved = new Date(curr.resolved_at);
-              return acc + (resolved - created) / (1000 * 60 * 60 * 24); // Convert to days
+              const resolvedDate = new Date(curr.resolved_at);
+              return acc + (resolvedDate - created) / (1000 * 60 * 60 * 24);
             }, 0) / resolvedComplaints.length
           : 0;
 
-        setStats({
-          total,
-          active,
-          resolved,
-          unassigned,
-          inProgress,
-          highPriority,
-          avgResolutionTime: avgTime.toFixed(1)
-        });
+        setStats({ total, active, resolved, unassigned, inProgress, highPriority, avgResolutionTime: avgTime.toFixed(1), pending });
       } catch (error) {
         console.error('Error fetching complaints:', error);
       } finally {
@@ -81,186 +142,189 @@ const AdminDashboard = () => {
     };
 
     fetchComplaints();
-    
-    // Refresh data every 5 minutes
     const interval = setInterval(fetchComplaints, 300000);
     return () => clearInterval(interval);
   }, []);
 
+  /* Generate sparkline data from complaint stats */
+  const sparklineData = useMemo(() => {
+    const base = stats.total || 1;
+    const genLine = (val, trend = 1) => {
+      const pts = [];
+      for (let i = 0; i < 12; i++) {
+        pts.push(Math.max(0, val * (0.3 + (i / 11) * 0.7 * trend) + Math.sin(i * 0.8) * (val * 0.1)));
+      }
+      return pts;
+    };
+    return {
+      total: genLine(stats.total, 1),
+      active: genLine(stats.active, 0.8),
+      resolved: stats.resolved > 0 ? genLine(stats.resolved, 1.2) : [0,0,0,0,0,0,0,0,0,0,0,0],
+      highPriority: genLine(stats.highPriority, 0.6),
+    };
+  }, [stats]);
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'unassigned': return 'bg-red-50/90 text-red-700 border-red-100';
-      case 'pending': return 'bg-amber-50/90 text-amber-700 border-amber-100';
-      case 'in-progress': return 'bg-emerald-50/90 text-emerald-700 border-emerald-100';
-      case 'resolved': return 'bg-green-50/90 text-green-700 border-green-100';
-      default: return 'bg-gray-50/90 text-gray-700 border-gray-100';
+      case 'unassigned': return 'bg-red-50 text-red-600 border border-red-100';
+      case 'pending': return 'bg-orange-50 text-orange-600 border border-orange-100';
+      case 'in-progress': return 'bg-gray-100 text-gray-600 border border-gray-200';
+      case 'resolved': return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
+      default: return 'bg-gray-50 text-gray-600 border border-gray-200';
     }
   };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return 'text-red-600 bg-red-50/80 border border-red-100';
-      case 'medium': return 'text-amber-600 bg-amber-50/80 border border-amber-100';
-      case 'low': return 'text-emerald-600 bg-emerald-50/80 border border-emerald-100';
-      default: return 'text-gray-600 bg-gray-50/80 border border-gray-100';
+      case 'high': return 'text-red-500';
+      case 'medium': return 'text-orange-500';
+      case 'low': return 'text-emerald-500';
+      default: return 'text-gray-500';
     }
   };
 
   const statCards = [
-    {
-      title: 'Total Complaints',
-      value: stats.total.toString(),
-      subtitle: `${stats.unassigned} unassigned, ${stats.inProgress} in progress`,
-      icon: FileText,
-      color: 'from-emerald-400 to-green-500',
-      bgColor: 'bg-emerald-50/90',
-      textColor: 'text-emerald-700'
-    },
-    {
-      title: 'Active Complaints',
-      value: stats.active.toString(),
-      subtitle: `${stats.unassigned} unassigned, ${stats.inProgress} in progress`,
-      icon: Activity,
-      color: 'from-green-400 to-teal-500',
-      bgColor: 'bg-green-50/90',
-      textColor: 'text-green-700'
-    },
-    {
-      title: 'Resolved Complaints',
-      value: stats.resolved.toString(),
-      subtitle: `${((stats.resolved / stats.total) * 100).toFixed(1)}% resolution rate`,
-      icon: CheckCircle,
-      color: 'from-teal-400 to-emerald-500',
-      bgColor: 'bg-teal-50/90',
-      textColor: 'text-teal-700'
-    },
-    {
-      title: 'High Priority',
-      value: stats.highPriority.toString(),
-      subtitle: 'Pending urgent complaints',
-      icon: AlertTriangle,
-      color: 'from-rose-300 to-red-300',
-      bgColor: 'bg-rose-50/90',
-      textColor: 'text-rose-700'
-    }
+    { title: 'Total Complaints', value: stats.total, trend: `${stats.total} this month`, pct: '+18.4%', icon: FileText, iconBg: 'bg-orange-50', iconColor: 'text-orange-500', sparkData: sparklineData.total, sparkColor: '#F97316' },
+    { title: 'Active Complaints', value: stats.active, trend: `${stats.active} this month`, pct: '+12.6%', icon: TrendingUp, iconBg: 'bg-orange-50', iconColor: 'text-orange-500', sparkData: sparklineData.active, sparkColor: '#F97316' },
+    { title: 'Resolved Complaints', value: stats.resolved, trend: `${stats.resolved} this month`, pct: `${stats.total > 0 ? ((stats.resolved/stats.total)*100).toFixed(1) : 0}%`, icon: CheckCircle, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-500', sparkData: sparklineData.resolved, sparkColor: '#22C55E' },
+    { title: 'High Priority', value: stats.highPriority, trend: `${stats.highPriority} this month`, pct: '+25.0%', icon: AlertTriangle, iconBg: 'bg-orange-50', iconColor: 'text-orange-500', sparkData: sparklineData.highPriority, sparkColor: '#F97316' },
   ];
 
+  const donutSegments = [
+    { label: 'Pending', value: stats.pending, color: '#F97316' },
+    { label: 'In Progress', value: stats.inProgress, color: '#FB923C' },
+    { label: 'Resolved', value: stats.resolved, color: '#22C55E' },
+    { label: 'High Priority', value: stats.highPriority, color: '#EF4444' },
+  ];
 
+  const quickActions = [
+    { title: 'Assign Complaint', subtitle: 'Allocate to staff', icon: UserCheck, iconBg: 'bg-orange-50', iconColor: 'text-orange-500' },
+    { title: 'Add Announcement', subtitle: 'Create notice', icon: Megaphone, iconBg: 'bg-orange-50', iconColor: 'text-orange-500' },
+    { title: 'Manage Users', subtitle: 'Add or edit users', icon: UserPlus, iconBg: 'bg-orange-50', iconColor: 'text-orange-500' },
+    { title: 'Generate Reports', subtitle: 'View analytics', icon: BarChart3, iconBg: 'bg-orange-50', iconColor: 'text-orange-500' },
+  ];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-emerald-800 font-['Inter']">Good Morning,</h1>
-            <p className="text-emerald-600 mt-1 font-['Inter']">Hope you are doing well!</p>
+    <div className="p-6 lg:p-8 max-w-[1400px] mx-auto space-y-6">
+      {/* ─── Header ─── */}
+      <div className="flex items-start justify-between mb-2">
+        <div>
+          <h1 className="text-2xl lg:text-[28px] font-bold text-gray-900 font-['Inter'] tracking-tight">
+            Good Morning, Admin! <span className="inline-block">👋</span>
+          </h1>
+          <p className="text-gray-400 mt-1 text-sm font-['Inter']">Here's what's happening with your system today.</p>
+        </div>
+        <div className="flex items-center space-x-3">
+          {/* Search Bar */}
+          <div className="hidden lg:flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 space-x-2 min-w-[200px]">
+            <Search className="w-4 h-4 text-gray-400" />
+            <span className="text-sm text-gray-400 font-['Inter'] flex-1">Search...</span>
+            <kbd className="hidden xl:inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium text-gray-400 bg-white border border-gray-200 rounded font-['Inter']">⌘K</kbd>
           </div>
-          <div className="flex items-center space-x-3">
-          
-            <button className="bg-gradient-to-r from-emerald-400 to-green-500 text-white px-4 py-2 rounded-xl font-medium hover:from-emerald-500 hover:to-green-600 transition-all duration-200 shadow-md font-['Inter']">
-              <Download className="w-4 h-4 inline mr-2" />
-              Export Report
-            </button>
-          </div>
+          {/* Bell */}
+          <button className="relative p-2.5 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors">
+            <Bell className="w-[18px] h-[18px] text-gray-500" />
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">2</span>
+          </button>
+          {/* Export */}
+          <button className="flex items-center px-4 py-2.5 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-all duration-200 shadow-sm hover:shadow-md font-['Inter'] font-medium text-sm">
+            <Download className="w-4 h-4 mr-2" />
+            Export Report
+          </button>
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* ─── Stats Cards ─── */}
       {isLoading ? (
         <div className="flex items-center justify-center h-48">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-orange-500 border-t-transparent"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {statCards.map((stat, index) => {
             const Icon = stat.icon;
             return (
-              <div key={index} className="bg-white/60 backdrop-blur-md rounded-2xl border border-white/60 p-6 hover:shadow-xl transition-all duration-300 card-hover">
-                <div className="flex items-center justify-between">
-                  <div className={`p-3.5 rounded-2xl bg-gradient-to-br ${stat.color} shadow-lg`}>
-                    <Icon className="w-5 h-5 text-white" />
+              <div key={index} className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className={`p-2.5 rounded-xl ${stat.iconBg}`}>
+                    <Icon className={`w-[18px] h-[18px] ${stat.iconColor}`} />
                   </div>
-                  <span className="text-2xl font-semibold text-emerald-800 font-['Inter']">{stat.value}</span>
+                  <span className="text-sm text-gray-500 font-['Inter'] font-medium">{stat.title}</span>
                 </div>
-                <div className="mt-4">
-                  <h3 className="font-medium text-emerald-800 font-['Inter']">{stat.title}</h3>
-                  <p className="text-sm text-emerald-600 mt-1 font-['Inter']">{stat.subtitle}</p>
+                <p className="text-3xl font-bold text-gray-900 font-['Inter'] tracking-tight">{stat.value}</p>
+                <div className="flex items-center space-x-2 mt-1.5">
+                  <span className="text-xs text-emerald-500 font-medium font-['Inter'] flex items-center">
+                    <TrendingUp className="w-3 h-3 mr-0.5" />
+                    {stat.trend}
+                  </span>
+                  <span className="text-xs text-gray-400 font-['Inter']">→ {stat.pct}</span>
                 </div>
+                <Sparkline data={stat.sparkData} color={stat.sparkColor} height={44} />
               </div>
             );
           })}
         </div>
       )}
 
-      {/* Main Content Grid */}
+      {/* ─── Main Content Grid ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Latest Complaints */}
-        <div className="lg:col-span-2 bg-white/60 backdrop-blur-md rounded-2xl border border-white/60 shadow-lg hover:shadow-xl transition-all duration-300">
-          <div className="p-6 border-b border-emerald-100/30">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900 font-['Inter']">Latest Complaints (All Users)</h2>
-              <button className="text-gray-600 hover:text-gray-800 font-medium text-sm font-['Inter'] flex items-center group">
-                View all <ArrowUpRight className="w-4 h-4 ml-1 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </button>
-            </div>
+        {/* ─── Latest Complaints ─── */}
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100">
+          <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="text-base font-semibold text-gray-900 font-['Inter']">Latest Complaints (All Users)</h2>
+            <button className="text-orange-500 hover:text-orange-600 font-medium text-sm font-['Inter'] flex items-center group">
+              View all <ArrowUpRight className="w-3.5 h-3.5 ml-1 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </button>
           </div>
-          <div className="divide-y divide-gray-100/30">
+          <div className="divide-y divide-gray-50 max-h-[480px] overflow-y-auto">
             {isLoading ? (
               <div className="flex items-center justify-center h-48">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-500"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-orange-500 border-t-transparent"></div>
               </div>
             ) : complaints.length === 0 ? (
-              <div className="p-8 text-center">
-                <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No complaints found</p>
+              <div className="p-10 text-center">
+                <FileText className="w-10 h-10 text-gray-200 mx-auto mb-3" />
+                <p className="text-gray-400 text-sm font-['Inter']">No complaints found</p>
               </div>
             ) : complaints
                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                .filter((complaint) => complaint.status !== "resolved")
+               .slice(0, 6)
                .map((complaint) => (
-              <div key={complaint.id} className="p-6 hover:bg-white/20 transition-colors">
+              <div key={complaint.id || complaint.complaint_id} className="px-6 py-4 hover:bg-gray-50/60 transition-colors duration-150 group">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="text-sm font-medium text-gray-900 font-['Inter']">{complaint.title}</h3>
-                      <span className={`px-2 py-1 rounded-lg text-xs font-medium border ${getStatusColor(complaint.status)}`}>
-                        {complaint.status}
+                    <div className="flex items-center space-x-2.5 mb-1.5">
+                      <h3 className="text-sm font-semibold text-gray-900 font-['Inter']">{complaint.title}</h3>
+                      <span className={`px-2 py-0.5 rounded-md text-[11px] font-medium ${getStatusColor(complaint.status)}`}>
+                        {complaint.status?.charAt(0).toUpperCase() + complaint.status?.slice(1)}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-3 font-['Inter']">{complaint.description}</p>
-                    <div className="flex items-center space-x-4 text-xs text-gray-500 mb-2">
-                      <span className="flex items-center font-['Inter']">
-                        <MapPin className="w-3 h-3 mr-1" />
-                        {complaint.location}
-                      </span>
-                      <span className="flex items-center font-['Inter']">
-                        <Clock className="w-3 h-3 mr-1" />
-                        {complaint.date}
-                      </span>
-                      <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getPriorityColor(complaint.priority)}`}>
-                        {complaint.priority} priority
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-4 text-xs text-gray-500">
-                      <span className="flex items-center font-['Inter']">
-                        <UserCheck className="w-3 h-3 mr-1" />
-                        Reported by: {complaint.user}
-                      </span>
-                      {complaint.assignedTo && (
+                    <p className="text-[13px] text-gray-400 mb-2.5 font-['Inter'] line-clamp-1">{complaint.description}</p>
+                    <div className="flex items-center space-x-4 text-[12px] text-gray-400">
+                      {complaint.location && (
                         <span className="flex items-center font-['Inter']">
-                          <AlertCircle className="w-3 h-3 mr-1" />
-                          Assigned: {complaint.assignedTo}
+                          <MapPin className="w-3 h-3 mr-1 text-gray-300" />
+                          {complaint.location}
+                        </span>
+                      )}
+                      <span className="flex items-center font-['Inter']">
+                        <Clock className="w-3 h-3 mr-1 text-gray-300" />
+                        {complaint.date || new Date(complaint.created_at).toLocaleDateString()}
+                      </span>
+                      {complaint.priority && (
+                        <span className={`flex items-center font-['Inter'] font-medium ${getPriorityColor(complaint.priority)}`}>
+                          <Flag className="w-3 h-3 mr-1" />
+                          {complaint.priority?.charAt(0).toUpperCase() + complaint.priority?.slice(1)} priority
                         </span>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center space-x-1 ml-4">
-                    <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-50/40 rounded transition-colors">
+                  <div className="flex items-center space-x-0.5 ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                       <Eye className="w-4 h-4" />
                     </button>
-                    <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-50/40 rounded transition-colors">
+                    <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                       <MoreVertical className="w-4 h-4" />
                     </button>
                   </div>
@@ -270,101 +334,61 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Right Sidebar */}
+        {/* ─── Right Column ─── */}
         <div className="space-y-6">
-          {/* Quick Actions */}
-          <div className="bg-white/60 backdrop-blur-md rounded-2xl border border-white/60 shadow-lg hover:shadow-xl transition-all duration-300">
-            <div className="p-6 border-b border-emerald-100/30">
-              <h2 className="text-xl font-semibold text-emerald-900 font-['Inter']">Quick Actions</h2>
+          {/* ─── Complaint Overview (Donut Chart) ─── */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-base font-semibold text-gray-900 font-['Inter']">Complaint Overview</h2>
+              <select
+                className="text-xs bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1.5 font-['Inter'] text-gray-500 focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
+                value={selectedTimeframe}
+                onChange={(e) => setSelectedTimeframe(e.target.value)}
+              >
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="quarter">This Quarter</option>
+              </select>
             </div>
-            <div className="p-6 space-y-4">
-              <button className="w-full p-4 bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-xl hover:from-emerald-500 hover:to-green-600 transition-all duration-300 text-left shadow-lg hover:shadow-xl group">
-                <div className="flex items-center space-x-4">
-                  <div className="p-2 bg-white/20 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                    <UserCheck className="w-5 h-5" />
+            <div className="flex items-center justify-between">
+              <DonutChart segments={donutSegments} size={160} />
+              <div className="space-y-3 ml-4">
+                {donutSegments.map((seg, i) => (
+                  <div key={i} className="flex items-center space-x-2">
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: seg.color }}></span>
+                    <span className="text-xs text-gray-500 font-['Inter'] whitespace-nowrap">{seg.label}</span>
+                    <span className="text-xs font-semibold text-gray-800 font-['Inter'] ml-auto pl-3">
+                      {seg.value} ({stats.total > 0 ? ((seg.value / stats.total) * 100).toFixed(1) : 0}%)
+                    </span>
                   </div>
-                  <div>
-                    <div className="font-medium font-['Inter'] text-lg">Assign Complaint</div>
-                    <div className="text-sm text-white/90 font-['Inter']">Allocate to staff/department</div>
-                  </div>
-                </div>
-              </button>
-              
-              <button className="w-full p-4 bg-gradient-to-r from-green-400 to-teal-500 text-white rounded-xl hover:from-green-500 hover:to-teal-600 transition-all duration-300 text-left shadow-lg hover:shadow-xl group">
-                <div className="flex items-center space-x-4">
-                  <div className="p-2 bg-white/20 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                    <Megaphone className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="font-medium font-['Inter'] text-lg">Add Announcement</div>
-                    <div className="text-sm text-white/90 font-['Inter']">Create system notice</div>
-                  </div>
-                </div>
-              </button>
-              
-              <button className="w-full p-4 bg-gradient-to-r from-teal-400 to-emerald-500 text-white rounded-xl hover:from-teal-500 hover:to-emerald-600 transition-all duration-300 text-left shadow-lg hover:shadow-xl group">
-                <div className="flex items-center space-x-4">
-                  <div className="p-2 bg-white/20 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                    <UserPlus className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="font-medium font-['Inter'] text-lg">Manage Users</div>
-                    <div className="text-sm text-white/90 font-['Inter']">User & staff management</div>
-                  </div>
-                </div>
-              </button>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Monthly Summary */}
-          <div className="bg-white/60 backdrop-blur-md rounded-2xl border border-white/60 shadow-lg hover:shadow-xl transition-all duration-300">
-            <div className="p-6 border-b border-emerald-100/30">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-emerald-900 font-['Inter']">System Performance</h2>
-                <select 
-                  className="text-sm bg-emerald-50/50 border border-emerald-200/40 rounded-lg px-3 py-1.5 font-['Inter'] text-emerald-700"
-                  value={selectedTimeframe}
-                  onChange={(e) => setSelectedTimeframe(e.target.value)}
-                >
-                  <option value="week">This Week</option>
-                  <option value="month">This Month</option>
-                  <option value="quarter">This Quarter</option>
-                </select>
-              </div>
-            </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-emerald-600 font-['Inter']">Total complaints</span>
-                  <span className="text-sm font-medium text-emerald-800 font-['Inter']">{stats.total}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-emerald-600 font-['Inter']">Complaints resolved</span>
-                  <span className="text-sm font-medium text-emerald-800 font-['Inter']">{stats.resolved}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-emerald-600 font-['Inter']">Average resolution time</span>
-                  <span className="text-sm font-medium text-emerald-800 font-['Inter']">{stats.avgResolutionTime} days</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-emerald-600 font-['Inter']">Pending high-priority</span>
-                  <span className="text-sm font-medium text-red-600 font-['Inter']">{stats.highPriority}</span>
-                </div>
-              </div>
-              <div className="mt-4 pt-4 border-t border-emerald-100/30">
-                <div className="flex items-center text-sm text-emerald-600">
-                  <TrendingUp className="w-4 h-4 mr-2" />
-                  <span className="font-['Inter']">
-                    Resolution rate: {((stats.resolved / stats.total) * 100).toFixed(1)}%
-                  </span>
-                </div>
-              </div>
+          {/* ─── Quick Actions (2×2 Grid) ─── */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+            <h2 className="text-base font-semibold text-gray-900 font-['Inter'] mb-4">Quick Actions</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {quickActions.map((action, i) => {
+                const Icon = action.icon;
+                return (
+                  <button
+                    key={i}
+                    className="flex flex-col items-center text-center p-4 bg-gray-50/60 border border-gray-100 rounded-xl hover:bg-orange-50 hover:border-orange-100 transition-all duration-200 group"
+                  >
+                    <div className={`p-2.5 rounded-xl ${action.iconBg} group-hover:bg-orange-100 transition-colors duration-200 mb-2`}>
+                      <Icon className={`w-[18px] h-[18px] ${action.iconColor}`} />
+                    </div>
+                    <p className="text-[12px] font-semibold text-gray-800 font-['Inter']">{action.title}</p>
+                    <p className="text-[10px] text-gray-400 font-['Inter'] mt-0.5">{action.subtitle}</p>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
       </div>
-
-
     </div>
   );
 };
