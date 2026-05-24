@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { loginUser, loginAdmin } from "../../services/AuthServices";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -205,11 +206,9 @@ const Login = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-2 top-9 text-gray-400 hover:text-emerald-500"
+              className="absolute right-2 top-9 text-gray-400 hover:text-emerald-500 flex items-center justify-center"
             >
-              <i
-                className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
-              ></i>
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
 

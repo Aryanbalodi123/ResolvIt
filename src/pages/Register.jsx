@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { registerUser, registerAdmin } from '../../services/AuthServices';
 import bcrypt from "bcryptjs";
 import { useNavigate } from "react-router-dom"; 
+import { Eye, EyeOff } from "lucide-react";
 
 const Register = () => {
   const navigate = useNavigate(); 
@@ -343,7 +344,7 @@ const Register = () => {
                   onClick={() => togglePasswordVisibility('password')}
                   className="absolute right-0 top-2 bg-none border-none cursor-pointer text-gray-500 p-0 w-5 h-3 flex items-center justify-center text-xs hover:text-emerald-500"
                 >
-                  <i className={`fas ${passwordVisible ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                  {passwordVisible ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               {/* Password Strength */}
@@ -380,7 +381,7 @@ const Register = () => {
                   onClick={() => togglePasswordVisibility('confirmPassword')}
                   className="absolute right-0 top-2 bg-none border-none cursor-pointer text-gray-500 p-0 w-5 h-3 flex items-center justify-center text-xs hover:text-emerald-500"
                 >
-                  <i className={`fas ${confirmPasswordVisible ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                  {confirmPasswordVisible ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               {/* Password Match Indicator */}
