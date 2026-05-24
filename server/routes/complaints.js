@@ -5,6 +5,7 @@ import { getNextNumericId } from "../utils/nextId.js";
 import { asRollNumber } from "../utils/normalize.js";
 import { requireAuth } from "../middleware/auth.js";
 import { emitComplaintCreated } from "../socket/socketServer.js";
+import { sendComplaintCreatedEmail } from "../utils/email.js";
 
 const router = express.Router();
 
@@ -38,6 +39,19 @@ router.post("/", async (req, res) => {
       emitComplaintCreated(created.toObject());
     } catch (socketErr) {
       console.error("[socket] emitComplaintCreated failed:", socketErr.message);
+    }
+
+    // ── Email Notification ──────────────────────────────────────────────────
+    try {
+      const user = await User.findOne({ rollNumber: created.user_id }).lean();
+      if (user) {
+        // Send email asynchronously without blocking the response
+        sendComplaintCreatedEmail(user, created).catch(err => 
+          console.error("[email] Background send failed:", err.message)
+        );
+      }
+    } catch (emailErr) {
+      console.error("[email] Failed to trigger creation email:", emailErr.message);
     }
 
     res.status(201).json(created);

@@ -3,6 +3,7 @@ import { Complaint } from "../models/Complaint.js";
 import { User } from "../models/User.js";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
 import { emitComplaintUpdated } from "../socket/socketServer.js";
+import { sendComplaintStatusEmail } from "../utils/email.js";
 
 const router = express.Router();
 
@@ -70,6 +71,13 @@ router.patch("/complaints/:complaintId", async (req, res) => {
       emitComplaintUpdated(updated);
     } catch (socketErr) {
       console.error("[socket] emitComplaintUpdated failed:", socketErr.message);
+    }
+
+    // ── Email Notification ──────────────────────────────────────────────────
+    if (responsePayload.user && patch.status && patch.status !== originalComplaint.status) {
+      sendComplaintStatusEmail(responsePayload.user, updated, originalComplaint.status).catch(err => 
+        console.error("[email] Background send failed:", err.message)
+      );
     }
 
     res.json(responsePayload);
