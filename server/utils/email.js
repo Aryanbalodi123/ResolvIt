@@ -1,8 +1,31 @@
 import nodemailer from "nodemailer";
+import "../config/env.js";
+
+let transporter;
+
+function getRequiredEnv(name) {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing ${name} environment variable`);
+  }
+
+  return value;
+}
+
+function getAppName() {
+  return process.env.APP_NAME || "ComplaintUs";
+}
+
+function getClientUrl(path = "") {
+  const clientUrl = getRequiredEnv("CLIENT_URL").replace(/\/$/, "");
+  return `${clientUrl}${path}`;
+}
+
+function getFromEmail() {
+  return process.env.EMAIL_FROM || `"${getAppName()}" <${getRequiredEnv("GMAIL_USER")}>`;
+}
 
 // Create a reusable transporter using environment variables.
-// If no credentials are provided, it will log a warning and fall back to ethereal (mock email)
-// or just print to console to prevent the app from crashing.
 function createTransporter() {
   const host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
@@ -17,7 +40,6 @@ function createTransporter() {
     });
   }
 
-  // Fallback for development: use Gmail if specifically configured, or mock
   if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
     return nodemailer.createTransport({
       service: "gmail",
@@ -28,29 +50,39 @@ function createTransporter() {
     });
   }
 
-  console.warn("⚠️ No SMTP or Gmail config found in .env. Email delivery will be simulated.");
-  
-  // Dummy transporter that just logs to console
+  if (process.env.EMAIL_DELIVERY_MODE !== "simulated") {
+    throw new Error(
+      "Missing email delivery config. Set SMTP_* or GMAIL_* env vars, or set EMAIL_DELIVERY_MODE=simulated."
+    );
+  }
+
   return {
     sendMail: async (mailOptions) => {
-      console.log("\n✉️  [SIMULATED EMAIL] ──────────────────────────────────────────");
-      console.log(`To:      ${mailOptions.to}`);
-      console.log(`Subject: ${mailOptions.subject}`);
-      console.log(`HTML:    \n${mailOptions.html}`);
-      console.log("──────────────────────────────────────────────────────────────\n");
+      console.log("[email] Simulated email", {
+        to: mailOptions.to,
+        subject: mailOptions.subject,
+      });
       return { messageId: "simulated-id" };
-    }
+    },
   };
 }
 
-const transporter = createTransporter();
-const FROM_EMAIL = process.env.EMAIL_FROM || '"ComplaintUs" <noreply@complaintus.com>';
+function getTransporter() {
+  if (!transporter) {
+    transporter = createTransporter();
+  }
+
+  return transporter;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HTML Email Templates
 // ─────────────────────────────────────────────────────────────────────────────
 
-const baseTemplate = (title, content) => `
+const baseTemplate = (title, content) => {
+  const appName = getAppName();
+
+  return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -79,13 +111,14 @@ const baseTemplate = (title, content) => `
       ${content}
     </div>
     <div class="footer">
-      This is an automated message from ComplaintUs.<br>
+      This is an automated message from ${appName}.<br>
       Please do not reply directly to this email.
     </div>
   </div>
 </body>
 </html>
 `;
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Senders
@@ -96,6 +129,7 @@ const baseTemplate = (title, content) => `
  */
 export async function sendComplaintCreatedEmail(user, complaint) {
   if (!user || !user.email) return;
+  const complaintsUrl = getClientUrl("/complaints");
 
   const html = baseTemplate(
     "Complaint Received",
@@ -114,14 +148,14 @@ export async function sendComplaintCreatedEmail(user, complaint) {
 
     <p>We'll notify you as soon as there's an update on your complaint.</p>
     <center>
-      <a href="http://localhost:5173/complaints" class="btn">View My Complaints</a>
+      <a href="${complaintsUrl}" class="btn">View My Complaints</a>
     </center>
     `
   );
 
   try {
-    await transporter.sendMail({
-      from: FROM_EMAIL,
+    await getTransporter().sendMail({
+      from: getFromEmail(),
       to: user.email,
       subject: `Complaint Received: #${complaint.complaint_id} - ${complaint.title}`,
       html,
@@ -138,6 +172,7 @@ export async function sendComplaintStatusEmail(user, complaint, oldStatus) {
   if (!user || !user.email) return;
   // Don't send an email if the status didn't actually change
   if (oldStatus === complaint.status) return;
+  const complaintsUrl = getClientUrl("/complaints");
 
   let statusClass = "status-pending";
   let statusText = "Pending";
@@ -170,14 +205,14 @@ export async function sendComplaintStatusEmail(user, complaint, oldStatus) {
     ${complaint.status === 'resolved' ? '<p>Your complaint has been marked as resolved. Thank you for making our campus better!</p>' : '<p>Our team is actively monitoring the situation.</p>'}
     
     <center>
-      <a href="http://localhost:5173/complaints" class="btn">View Details</a>
+      <a href="${complaintsUrl}" class="btn">View Details</a>
     </center>
     `
   );
 
   try {
-    await transporter.sendMail({
-      from: FROM_EMAIL,
+    await getTransporter().sendMail({
+      from: getFromEmail(),
       to: user.email,
       subject: `Update on Complaint #${complaint.complaint_id}: Marked as ${statusText}`,
       html,

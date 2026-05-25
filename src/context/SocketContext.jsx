@@ -13,8 +13,11 @@ import { io } from "socket.io-client";
 // ─────────────────────────────────────────────────────────────────────────────
 const SOCKET_URL =
   import.meta.env.VITE_SOCKET_URL ||
-  import.meta.env.VITE_API_BASE_URL?.replace("/api", "") ||
-  "http://localhost:4000";
+  import.meta.env.VITE_API_BASE_URL?.replace("/api", "");
+
+if (!SOCKET_URL) {
+  throw new Error("Missing VITE_SOCKET_URL or VITE_API_BASE_URL environment variable");
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Context

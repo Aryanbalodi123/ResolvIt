@@ -19,11 +19,9 @@ export async function uploadImage(base64Str) {
   if (!base64Str) return null;
   
   try {
-    // We mock the upload if API key is the dummy one
     if (process.env.CLOUDINARY_API_KEY === '123456789012345' || !process.env.CLOUDINARY_NAME) {
       console.warn("⚠️ Using dummy Cloudinary credentials. Image will not actually be uploaded.");
       console.warn("Please add CLOUDINARY_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET to your .env.local");
-      // Return a dummy image URL so the frontend doesn't break
       return "https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg";
     }
 
