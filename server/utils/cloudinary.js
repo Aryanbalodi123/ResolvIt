@@ -1,33 +1,34 @@
 import { v2 as cloudinary } from 'cloudinary';
-import dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
+import "../config/env.js";
 
-// Configure cloudinary with dummy fallbacks if not provided so the app doesn't crash
-// To make it work for real, add CLOUDINARY_URL or CLOUDINARY_NAME/KEY/SECRET to .env.local
+function getRequiredEnv(name) {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing ${name} environment variable`);
+  }
+
+  return value;
+}
+
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_NAME || 'demo',
-  api_key: process.env.CLOUDINARY_API_KEY || '123456789012345',
-  api_secret: process.env.CLOUDINARY_API_SECRET || 'abcdefghijklmnopqrstuvwxyza'
+  cloud_name: getRequiredEnv("CLOUDINARY_NAME"),
+  api_key: getRequiredEnv("CLOUDINARY_API_KEY"),
+  api_secret: getRequiredEnv("CLOUDINARY_API_SECRET"),
 });
 
 /**
  * Uploads a base64 encoded image to Cloudinary.
  * @param {string} base64Str - The base64 data URI (e.g., 'data:image/jpeg;base64,...')
+ * @param {string} folder - Cloudinary folder where the image should be stored.
  * @returns {Promise<string|null>} - The secure URL of the uploaded image, or null if failed.
  */
-export async function uploadImage(base64Str) {
+export async function uploadImage(base64Str, folder = "complaint_us/uploads") {
   if (!base64Str) return null;
   
   try {
-    if (process.env.CLOUDINARY_API_KEY === '123456789012345' || !process.env.CLOUDINARY_NAME) {
-      console.warn("⚠️ Using dummy Cloudinary credentials. Image will not actually be uploaded.");
-      console.warn("Please add CLOUDINARY_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET to your .env.local");
-      return "https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg";
-    }
-
     const result = await cloudinary.uploader.upload(base64Str, {
-      folder: "complaint_us/lost_found",
-      resource_type: "auto",
+      folder,
+      resource_type: "image",
     });
     return result.secure_url;
   } catch (error) {

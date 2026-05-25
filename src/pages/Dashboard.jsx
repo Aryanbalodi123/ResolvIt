@@ -15,6 +15,7 @@ import {
 } from "../../services/UserServices";
 import "./Dashboard.css";
 import Modal from "../components/Modal";
+import { imageToDataUrl } from "../utils/imageToDataUrl";
 
 import {
   FileText,
@@ -34,6 +35,7 @@ import {
   PackageOpen,
   Flag,
   Bell,
+  Image,
 } from "lucide-react";
 
 /* ─── Sparkline Component ─── */
@@ -144,7 +146,7 @@ const Dashboard = () => {
   const [reportType, setReportType] = useState("lost");
 
   const [complaintFormData, setComplaintFormData] = useState({
-    title: "", description: "", location: "", priority: "medium", category: "infrastructure",
+    title: "", description: "", location: "", priority: "medium", category: "infrastructure", image: "", imageName: "",
   });
   const [lostFoundFormData, setLostFoundFormData] = useState({
     title: "", description: "", location: "", category: "Personal Items", contactDetails: "", date: "", distinguishingFeatures: "",
@@ -233,9 +235,30 @@ const Dashboard = () => {
   const handleComplaintModalClose = () => {
     if (isSubmitting) return;
     setIsComplaintModalOpen(false);
-    setComplaintFormData({ title: "", description: "", location: "", priority: "medium", category: "infrastructure" });
+    setComplaintFormData({ title: "", description: "", location: "", priority: "medium", category: "infrastructure", image: "", imageName: "" });
   };
   const handleComplaintInputChange = (e) => { const { name, value } = e.target; setComplaintFormData((prev) => ({ ...prev, [name]: value })); };
+  const handleComplaintImageChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      setComplaintFormData((prev) => ({ ...prev, image: "", imageName: "" }));
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please choose an image file.");
+      e.target.value = "";
+      return;
+    }
+
+    try {
+      const image = await imageToDataUrl(file);
+      setComplaintFormData((prev) => ({ ...prev, image, imageName: file.name }));
+    } catch (err) {
+      console.error("Failed to read complaint image:", err);
+      alert("Could not read the selected image.");
+    }
+  };
   const isOnlyWhitespace = (text) => !text.trim();
   const isOnlyNumbers = (text) => /^[0-9]+$/.test(text.trim());
 
@@ -360,6 +383,20 @@ const Dashboard = () => {
                         </span>
                       </div>
                       <p className="text-[14px] text-gray-500 mb-3 font-['Inter'] line-clamp-2 leading-relaxed">{complaint.description}</p>
+                      {complaint.complaint_image && (
+                        <a
+                          href={complaint.complaint_image}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mb-3 block overflow-hidden rounded-xl border border-gray-100"
+                        >
+                          <img
+                            src={complaint.complaint_image}
+                            alt={`${complaint.title} attachment`}
+                            className="h-28 w-full object-cover"
+                          />
+                        </a>
+                      )}
                       <div className="flex flex-wrap items-center gap-4 text-[12px] text-gray-400 font-medium">
                         {complaint.location && (
                           <span className="flex items-center bg-gray-50 px-2.5 py-1 rounded-lg">
@@ -446,6 +483,17 @@ const Dashboard = () => {
           </div>
           <FormInput label="Location" name="location" value={complaintFormData.location} onChange={handleComplaintInputChange} placeholder="e.g., Outside 'A' Block, near library" required />
           <FormTextarea label="Description" name="description" value={complaintFormData.description} onChange={handleComplaintInputChange} placeholder="Provide as much detail as possible..." required />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">Image Proof <span className="text-gray-400">(optional)</span></label>
+            <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 font-['Inter']">
+              <Image className="h-4 w-4 text-gray-400" />
+              {complaintFormData.imageName || "Upload complaint image"}
+              <input type="file" accept="image/*" onChange={handleComplaintImageChange} className="hidden" />
+            </label>
+            {complaintFormData.image && (
+              <img src={complaintFormData.image} alt="Selected complaint proof" className="mt-3 h-32 w-full rounded-xl border border-gray-200 object-cover" />
+            )}
+          </div>
           <div className="flex space-x-3 pt-4">
             <button type="button" onClick={handleComplaintModalClose} disabled={isSubmitting} className="flex-1 px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors font-medium font-['Inter'] text-sm disabled:opacity-50">Cancel</button>
             <button type="submit" disabled={isSubmitting} className="flex-1 px-4 py-2.5 bg-[#065F46] text-white rounded-xl hover:bg-[#064E3B] transition-all duration-200 font-medium shadow-sm font-['Inter'] text-sm disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center">

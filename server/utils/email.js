@@ -25,46 +25,15 @@ function getFromEmail() {
   return process.env.EMAIL_FROM || `"${getAppName()}" <${getRequiredEnv("GMAIL_USER")}>`;
 }
 
-// Create a reusable transporter using environment variables.
+// Create a reusable Gmail transporter using environment variables.
 function createTransporter() {
-  const host = process.env.SMTP_HOST;
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-
-  if (host && user && pass) {
-    return nodemailer.createTransport({
-      host,
-      port: Number(process.env.SMTP_PORT || 587),
-      secure: process.env.SMTP_SECURE === "true", // true for 465, false for other ports
-      auth: { user, pass },
-    });
-  }
-
-  if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
-    return nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD,
-      },
-    });
-  }
-
-  if (process.env.EMAIL_DELIVERY_MODE !== "simulated") {
-    throw new Error(
-      "Missing email delivery config. Set SMTP_* or GMAIL_* env vars, or set EMAIL_DELIVERY_MODE=simulated."
-    );
-  }
-
-  return {
-    sendMail: async (mailOptions) => {
-      console.log("[email] Simulated email", {
-        to: mailOptions.to,
-        subject: mailOptions.subject,
-      });
-      return { messageId: "simulated-id" };
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: getRequiredEnv("GMAIL_USER"),
+      pass: getRequiredEnv("GMAIL_APP_PASSWORD"),
     },
-  };
+  });
 }
 
 function getTransporter() {
@@ -99,6 +68,7 @@ const baseTemplate = (title, content) => {
     .status-in-progress { background: #e0f2fe; color: #0369a1; }
     .status-resolved { background: #d1fae5; color: #047857; }
     .detail-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin: 20px 0; }
+    .email-image { display: block; width: 100%; max-width: 520px; max-height: 320px; object-fit: cover; border-radius: 10px; border: 1px solid #e2e8f0; margin-top: 10px; }
     .btn { display: inline-block; background: #10b981; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; margin-top: 20px; }
   </style>
 </head>
@@ -144,6 +114,12 @@ export async function sendComplaintCreatedEmail(user, complaint) {
       <p><strong>Priority:</strong> ${complaint.priority}</p>
       <br>
       <p><strong>Description:</strong><br>${complaint.description}</p>
+      ${complaint.complaint_image ? `
+        <p><strong>Attached Image:</strong></p>
+        <a href="${complaint.complaint_image}">
+          <img src="${complaint.complaint_image}" alt="Complaint attachment" class="email-image" width="520" style="display:block;width:100%;max-width:520px;max-height:320px;object-fit:cover;border-radius:10px;border:1px solid #e2e8f0;margin-top:10px;">
+        </a>
+      ` : ""}
     </div>
 
     <p>We'll notify you as soon as there's an update on your complaint.</p>
@@ -200,6 +176,12 @@ export async function sendComplaintStatusEmail(user, complaint, oldStatus) {
     <div class="detail-box">
       <p><strong>Title:</strong> ${complaint.title}</p>
       ${complaint.assigned_to ? `<p><strong>Assigned To:</strong> ${complaint.assigned_to}</p>` : ''}
+      ${complaint.complaint_image ? `
+        <p><strong>Attached Image:</strong></p>
+        <a href="${complaint.complaint_image}">
+          <img src="${complaint.complaint_image}" alt="Complaint attachment" class="email-image" width="520" style="display:block;width:100%;max-width:520px;max-height:320px;object-fit:cover;border-radius:10px;border:1px solid #e2e8f0;margin-top:10px;">
+        </a>
+      ` : ""}
     </div>
 
     ${complaint.status === 'resolved' ? '<p>Your complaint has been marked as resolved. Thank you for making our campus better!</p>' : '<p>Our team is actively monitoring the situation.</p>'}

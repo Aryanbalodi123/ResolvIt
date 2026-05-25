@@ -48,6 +48,11 @@ const complaintSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    complaint_image: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     resolved_at: {
       type: Date,
       default: null,

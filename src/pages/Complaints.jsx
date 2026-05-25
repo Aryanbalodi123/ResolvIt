@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Plus,
   Eye,
@@ -16,12 +16,14 @@ import {
   X,
   Loader2,
   Wifi,
-  WifiOff
+  WifiOff,
+  Image
 } from 'lucide-react';
 import { sendComplaint } from "../../services/ComplaintServices";
 import { getUserComplaints } from "../../services/UserServices";
 import Modal from '../components/Modal';
 import { useLiveComplaintList } from '../hooks/useComplaintUpdates';
+import { imageToDataUrl } from "../utils/imageToDataUrl";
 
 const Complaints = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
@@ -39,6 +41,8 @@ const Complaints = () => {
     location: "",
     priority: "medium",
     category: "infrastructure",
+    image: "",
+    imageName: "",
   });
 
   useEffect(() => {
@@ -125,6 +129,8 @@ const Complaints = () => {
       location: "",
       priority: "medium",
       category: "infrastructure",
+      image: "",
+      imageName: "",
     });
   };
 
@@ -134,6 +140,28 @@ const Complaints = () => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleComplaintImageChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      setComplaintFormData((prev) => ({ ...prev, image: "", imageName: "" }));
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please choose an image file.");
+      e.target.value = "";
+      return;
+    }
+
+    try {
+      const image = await imageToDataUrl(file);
+      setComplaintFormData((prev) => ({ ...prev, image, imageName: file.name }));
+    } catch (err) {
+      console.error("Failed to read complaint image:", err);
+      alert("Could not read the selected image.");
+    }
   };
 
   const handleComplaintSubmit = async (e) => {
@@ -150,6 +178,7 @@ const Complaints = () => {
         location: complaintFormData.location,
         priority: complaintFormData.priority,
         category: complaintFormData.category,
+        image: complaintFormData.image,
         status: "pending"
       };
 
@@ -234,7 +263,6 @@ const Complaints = () => {
           {filterOptions.map((option) => {
             const isSelected = selectedFilter === option.value;
             let iconColor = "text-gray-400";
-            let bgLight = "bg-white";
             if (option.value === 'pending') iconColor = "text-amber-500";
             if (option.value === 'in-progress') iconColor = "text-blue-500";
             if (option.value === 'resolved') iconColor = "text-emerald-500";
@@ -335,6 +363,21 @@ const Complaints = () => {
                   <p className="text-gray-500 text-sm mb-6 font-['Inter'] line-clamp-3 leading-relaxed relative z-10">
                     {complaint.description}
                   </p>
+
+                  {complaint.complaint_image && (
+                    <a
+                      href={complaint.complaint_image}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mb-5 block overflow-hidden rounded-2xl border border-gray-100 relative z-10"
+                    >
+                      <img
+                        src={complaint.complaint_image}
+                        alt={`${complaint.title} attachment`}
+                        className="h-36 w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                      />
+                    </a>
+                  )}
 
                   <div className="mt-auto pt-4 border-t border-gray-50 space-y-3 relative z-10">
                     <div className="flex items-center text-xs font-bold text-gray-400 uppercase tracking-wide">
@@ -453,6 +496,29 @@ const Complaints = () => {
               rows={4}
               className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-green-300 focus:border-transparent bg-white/80 backdrop-blur-sm resize-none font-['Inter']"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
+              Image Proof <span className="text-gray-400">(optional)</span>
+            </label>
+            <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300/80 bg-gray-50/70 px-4 py-3 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 font-['Inter']">
+              <Image className="h-4 w-4 text-gray-400" />
+              {complaintFormData.imageName || "Upload complaint image"}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleComplaintImageChange}
+                className="hidden"
+              />
+            </label>
+            {complaintFormData.image && (
+              <img
+                src={complaintFormData.image}
+                alt="Selected complaint proof"
+                className="mt-3 h-32 w-full rounded-xl border border-gray-200 object-cover"
+              />
+            )}
           </div>
 
           <div className="flex space-x-3 pt-4">

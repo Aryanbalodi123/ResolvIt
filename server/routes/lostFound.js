@@ -36,7 +36,7 @@ router.post("/lost", async (req, res) => {
     let imageUrl = "";
     if (req.body?.image) {
       console.log(`[debug] /lost received image of length: ${req.body.image.length}`);
-      imageUrl = await uploadImage(req.body.image) || "";
+      imageUrl = await uploadImage(req.body.image, "complaint_us/lost_found") || "";
     } else {
       console.log(`[debug] /lost received NO image`);
     }
@@ -64,7 +64,7 @@ router.post("/found", async (req, res) => {
     
     let imageUrl = "";
     if (req.body?.image) {
-      imageUrl = await uploadImage(req.body.image) || "";
+      imageUrl = await uploadImage(req.body.image, "complaint_us/lost_found") || "";
     }
 
     const created = await LostFound.create({

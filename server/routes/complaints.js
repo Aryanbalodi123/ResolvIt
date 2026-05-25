@@ -6,6 +6,7 @@ import { asRollNumber } from "../utils/normalize.js";
 import { requireAuth } from "../middleware/auth.js";
 import { emitComplaintCreated } from "../socket/socketServer.js";
 import { sendComplaintCreatedEmail } from "../utils/email.js";
+import { uploadImage } from "../utils/cloudinary.js";
 
 const router = express.Router();
 
@@ -21,6 +22,13 @@ router.post("/", async (req, res) => {
     }
 
     const complaintId = await getNextNumericId(Complaint, "complaint_id");
+    let complaintImage = "";
+    if (payload.image) {
+      complaintImage = await uploadImage(payload.image, "complaint_us/complaints");
+      if (!complaintImage) {
+        return res.status(502).json({ message: "Failed to upload complaint image" });
+      }
+    }
 
     const created = await Complaint.create({
       complaint_id: complaintId,
@@ -32,6 +40,7 @@ router.post("/", async (req, res) => {
       category: payload.category || "",
       priority: payload.priority || "medium",
       assigned_to: payload.assigned_to || "",
+      complaint_image: complaintImage,
     });
 
     // ── Real-time push: notify admins a new complaint has arrived ─────────

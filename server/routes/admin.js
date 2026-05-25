@@ -12,7 +12,10 @@ router.use(requireAdmin);
 
 async function attachUserDetails(complaints) {
   const userIds = Array.from(new Set(complaints.map((c) => String(c.user_id))));
-  const users = await User.find({ rollNumber: { $in: userIds } }, { rollNumber: 1, name: 1, _id: 0 }).lean();
+  const users = await User.find(
+    { rollNumber: { $in: userIds } },
+    { rollNumber: 1, name: 1, email: 1, _id: 0 }
+  ).lean();
 
   const userMap = new Map(users.map((u) => [String(u.rollNumber), u]));
 

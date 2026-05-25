@@ -181,6 +181,7 @@ function buildComplaintPayload(complaint) {
     status: complaint.status,
     priority: complaint.priority,
     assigned_to: complaint.assigned_to,
+    complaint_image: complaint.complaint_image || "",
     resolved_at: complaint.resolved_at ?? null,
     updated_at: complaint.updated_at || complaint.updatedAt || new Date().toISOString(),
     timestamp: new Date().toISOString(),

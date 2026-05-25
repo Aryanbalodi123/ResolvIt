@@ -318,6 +318,23 @@ const AdminComplaints = () => {
                   
                   <h3 className="text-lg font-black text-gray-900 font-['Inter'] mb-1 line-clamp-1">{complaint.title}</h3>
                   <p className="text-gray-500 text-sm font-['Inter'] line-clamp-1 leading-relaxed mb-4">{complaint.description}</p>
+                  {complaint.complaint_image && (
+                    <a
+                      href={complaint.complaint_image}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mb-4 flex max-w-sm items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-2 transition-colors hover:bg-gray-100"
+                    >
+                      <img
+                        src={complaint.complaint_image}
+                        alt={`${complaint.title} attachment`}
+                        className="h-14 w-20 rounded-lg object-cover"
+                      />
+                      <span className="text-xs font-bold uppercase tracking-wide text-gray-500">
+                        View attached proof
+                      </span>
+                    </a>
+                  )}
                   
                   <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs font-bold text-gray-400 uppercase tracking-wide">
                     <div className="flex items-center">
@@ -395,6 +412,20 @@ const AdminComplaints = () => {
               <p className="text-gray-700 font-['Inter'] border-l-4 border-green-300 pl-3 py-1 bg-[#ECFDF5]/50 rounded-r-md">
                 <strong>Title:</strong> {selectedComplaint.title}
               </p>
+              {selectedComplaint.complaint_image && (
+                <a
+                  href={selectedComplaint.complaint_image}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block overflow-hidden rounded-2xl border border-gray-100"
+                >
+                  <img
+                    src={selectedComplaint.complaint_image}
+                    alt={`${selectedComplaint.title} attachment`}
+                    className="h-48 w-full object-cover"
+                  />
+                </a>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">
