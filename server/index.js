@@ -7,7 +7,6 @@ import { initSocketServer } from "./socket/socketServer.js";
 const PORT = Number(process.env.API_PORT || 4000);
 const MONGODB_URI = process.env.MONGODB_URI;
 
-// Allowed origins for CORS / Socket.io — extend via env var in production
 const ALLOWED_ORIGINS = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(",").map((o) => o.trim())
   : [];
@@ -15,10 +14,8 @@ const ALLOWED_ORIGINS = process.env.CORS_ORIGINS
 async function start() {
   await connectDB(MONGODB_URI);
 
-  // Wrap Express in a plain http.Server so Socket.io can share the same port
   const httpServer = createServer(app);
 
-  // Initialise Socket.io — must happen before routes try to emit events
   initSocketServer(httpServer, ALLOWED_ORIGINS);
 
   httpServer.listen(PORT, () => {
