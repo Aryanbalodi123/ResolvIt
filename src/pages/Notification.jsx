@@ -117,8 +117,8 @@ export default function Notifications() {
         } catch { }
     }, [readIds]);
 
-    const fetchAll = useCallback(async () => {
-        setLoading(true);
+    const fetchAll = useCallback(async ({ showLoading = false } = {}) => {
+        if (showLoading) setLoading(true);
         const settled = await Promise.allSettled([
             typeof retrieveComplaint === "function" ? retrieveComplaint() : Promise.resolve([]),
             typeof getLostItems === "function" ? getLostItems() : Promise.resolve([]),
@@ -181,13 +181,13 @@ export default function Notifications() {
 
         if (mountedRef.current) {
             setNotifications(filtered);
-            setLoading(false);
+            if (showLoading) setLoading(false);
         }
     }, [dismissed]);
 
     useEffect(() => {
         mountedRef.current = true;
-        fetchAll();
+        fetchAll({ showLoading: true });
         const id = setInterval(fetchAll, 120000);
         return () => {
             mountedRef.current = false;

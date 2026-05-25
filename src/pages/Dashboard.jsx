@@ -169,8 +169,8 @@ const Dashboard = () => {
 
     if (!token || !userInfo.rollNumber) { navigate("/login", { replace: true }); return; }
 
-    const fetchAllData = async () => {
-      setIsLoading(true);
+    const fetchAllData = async ({ showLoading = false } = {}) => {
+      if (showLoading) setIsLoading(true);
       try {
         const userId = userInfo.rollNumber;
         const [userDetailsData, userComplaintsData, userLostItemsData] = await Promise.all([
@@ -182,10 +182,12 @@ const Dashboard = () => {
         const complaintsData = await retrieveComplaint();
         if (Array.isArray(complaintsData)) setComplaints(complaintsData);
       } catch (err) { console.error("Error fetching data:", err.message); }
-      finally { setIsLoading(false); }
+      finally {
+        if (showLoading) setIsLoading(false);
+      }
     };
 
-    fetchAllData();
+    fetchAllData({ showLoading: true });
     const interval = setInterval(fetchAllData, 30000);
     return () => clearInterval(interval);
   }, [navigate]);
@@ -263,10 +265,10 @@ const Dashboard = () => {
   const isOnlyNumbers = (text) => /^[0-9]+$/.test(text.trim());
 
   const handleComplaintSubmit = async (e) => {
+    e.preventDefault();
     const { title, description } = complaintFormData;
     if (isOnlyWhitespace(title) || isOnlyWhitespace(description)) { alert("Title and Description cannot be empty or only spaces."); return; }
     if (isOnlyNumbers(title) || isOnlyNumbers(description)) { alert("Title and Description cannot contain only numbers."); return; }
-    e.preventDefault();
     setIsSubmitting(true);
     try {
       const userInfo = JSON.parse(localStorage.getItem("token") || "{}");

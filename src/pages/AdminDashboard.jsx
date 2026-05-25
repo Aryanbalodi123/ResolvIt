@@ -110,9 +110,9 @@ const AdminDashboard = () => {
   });
 
   useEffect(() => {
-    const fetchComplaints = async () => {
+    const fetchComplaints = async ({ showLoading = false } = {}) => {
       try {
-        setIsLoading(true);
+        if (showLoading) setIsLoading(true);
         const data = await retrieveComplaint();
         setComplaints(data);
 
@@ -137,11 +137,11 @@ const AdminDashboard = () => {
       } catch (error) {
         console.error('Error fetching complaints:', error);
       } finally {
-        setIsLoading(false);
+        if (showLoading) setIsLoading(false);
       }
     };
 
-    fetchComplaints();
+    fetchComplaints({ showLoading: true });
     const interval = setInterval(fetchComplaints, 300000);
     return () => clearInterval(interval);
   }, []);
