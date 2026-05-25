@@ -7,7 +7,8 @@ import {
     CheckCircle2,
     Circle,
     Trash2,
-    Sparkles
+    Sparkles,
+    Loader2
 } from "lucide-react";
 
 import { retrieveComplaint } from "../../services/ComplaintServices";
@@ -23,7 +24,7 @@ const TYPE_META = {
         key: "complaint",
         label: "Complaints",
         Icon: FileText,
-        colorGradient: "from-rose-400 to-red-500",
+        colorGradient: "bg-red-500",
         pillBg: "bg-rose-50/70",
         dot: "bg-rose-500",
     },
@@ -31,7 +32,7 @@ const TYPE_META = {
         key: "lost",
         label: "Lost",
         Icon: PackageSearch,
-        colorGradient: "from-pink-400 to-red-400",
+        colorGradient: "bg-pink-500",
         pillBg: "bg-pink-50/70",
         dot: "bg-pink-500",
     },
@@ -39,9 +40,9 @@ const TYPE_META = {
         key: "found",
         label: "Found",
         Icon: PackageCheck,
-        colorGradient: "from-emerald-400 to-green-500",
-        pillBg: "bg-emerald-50/70",
-        dot: "bg-emerald-500",
+        colorGradient: "bg-[#065F46]",
+        pillBg: "bg-[#ECFDF5]/70",
+        dot: "bg-[#065F46]",
     },
 };
 
@@ -131,7 +132,7 @@ export default function Notifications() {
         const list = [];
 
         for (const c of complaints) {
-            const id = safeGet(c, "complaint_id") || safeGet(c, "id") || genId("complaint", btoa((c.title || "") + (c.created_at || "")));
+            const id = safeGet(c, "complaint_id") || safeGet(c, "id") || genId("complaint", ((c.title || "") + (c.created_at || "")).replace(/[^a-zA-Z0-9]/g, ''));
             list.push({
                 id,
                 type: "complaint",
@@ -144,7 +145,7 @@ export default function Notifications() {
         }
 
         for (const i of lost) {
-            const id = safeGet(i, "lost_id") || safeGet(i, "id") || genId("lost", btoa((i.title || "") + (i.date_lost || "")));
+            const id = safeGet(i, "lost_id") || safeGet(i, "id") || genId("lost", ((i.title || "") + (i.date_lost || "")).replace(/[^a-zA-Z0-9]/g, ''));
             list.push({
                 id,
                 type: "lost",
@@ -157,7 +158,7 @@ export default function Notifications() {
         }
 
         for (const i of found) {
-            const id = safeGet(i, "lost_id") || safeGet(i, "id") || genId("found", btoa((i.title || "") + (i.date_lost || "")));
+            const id = safeGet(i, "lost_id") || safeGet(i, "id") || genId("found", ((i.title || "") + (i.date_lost || "")).replace(/[^a-zA-Z0-9]/g, ''));
             list.push({
                 id,
                 type: "found",
@@ -241,34 +242,31 @@ export default function Notifications() {
     const totalUnread = Object.values(counts.unread).reduce((a, b) => a + b, 0);
 
     return (
-        <div className="w-full h-screen overflow-y-auto bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50">
-            <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-4 sm:space-y-6 pb-20">
-                {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-                    <div className="flex items-center gap-3 sm:gap-4">
-                        <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-400 to-green-500 shadow-lg">
-                            <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                        </div>
-
-                        <div>
-                            <h1 className="text-xl sm:text-2xl font-bold text-emerald-900">
-                                Notifications
-                            </h1>
-                            <p className="text-xs sm:text-sm text-emerald-600 mt-0.5">
-                                {totalUnread > 0 ? `${totalUnread} unread notification${totalUnread > 1 ? 's' : ''}` : "You're all caught up!"}
-                            </p>
-                        </div>
+        <div className="w-full h-full p-6 lg:p-10 space-y-8">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <div className="p-4 rounded-[2rem] bg-[#065F46] shadow-lg flex items-center justify-center">
+                        <Bell className="w-6 h-6 text-white" />
                     </div>
-
+                    <div>
+                        <h1 className="text-3xl font-black text-gray-900 tracking-tight font-['Inter']">
+                            Notification Hub
+                        </h1>
+                        <p className="text-sm text-gray-500 mt-1 font-medium font-['Inter']">
+                            {totalUnread > 0 ? `You have ${totalUnread} new notifications waiting.` : "You're all caught up!"}
+                        </p>
+                    </div>
                 </div>
+            </div>
 
                 {/* MOBILE QUICK ACTIONS */}
-                <div className="sm:hidden rounded-xl p-3 border border-emerald-200 bg-white/80 backdrop-blur-sm shadow-sm">
-                    <div className="text-xs font-semibold text-emerald-800 mb-2.5">Quick Actions</div>
+                <div className="sm:hidden rounded-xl p-3 border border-[#A7F3D0] bg-white/80 backdrop-blur-sm shadow-sm">
+                    <div className="text-xs font-semibold text-green-800 mb-2.5">Quick Actions</div>
                     <div className="grid grid-cols-2 gap-2">
                         <button
                             onClick={markAllRead}
-                            className="px-3 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-green-500 text-white text-sm font-medium shadow-md active:scale-95 transition"
+                            className="px-3 py-2.5 rounded-lg bg-[#065F46] text-white text-sm font-medium shadow-md active:scale-95 transition"
                         >
                             Mark All Read
                         </button>
@@ -280,7 +278,7 @@ export default function Notifications() {
                                 );
                                 setNotifications((p) => p.filter((n) => !ids.includes(n.id)));
                             }}
-                            className="px-3 py-2.5 rounded-lg border-2 border-emerald-300 text-sm font-medium bg-white text-emerald-700 active:scale-95 transition"
+                            className="px-3 py-2.5 rounded-lg border-2 border-green-300 text-sm font-medium bg-white text-green-700 active:scale-95 transition"
                         >
                             Dismiss All
                         </button>
@@ -294,8 +292,8 @@ export default function Notifications() {
                 </div>
 
                 {/* FILTER CHIPS */}
-                <div className="w-full overflow-x-auto">
-                    <div className="flex items-center gap-2 sm:gap-3 pb-2">
+                <div className="w-full overflow-x-auto no-scrollbar pb-2">
+                    <div className="flex items-center gap-3">
                         {Object.keys(TYPE_META).map((k) => {
                             const m = TYPE_META[k];
                             const enabled = filters[k];
@@ -306,25 +304,20 @@ export default function Notifications() {
                                 <button
                                     key={k}
                                     onClick={() => toggleFilter(k)}
-                                    className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold active:scale-95 transition-all shadow-md ${enabled
-                                            ? `bg-gradient-to-r ${m.colorGradient} text-white`
-                                            : "bg-white text-gray-700 border-2 border-gray-200"
+                                    className={`flex-shrink-0 flex items-center gap-2 px-5 py-3 rounded-full text-sm font-bold active:scale-95 transition-all duration-300 font-['Inter'] ${enabled
+                                            ? ` ${m.colorGradient} text-white shadow-lg`
+                                            : "bg-white text-gray-400 border border-gray-200 hover:bg-gray-50"
                                         }`}
                                 >
                                     <m.Icon className="w-4 h-4" />
                                     {m.label}
 
-                                    <span
-                                        className={`inline-flex items-center gap-1.5 text-xs ${enabled ? "text-white" : "text-gray-600"
-                                            }`}
-                                    >
-                                        <span className={`px-2 py-0.5 rounded-full ${enabled ? 'bg-white/20' : 'bg-gray-100'}`}>
+                                    <span className="flex items-center gap-1.5 ml-1">
+                                        <span className={`px-2 py-0.5 rounded-full text-xs ${enabled ? 'bg-black/20 text-white' : 'bg-gray-100 text-gray-500'}`}>
                                             {total}
                                         </span>
                                         {unreadCount > 0 && (
-                                            <span className="px-2 py-0.5 rounded-full bg-red-500 text-white font-bold">
-                                                {unreadCount}
-                                            </span>
+                                            <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
                                         )}
                                     </span>
                                 </button>
@@ -333,266 +326,136 @@ export default function Notifications() {
                     </div>
                 </div>
 
-                {/* BODY */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-                    <div className="lg:col-span-2">
-                        {/* Desktop timeline */}
-                        <div className="hidden sm:block relative pl-6">
-                            <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-emerald-200 rounded"></div>
-
-                            {loading ? (
-                                <div className="py-10 flex items-center justify-center">
-                                    <div className="h-10 w-10 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin" />
-                                </div>
-                            ) : visible.length === 0 ? (
-                                <div className="py-12 text-center">
-                                    <Sparkles className="w-12 h-12 mx-auto mb-3 text-emerald-500" />
-                                    <div className="font-semibold text-gray-800 text-lg">You're all caught up!</div>
-                                    <div className="text-sm text-gray-600 mt-1">No notifications match your selected filters.</div>
-                                </div>
-                            ) : (
-                                <>
-                                    {Object.entries(grouped).map(([groupLabel, items]) =>
-                                        items.length > 0 ? (
-                                            <section key={groupLabel} className="mb-6">
-                                                <div className="mb-3">
-                                                    <div className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-xs text-emerald-800 font-bold border border-emerald-300">
-                                                        {groupLabel}
-                                                    </div>
+                {/* BODY GRID */}
+                <div className="flex flex-col xl:flex-row gap-8">
+                    <div className="flex-1">
+                        {loading ? (
+                            <div className="py-20 flex items-center justify-center">
+                                <Loader2 className="w-10 h-10 text-[#065F46] animate-spin" />
+                            </div>
+                        ) : visible.length === 0 ? (
+                            <div className="py-24 text-center bg-white rounded-[3rem] shadow-sm border border-gray-100">
+                                <Sparkles className="w-16 h-16 mx-auto mb-4 text-gray-200" />
+                                <div className="font-black text-gray-900 text-2xl font-['Inter']">You're all caught up!</div>
+                                <div className="text-gray-500 mt-2 font-medium font-['Inter']">No notifications match your selected filters.</div>
+                            </div>
+                        ) : (
+                            <div className="space-y-12">
+                                {Object.entries(grouped).map(([dateGroup, items]) => {
+                                    if (items.length === 0) return null;
+                                    
+                                    return (
+                                        <div key={dateGroup} className="relative">
+                                            <div className="sticky top-4 z-10 inline-block mb-6">
+                                                <div className="px-4 py-2 rounded-full bg-gray-900 text-white font-bold text-sm font-['Inter'] shadow-md">
+                                                    {dateGroup}
                                                 </div>
+                                            </div>
+                                            
+                                            <div className="relative border-l-2 border-gray-100 ml-4 pl-8 space-y-8">
+                                                {items.map((n) => {
+                                                    const meta = TYPE_META[n.type];
+                                                    const Icon = meta.Icon;
+                                                    const isRead = readIds.includes(n.id);
 
-                                                <div className="space-y-4">
-                                                    {items.map((n) => {
-                                                        const meta = TYPE_META[n.type];
-                                                        const Icon = meta.Icon;
-                                                        const isRead = readIds.includes(n.id);
-
-                                                        return (
-                                                            <article
-                                                                key={n.id}
-                                                                className="relative bg-white rounded-2xl p-4 border-2 border-emerald-100 shadow-sm hover:shadow-xl transition flex items-start gap-4"
-                                                            >
-                                                                <div
-                                                                    className={`absolute -left-6 top-5 w-4 h-4 rounded-full ring-4 ring-white shadow-md ${isRead ? "bg-gray-300" : meta.dot
-                                                                        }`}
-                                                                />
-
-                                                                <div className={`flex-none p-2.5 rounded-xl ${meta.pillBg} shadow-sm border border-white`}>
-                                                                    <Icon className="w-5 h-5 text-gray-800" />
-                                                                </div>
-
-                                                                <div className="flex-1 min-w-0">
-                                                                    <div className="flex items-start justify-between gap-4">
-                                                                        <div className="min-w-0">
-                                                                            <h4
-                                                                                className={`text-sm font-bold ${isRead ? "text-gray-600" : "text-emerald-900"
-                                                                                    }`}
-                                                                            >
-                                                                                {n.title}
-                                                                            </h4>
-                                                                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{n.message}</p>
-
-                                                                            <div className="mt-3 flex items-center gap-2 text-xs">
-                                                                                <span className="px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 font-medium">
-                                                                                    {meta.label}
-                                                                                </span>
-                                                                                {(n.meta?.category || n.meta?.status || n.meta?.location) && (
-                                                                                    <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-medium">
-                                                                                        {n.meta?.category || n.meta?.status || n.meta?.location}
-                                                                                    </span>
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div className="flex flex-col items-end gap-2">
-                                                                            <div className="text-xs text-gray-500 font-medium">{timeAgoLabel(n.time)} ago</div>
-
-                                                                            <div className="flex items-center gap-2">
-                                                                                {/* <button
-                                                                                    onClick={() => (isRead ? markUnread(n.id) : markRead(n.id))}
-                                                                                    className="p-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition"
-                                                                                    title={isRead ? "Mark as unread" : "Mark as read"}
-                                                                                >
-                                                                                    {isRead ? (
-                                                                                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                                                                                    ) : (
-                                                                                        <Circle className="w-4 h-4 text-gray-400" />
-                                                                                    )}
-                                                                                </button>
-                                                                                <button
-                                                                                    onClick={() => dismissNotif(n.id)}
-                                                                                    className="p-2 rounded-lg bg-red-50 hover:bg-red-100 transition"
-                                                                                >
-                                                                                    <Trash2 className="w-4 h-4 text-red-600" />
-                                                                                </button> */}
-                                                                            </div>
-                                                                        </div>
+                                                    return (
+                                                        <div key={n.id} className="relative group">
+                                                            {/* Timeline Dot */}
+                                                            <div className={`absolute -left-[41px] top-4 w-5 h-5 rounded-full border-4 border-white ${isRead ? 'bg-gray-300' : meta.dot} shadow-sm transition-colors`} />
+                                                            
+                                                            {/* Notification Card */}
+                                                            <div className={`bg-white rounded-[2rem] p-6 shadow-sm border ${isRead ? 'border-gray-50 bg-gray-50/50' : 'border-gray-100 bg-white'} hover:shadow-xl hover:-translate-y-1 transition-all duration-300`}>
+                                                                <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                                                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${meta.pillBg} shadow-inner flex-shrink-0`}>
+                                                                        <Icon className={`w-5 h-5 ${meta.dot.replace('bg-', 'text-')}`} />
                                                                     </div>
-                                                                </div>
-                                                            </article>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </section>
-                                        ) : null
-                                    )}
-                                </>
-                            )}
-                        </div>
-
-                        {/* MOBILE CARD VIEW */}
-                        <div className="sm:hidden space-y-4">
-                            {loading ? (
-                                <div className="py-16 flex items-center justify-center">
-                                    <div className="h-10 w-10 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin" />
-                                </div>
-                            ) : visible.length === 0 ? (
-                                <div className="py-16 text-center bg-white rounded-2xl shadow-sm border border-emerald-100 p-8">
-                                    <Sparkles className="w-12 h-12 mx-auto mb-3 text-emerald-500" />
-                                    <div className="text-base font-bold text-gray-800">You're all caught up!</div>
-                                    <div className="text-sm text-gray-600 mt-2">No notifications match your filters.</div>
-                                </div>
-                            ) : (
-                                <>
-                                    {Object.entries(grouped).map(([groupLabel, items]) =>
-                                        items.length > 0 ? (
-                                            <section key={groupLabel} className="space-y-3">
-                                                <div className="pb-2">
-                                                    <div className="inline-block px-3 py-1.5 rounded-full bg-emerald-100 text-xs text-emerald-800 font-bold border border-emerald-300 shadow-sm">
-                                                        {groupLabel}
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-3">
-                                                    {items.map((n) => {
-                                                        const meta = TYPE_META[n.type];
-                                                        const Icon = meta.Icon;
-                                                        const isRead = readIds.includes(n.id);
-
-                                                        return (
-                                                            <article
-                                                                key={n.id}
-                                                                className={`rounded-xl p-4 border-2 ${isRead ? "border-gray-200 bg-gray-50" : "border-emerald-200 bg-white"
-                                                                    } shadow-sm`}
-                                                            >
-                                                                <div className="flex items-start gap-3">
-                                                                    <div className={`p-2.5 rounded-lg ${meta.pillBg} shadow-sm flex-shrink-0`}>
-                                                                        <Icon className="w-4 h-4 text-gray-800" />
-                                                                    </div>
-
+                                                                    
                                                                     <div className="flex-1 min-w-0">
-                                                                        <div className="flex items-start justify-between gap-2 mb-2">
-                                                                            <h4
-                                                                                className={`text-sm font-bold ${isRead ? "text-gray-600" : "text-emerald-900"
-                                                                                    }`}
-                                                                            >
-                                                                                {n.title}
-                                                                            </h4>
-                                                                            <span className="text-xs text-gray-500 font-medium flex-shrink-0">
-                                                                                {timeAgoLabel(n.time)}
-                                                                            </span>
+                                                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1">
+                                                                            <div className="text-xs font-bold text-gray-800 font-['Inter'] uppercase tracking-wider">{meta.label}</div>
+                                                                            <span className="text-xs font-bold text-gray-400 font-['Inter']">{timeAgoLabel(n.time)} ago</span>
                                                                         </div>
-
-                                                                        <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+                                                                        
+                                                                        <h4 className={`text-lg font-black font-['Inter'] leading-tight mb-2 ${isRead ? "text-gray-600" : "text-gray-900"}`}>
+                                                                            {n.title}
+                                                                        </h4>
+                                                                        <p className={`text-sm font-['Inter'] leading-relaxed ${isRead ? "text-gray-400" : "text-gray-500"}`}>
                                                                             {n.message}
                                                                         </p>
 
-                                                                        <div className="flex flex-wrap items-center gap-2 mb-3">
-                                                                            <span className="px-2.5 py-1 rounded-full bg-gray-100 text-xs text-gray-700 font-medium">
-                                                                                {meta.label}
-                                                                            </span>
-                                                                            {(n.meta?.status ||
-                                                                                n.meta?.location ||
-                                                                                n.meta?.category) && (
-                                                                                    <span className="px-2.5 py-1 rounded-full bg-blue-50 text-xs text-blue-700 font-medium">
-                                                                                        {n.meta?.category ||
-                                                                                            n.meta?.status ||
-                                                                                            n.meta?.location}
-                                                                                    </span>
-                                                                                )}
-                                                                        </div>
+                                                                        {(n.meta?.category || n.meta?.status || n.meta?.location) && (
+                                                                            <div className="flex flex-wrap gap-2 pt-3">
+                                                                                {n.meta?.category && <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-[11px] font-bold">{n.meta.category}</span>}
+                                                                                {n.meta?.status && <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-[11px] font-bold">{n.meta.status}</span>}
+                                                                            </div>
+                                                                        )}
 
-                                                                        <div className="flex items-center gap-2">
-                                                                            {/* <div className="w-full flex justify-end">
-                                                                                <button
-                                                                                    onClick={() => (isRead ? markUnread(n.id) : markRead(n.id))}
-                                                                                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-500 text-white active:scale-95 transition shadow-sm"
-                                                                                >
-                                                                                    {isRead ? (
-                                                                                        <Circle className="w-5 h-5" />
-                                                                                    ) : (
-                                                                                        <CheckCircle2 className="w-5 h-5" />
-                                                                                    )}
-                                                                                </button>
-                                                                            </div> */}
-
-
-
+                                                                        <div className="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                            <button onClick={() => isRead ? markUnread(n.id) : markRead(n.id)} className={`text-xs font-bold flex items-center hover:underline ${isRead ? 'text-gray-500' : 'text-[#065F46]'}`}>
+                                                                                {isRead ? <Circle className="w-3 h-3 mr-1" /> : <CheckCircle2 className="w-3 h-3 mr-1" />}
+                                                                                {isRead ? "Mark Unread" : "Mark Read"}
+                                                                            </button>
+                                                                            <button onClick={() => dismissNotif(n.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
+                                                                                <Trash2 className="w-4 h-4" />
+                                                                            </button>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </article>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </section>
-                                        ) : null
-                                    )}
-                                </>
-                            )}
-                        </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
 
-                    {/* DESKTOP RIGHT SIDEBAR */}
-                    <aside className="hidden lg:block space-y-4">
-                        <div className="bg-white rounded-2xl p-5 border-2 border-emerald-100 shadow-md">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="text-sm font-bold text-gray-900">Summary</div>
-                                <div className="text-xs text-gray-600 font-medium">{notifications.length} total</div>
-                            </div>
-
-                            <div className="space-y-3">
+                    {/* RIGHT ACTIONS / SUMMARY */}
+                    <div className="w-full xl:w-80 space-y-6 flex-shrink-0">
+                        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100">
+                            <h3 className="text-lg font-black text-gray-900 mb-6 font-['Inter']">Summary</h3>
+                            <div className="space-y-4">
                                 {Object.keys(TYPE_META).map((k) => {
                                     const m = TYPE_META[k];
                                     const total = counts.totals[k] || 0;
                                     const unread = counts.unread[k] || 0;
                                     return (
-                                        <div key={k} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition">
+                                        <div key={k} className="flex items-center justify-between group cursor-default">
                                             <div className="flex items-center gap-3">
-                                                <div className={`p-2 rounded-lg ${m.pillBg} shadow-sm`}>
-                                                    <m.Icon className="w-4 h-4" />
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${m.pillBg}`}>
+                                                    <m.Icon className={`w-4 h-4 ${m.dot.replace('bg-', 'text-')}`} />
                                                 </div>
-                                                <div className="text-sm">
-                                                    <div className="font-semibold text-gray-800">{m.label}</div>
-                                                    <div className="text-xs text-gray-500">
-                                                        {total} notification{total !== 1 ? 's' : ''}
-                                                    </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-bold text-gray-800 font-['Inter']">{m.label}</span>
+                                                    <span className="text-[10px] text-gray-400 font-bold uppercase">{total} Total</span>
                                                 </div>
                                             </div>
-
-                                            <div className="text-sm">
-                                                {unread > 0 ? (
-                                                    <div className="px-2.5 py-1 rounded-full bg-red-500 text-white text-xs font-bold shadow-sm">
-                                                        {unread}
-                                                    </div>
-                                                ) : (
-                                                    <div className="text-xs text-gray-500 font-medium">All read</div>
-                                                )}
-                                            </div>
+                                            {unread > 0 ? (
+                                                <div className="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-bold shadow-sm">
+                                                    {unread}
+                                                </div>
+                                            ) : (
+                                                <div className="w-6 h-6 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center">
+                                                    <CheckCircle2 className="w-3 h-3 text-gray-300" />
+                                                </div>
+                                            )}
                                         </div>
                                     );
                                 })}
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-2xl p-5 border-2 border-emerald-100 shadow-md">
-                            <div className="text-sm font-bold text-gray-900 mb-4">Actions</div>
-                            <div className="space-y-2">
+                        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100">
+                            <h3 className="text-lg font-black text-gray-900 mb-4 font-['Inter']">Quick Tools</h3>
+                            <div className="space-y-3">
                                 <button
                                     onClick={markAllRead}
-                                    className="w-full px-4 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-green-500 text-white font-semibold hover:shadow-lg transition"
+                                    className="w-full py-3.5 rounded-2xl bg-[#065F46] text-white font-bold text-sm shadow-md hover:bg-[#064E3B] hover:-translate-y-0.5 transition-all duration-300 font-['Inter'] flex justify-center items-center"
                                 >
-                                    Mark all read
+                                    <CheckCircle2 className="w-4 h-4 mr-2" /> Mark All Read
                                 </button>
                                 <button
                                     onClick={() => {
@@ -600,21 +463,20 @@ export default function Notifications() {
                                         setDismissed((p) => Array.from(new Set([...p, ...ids])));
                                         setNotifications((p) => p.filter((n) => !ids.includes(n.id)));
                                     }}
-                                    className="w-full px-4 py-2.5 rounded-lg bg-white border-2 border-red-200 text-sm font-semibold text-red-600 hover:bg-red-50 transition"
+                                    className="w-full py-3.5 rounded-2xl bg-white border border-rose-200 text-rose-600 font-bold text-sm hover:bg-rose-50 transition-all duration-300 font-['Inter']"
                                 >
-                                    Dismiss visible
+                                    Dismiss Visible
                                 </button>
                                 <button
                                     onClick={clearDismissed}
-                                    className="w-full px-4 py-2.5 rounded-lg bg-white border-2 border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+                                    className="w-full py-3.5 rounded-2xl bg-gray-50 border border-gray-200 text-gray-600 font-bold text-sm hover:bg-gray-100 transition-all duration-300 font-['Inter']"
                                 >
-                                    Restore dismissed
+                                    Restore Dismissed
                                 </button>
                             </div>
                         </div>
-                    </aside>
+                    </div>
                 </div>
-            </div>
         </div>
     );
 }

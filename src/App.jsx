@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 
 import Sidebar from "./components/Sidebar";
+import TopNavbar from "./components/TopNavbar";
 import LiveToastContainer from "./components/LiveToast";
 const Dashboard = React.lazy(() => import("./pages/Dashboard.jsx"));
 const Complaints = React.lazy(() => import("./pages/Complaints.jsx"));
@@ -73,25 +74,18 @@ export const AppRoutes = () => (
   </Routes>
 );
 
+
 const MainLayout = () => (
-  <div className="app-container">
-    <div className="decorative-circles">
-      <div className="circle-top"></div>
-      <div className="circle-bottom"></div>
-    </div>
-    <div className="content-wrapper">
-      <div className="translucent-container">
-        <div className="flex min-h-full">
-          <Sidebar />
-          <main className="main-content">
-            <div className="fade-in">
-              <Outlet />
-            </div>
-          </main>
+  <div className="flex h-screen w-full bg-[#F5F5F5] overflow-hidden relative">
+    <Sidebar />
+    <div className="flex-1 flex flex-col relative w-full h-full">
+      <TopNavbar />
+      <main className="flex-1 overflow-y-auto w-full h-full pb-8">
+        <div className="animate-fade-in w-full h-full">
+          <Outlet />
         </div>
-      </div>
+      </main>
     </div>
-    {/* Global live toast container — renders on every protected page */}
     <LiveToastContainer />
   </div>
 );

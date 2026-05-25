@@ -144,7 +144,7 @@ const Settings = () => {
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="text-emerald-600 hover:text-emerald-700 font-medium text-sm font-['Inter'] flex items-center"
+                  className="text-[#047857] hover:text-[#065F46] font-medium text-sm font-['Inter'] flex items-center"
                 >
                   <Edit3 className="w-4 h-4 mr-1" />
                   Edit Profile
@@ -153,7 +153,7 @@ const Settings = () => {
                 <div className="flex space-x-2">
                   <button
                     onClick={handleSave}
-                    className="bg-gradient-to-r from-emerald-400 to-green-500 text-white px-3 py-1 rounded-xl text-sm font-medium hover:from-emerald-500 hover:to-green-600 transition-all duration-200 font-['Inter'] flex items-center shadow-md"
+                    className="bg-green-400 text-white px-3 py-1 rounded-xl text-sm font-medium hover:from-green-500 hover:to-green-600 transition-all duration-200 font-['Inter'] flex items-center shadow-md"
                   >
                     <Save className="w-4 h-4 mr-1" />
                     Save
@@ -174,11 +174,11 @@ const Settings = () => {
             {/* Profile Picture */}
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center shadow-md">
+                <div className="w-20 h-20 bg-green-400 rounded-full flex items-center justify-center shadow-md">
                   <User className="w-10 h-10 text-white" />
                 </div>
                 {isEditing && (
-                  <button className="absolute -bottom-1 -right-1 bg-gradient-to-r from-emerald-400 to-green-500 text-white p-2 rounded-full hover:from-emerald-500 hover:to-green-600 transition-all duration-200 shadow-md">
+                  <button className="absolute -bottom-1 -right-1 bg-green-400 text-white p-2 rounded-full hover:from-green-500 hover:to-green-600 transition-all duration-200 shadow-md">
                     <Camera className="w-3 h-3" />
                   </button>
                 )}
@@ -209,7 +209,7 @@ const Settings = () => {
                         [field]: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
+                    className="w-full px-3 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-green-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
                   />
                 ) : (
                   <div className="flex items-center px-3 py-2 bg-white/20 rounded-xl font-['Inter'] backdrop-blur-sm">
@@ -247,7 +247,7 @@ const Settings = () => {
                 <span className="text-sm text-gray-600 font-['Inter']">
                   Resolved Issues
                 </span>
-                <span className="text-lg font-semibold text-emerald-600 font-['Inter']">
+                <span className="text-lg font-semibold text-[#047857] font-['Inter']">
                   {userProfile.resolvedComplaints}
                 </span>
               </div>
@@ -255,7 +255,7 @@ const Settings = () => {
                 <span className="text-sm text-gray-600 font-['Inter']">
                   Success Rate
                 </span>
-                <span className="text-lg font-semibold text-emerald-600 font-['Inter']">
+                <span className="text-lg font-semibold text-[#047857] font-['Inter']">
                   {userProfile.totalComplaints > 0
                     ? Math.round(
                         (userProfile.resolvedComplaints /
@@ -279,7 +279,7 @@ const Settings = () => {
             <div className="p-6 space-y-3">
               <button
                 onClick={() => setShowLogoutModal(true)}
-                className="w-full p-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl hover:from-rose-500 hover:to-rose-400 cursor-pointer transition-all duration-200 font-['Inter'] flex items-center justify-center shadow-md"
+                className="w-full p-3 bg-red-500 text-white rounded-xl hover:bg-red-600 cursor-pointer transition-all duration-200 font-['Inter'] flex items-center justify-center shadow-md"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
@@ -312,7 +312,7 @@ const Settings = () => {
             <div className="flex space-x-3">
               <button
                 onClick={handleLogout}
-                className="flex-1 bg-gradient-to-r from-red-300 to-rose-300 text-white py-2 px-4 rounded-xl font-medium hover:from-red-400 hover:to-rose-400 transition-all duration-200 font-['Inter'] shadow-md"
+                className="flex-1 bg-red-500 text-white py-2 px-4 rounded-xl font-medium hover:bg-red-600 transition-all duration-200 font-['Inter'] shadow-md"
               >
                 Yes, Sign Out
               </button>

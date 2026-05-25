@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 
 /* ─── Sparkline Component ─── */
-const Sparkline = ({ data = [], color = "#F97316", height = 48 }) => {
+const Sparkline = ({ data = [], color = "#065F46", height = 48 }) => {
   if (!data.length) return null;
   const min = Math.min(...data);
   const max = Math.max(...data);
@@ -110,7 +110,7 @@ const FormInput = ({ label, name, value, onChange, placeholder, required, type =
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">{label} {required && "*"}</label>
     <input type={type} name={name} value={value} onChange={onChange} placeholder={placeholder} required={required}
-      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-400 bg-white font-['Inter'] text-sm transition-colors" />
+      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#D1FAE5] focus:border-[#047857] bg-white font-['Inter'] text-sm transition-colors" />
   </div>
 );
 
@@ -118,7 +118,7 @@ const FormTextarea = ({ label, name, value, onChange, placeholder, required }) =
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">{label} {required && "*"}</label>
     <textarea name={name} value={value} onChange={onChange} placeholder={placeholder} required={required} rows={3}
-      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-400 bg-white font-['Inter'] text-sm transition-colors" />
+      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#D1FAE5] focus:border-[#047857] bg-white font-['Inter'] text-sm transition-colors" />
   </div>
 );
 
@@ -126,7 +126,7 @@ const FormSelect = ({ label, name, value, onChange, children, required }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2 font-['Inter']">{label} {required && "*"}</label>
     <select name={name} value={value} onChange={onChange} required={required}
-      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-400 bg-white font-['Inter'] text-sm transition-colors">{children}</select>
+      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#D1FAE5] focus:border-[#047857] bg-white font-['Inter'] text-sm transition-colors">{children}</select>
   </div>
 );
 
@@ -203,9 +203,9 @@ const Dashboard = () => {
     };
 
     return [
-      { title: "My Complaints", value: totalC, subtitle: `${pending} pending, ${inProg} in progress`, icon: FileText, iconBg: "bg-orange-50", iconColor: "text-orange-500", sparkData: genLine(totalC, 1), sparkColor: "#F97316" },
-      { title: "Lost & Found", value: lostItems?.length || 0, subtitle: `${activeLost} active, ${resolvedLost} resolved`, icon: Search, iconBg: "bg-blue-50", iconColor: "text-blue-500", sparkData: genLine(lostItems?.length || 0, 0.8), sparkColor: "#3B82F6" },
-      { title: "Resolved Cases", value: resolved, subtitle: "All time", icon: CheckCircle, iconBg: "bg-emerald-50", iconColor: "text-emerald-500", sparkData: resolved > 0 ? genLine(resolved, 1.2) : [0,0,0,0,0,0,0,0,0,0,0,0], sparkColor: "#22C55E" },
+      { title: "My Complaints", value: totalC, subtitle: `${pending} pending, ${inProg} in progress`, icon: FileText, iconBg: "bg-rose-100", iconColor: "text-rose-600", sparkData: genLine(totalC, 1), sparkColor: "#e11d48", cardBg: "bg-rose-50 border-rose-100" },
+      { title: "Lost & Found", value: lostItems?.length || 0, subtitle: `${activeLost} active, ${resolvedLost} resolved`, icon: Search, iconBg: "bg-blue-100", iconColor: "text-blue-600", sparkData: genLine(lostItems?.length || 0, 0.8), sparkColor: "#2563eb", cardBg: "bg-blue-50 border-blue-100" },
+      { title: "Resolved Cases", value: resolved, subtitle: "All time", icon: CheckCircle, iconBg: "bg-emerald-100", iconColor: "text-emerald-600", sparkData: resolved > 0 ? genLine(resolved, 1.2) : [0,0,0,0,0,0,0,0,0,0,0,0], sparkColor: "#059669", cardBg: "bg-[#ECFDF5] border-[#D1FAE5]" },
     ];
   }, [userComplaints, lostItems]);
 
@@ -214,17 +214,17 @@ const Dashboard = () => {
     const inProg = userComplaints?.filter((c) => c.status === "in-progress").length || 0;
     const resolved = userComplaints?.filter((c) => c.status === "resolved").length || 0;
     return [
-      { label: "Pending", value: pending, color: "#F97316" },
-      { label: "In Progress", value: inProg, color: "#FB923C" },
-      { label: "Resolved", value: resolved, color: "#22C55E" },
+      { label: "Pending", value: pending, color: "#065F46" },
+      { label: "In Progress", value: inProg, color: "#047857" },
+      { label: "Resolved", value: resolved, color: "#047857" },
     ];
   }, [userComplaints]);
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
-      case "pending": return "bg-orange-50 text-orange-600 border border-orange-100";
+      case "pending": return "bg-[#ECFDF5] text-green-700 border border-[#D1FAE5]";
       case "in-progress": return "bg-gray-100 text-gray-600 border border-gray-200";
-      case "resolved": return "bg-emerald-50 text-emerald-600 border border-emerald-100";
+      case "resolved": return "bg-[#ECFDF5] text-[#047857] border border-[#D1FAE5]";
       default: return "bg-gray-50 text-gray-600 border border-gray-200";
     }
   };
@@ -285,105 +285,99 @@ const Dashboard = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-orange-500 border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-green-500 border-t-transparent"></div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-[1400px] mx-auto space-y-6">
+    <div className="p-6 lg:p-10 space-y-8 w-full">
       {/* ─── Header ─── */}
-      <div className="flex items-start justify-between mb-2">
+      <div className="flex items-start justify-between mb-4">
         <div>
-          <h1 className="text-2xl lg:text-[28px] font-bold text-gray-900 font-['Inter'] tracking-tight">
-            Welcome back, {userDetails?.name || "User"}! <span className="inline-block">👋</span>
+          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 font-['Inter'] tracking-tight">
+            Welcome back, {userDetails?.name || "User"}! <span className="inline-block hover:animate-bounce cursor-default">👋</span>
           </h1>
-          <p className="text-gray-400 mt-1 text-sm font-['Inter']">Manage your complaints and stay updated on their progress.</p>
+          <p className="text-gray-500 mt-2 text-base font-['Inter']">Manage your complaints and stay updated on their progress.</p>
         </div>
         <div className="flex items-center space-x-3">
-          <div className="hidden lg:flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 space-x-2 min-w-[180px]">
-            <Search className="w-4 h-4 text-gray-400" />
-            <span className="text-sm text-gray-400 font-['Inter'] flex-1">Search...</span>
-            <kbd className="hidden xl:inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium text-gray-400 bg-white border border-gray-200 rounded font-['Inter']">⌘K</kbd>
-          </div>
-          <button className="relative p-2.5 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors">
-            <Bell className="w-[18px] h-[18px] text-gray-500" />
-          </button>
           <button onClick={handleComplaintModalOpen}
-            className="flex items-center px-4 py-2.5 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-all duration-200 shadow-sm hover:shadow-md font-['Inter'] font-medium text-sm">
-            <Plus className="w-4 h-4 mr-2" />
+            className="flex items-center px-5 py-3 bg-[#065F46] text-white rounded-full hover:bg-[#064E3B] transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 font-['Inter'] font-semibold text-sm">
+            <Plus className="w-5 h-5 mr-2" />
             New Complaint
           </button>
         </div>
       </div>
 
       {/* ─── Stats Cards ─── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
-              <div className="flex items-center space-x-3 mb-3">
-                <div className={`p-2.5 rounded-xl ${stat.iconBg}`}>
-                  <Icon className={`w-[18px] h-[18px] ${stat.iconColor}`} />
+            <div key={index} className={`rounded-3xl border p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 ${stat.cardBg}`}>
+              <div className="flex items-center space-x-4 mb-4">
+                <div className={`p-3 rounded-2xl ${stat.iconBg} shadow-inner`}>
+                  <Icon className={`w-5 h-5 ${stat.iconColor}`} />
                 </div>
-                <span className="text-sm text-gray-500 font-['Inter'] font-medium">{stat.title}</span>
+                <span className="text-sm text-gray-600 font-['Inter'] font-bold uppercase tracking-wider">{stat.title}</span>
               </div>
-              <p className="text-3xl font-bold text-gray-900 font-['Inter'] tracking-tight">{stat.value}</p>
-              <p className="text-xs text-gray-400 mt-1 font-['Inter']">{stat.subtitle}</p>
-              <Sparkline data={stat.sparkData} color={stat.sparkColor} height={44} />
+              <p className="text-4xl font-black text-gray-900 font-['Inter'] tracking-tight drop-shadow-sm">{stat.value}</p>
+              <p className="text-xs text-gray-500 mt-1.5 font-['Inter'] font-medium">{stat.subtitle}</p>
+              <Sparkline data={stat.sparkData} color={stat.sparkColor} height={50} />
             </div>
           );
         })}
       </div>
 
       {/* ─── Main Content Grid ─── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* ─── Recent Complaints ─── */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100">
-          <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-gray-900 font-['Inter']">Recent Complaints</h2>
+        <div className="lg:col-span-2 bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between bg-white/50 backdrop-blur-sm">
+            <h2 className="text-xl font-bold text-gray-900 font-['Inter']">Recent Complaints</h2>
             <button onClick={() => navigate("/complaints")}
-              className="text-orange-500 hover:text-orange-600 font-medium text-sm font-['Inter'] flex items-center group">
-              View all <ArrowUpRight className="w-3.5 h-3.5 ml-1 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              className="px-4 py-2 bg-gray-50 text-[#047857] hover:bg-green-50 rounded-full font-bold text-sm font-['Inter'] flex items-center group transition-colors">
+              View all <ArrowUpRight className="w-4 h-4 ml-1 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </button>
           </div>
-          <div className="divide-y divide-gray-50 max-h-[480px] overflow-y-auto">
+          <div className="divide-y divide-gray-50 max-h-[500px] overflow-y-auto p-2">
             {!Array.isArray(userComplaints) || userComplaints.length === 0 ? (
-              <div className="p-10 text-center">
-                <MessageSquare className="w-10 h-10 mx-auto mb-3 text-gray-200" />
-                <p className="text-gray-400 text-sm font-['Inter']">No complaints yet. Click the button above to create one.</p>
+              <div className="p-12 text-center">
+                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="w-8 h-8 text-gray-300" />
+                </div>
+                <p className="text-gray-500 text-sm font-['Inter'] font-medium">No complaints yet. Click the button above to create one.</p>
               </div>
             ) : (
               userComplaints.slice(0, 6).map((complaint) => (
-                <div key={complaint.complaint_id} className="px-6 py-4 hover:bg-gray-50/60 transition-colors duration-150 group">
+                <div key={complaint.complaint_id} className="p-4 mx-2 my-1 hover:bg-gray-50 rounded-2xl transition-all duration-200 group">
                   <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center space-x-2.5 mb-1.5">
-                        <h3 className="text-sm font-semibold text-gray-900 font-['Inter']">{complaint.title}</h3>
-                        <span className={`px-2 py-0.5 rounded-md text-[11px] font-medium ${getStatusColor(complaint.status)}`}>
-                          {complaint.status?.charAt(0).toUpperCase() + complaint.status?.slice(1)}
+                    <div className="flex-1 min-w-0 pr-4">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <h3 className="text-base font-bold text-gray-900 font-['Inter'] truncate">{complaint.title}</h3>
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase ${getStatusColor(complaint.status)}`}>
+                          {complaint.status}
                         </span>
                       </div>
-                      <p className="text-[13px] text-gray-400 mb-2.5 font-['Inter'] line-clamp-1">{complaint.description}</p>
-                      <div className="flex flex-wrap items-center gap-4 text-[12px] text-gray-400">
+                      <p className="text-[14px] text-gray-500 mb-3 font-['Inter'] line-clamp-2 leading-relaxed">{complaint.description}</p>
+                      <div className="flex flex-wrap items-center gap-4 text-[12px] text-gray-400 font-medium">
                         {complaint.location && (
-                          <span className="flex items-center font-['Inter']">
-                            <MapPin className="w-3 h-3 mr-1 text-gray-300" />{complaint.location}
+                          <span className="flex items-center bg-gray-50 px-2.5 py-1 rounded-lg">
+                            <MapPin className="w-3.5 h-3.5 mr-1.5 text-gray-400" />{complaint.location}
                           </span>
                         )}
-                        <span className="flex items-center font-['Inter']">
-                          <Clock className="w-3 h-3 mr-1 text-gray-300" />{new Date(complaint.created_at).toLocaleDateString()}
+                        <span className="flex items-center bg-gray-50 px-2.5 py-1 rounded-lg">
+                          <Clock className="w-3.5 h-3.5 mr-1.5 text-gray-400" />{new Date(complaint.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </span>
                         {complaint.priority && (
-                          <span className={`flex items-center font-['Inter'] font-medium ${complaint.priority === 'high' ? 'text-red-500' : complaint.priority === 'medium' ? 'text-orange-500' : 'text-emerald-500'}`}>
-                            <Flag className="w-3 h-3 mr-1" />{complaint.priority?.charAt(0).toUpperCase() + complaint.priority?.slice(1)} priority
+                          <span className={`flex items-center px-2.5 py-1 rounded-lg ${complaint.priority === 'high' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
+                            <Flag className="w-3.5 h-3.5 mr-1.5" />{complaint.priority} priority
                           </span>
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center space-x-0.5 ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"><Eye className="w-4 h-4" /></button>
+                    <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <button className="w-10 h-10 flex items-center justify-center bg-white border border-gray-100 shadow-sm text-gray-400 hover:text-[#065F46] hover:border-[#D1FAE5] hover:bg-[#ECFDF5] rounded-xl transition-all"><Eye className="w-4 h-4" /></button>
                     </div>
                   </div>
                 </div>
@@ -393,18 +387,18 @@ const Dashboard = () => {
         </div>
 
         {/* ─── Right Column ─── */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* ─── Complaint Status (Donut Chart) ─── */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
-            <h2 className="text-base font-semibold text-gray-900 font-['Inter'] mb-5">My Complaint Status</h2>
-            <div className="flex items-center justify-between">
-              <DonutChart segments={donutSegments} size={140} />
-              <div className="space-y-3 ml-4">
+          <div className="bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm">
+            <h2 className="text-xl font-bold text-gray-900 font-['Inter'] mb-8">Overall Status</h2>
+            <div className="flex flex-col items-center justify-center">
+              <DonutChart segments={donutSegments} size={180} />
+              <div className="w-full grid grid-cols-3 gap-2 mt-8">
                 {donutSegments.map((seg, i) => (
-                  <div key={i} className="flex items-center space-x-2">
-                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: seg.color }}></span>
-                    <span className="text-xs text-gray-500 font-['Inter']">{seg.label}</span>
-                    <span className="text-xs font-semibold text-gray-800 font-['Inter'] ml-auto pl-3">{seg.value}</span>
+                  <div key={i} className="flex flex-col items-center p-3 rounded-2xl bg-gray-50 text-center">
+                    <span className="w-3 h-3 rounded-full mb-2" style={{ backgroundColor: seg.color }}></span>
+                    <span className="text-lg font-black text-gray-900 leading-none">{seg.value}</span>
+                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">{seg.label}</span>
                   </div>
                 ))}
               </div>
@@ -412,24 +406,22 @@ const Dashboard = () => {
           </div>
 
           {/* ─── Quick Actions ─── */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
-            <h2 className="text-base font-semibold text-gray-900 font-['Inter'] mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-2 gap-3">
+          <div className="bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm">
+            <h2 className="text-xl font-bold text-gray-900 font-['Inter'] mb-6">Quick Actions</h2>
+            <div className="grid grid-cols-2 gap-4">
               <button onClick={handleComplaintModalOpen}
-                className="flex flex-col items-center text-center p-4 bg-gray-50/60 border border-gray-100 rounded-xl hover:bg-orange-50 hover:border-orange-100 transition-all duration-200 group">
-                <div className="p-2.5 rounded-xl bg-orange-50 group-hover:bg-orange-100 transition-colors duration-200 mb-2">
-                  <Plus className="w-[18px] h-[18px] text-orange-500" />
+                className="flex flex-col items-center justify-center p-6 bg-rose-50/50 border border-rose-100 rounded-[1.5rem] hover:bg-rose-100 hover:scale-105 transition-all duration-300 group">
+                <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <Plus className="w-6 h-6 text-rose-500" />
                 </div>
-                <p className="text-[12px] font-semibold text-gray-800 font-['Inter']">New Complaint</p>
-                <p className="text-[10px] text-gray-400 font-['Inter'] mt-0.5">Report an issue</p>
+                <p className="text-[13px] font-bold text-gray-900 font-['Inter']">New Complaint</p>
               </button>
               <button onClick={handleLostFoundModalOpen}
-                className="flex flex-col items-center text-center p-4 bg-gray-50/60 border border-gray-100 rounded-xl hover:bg-orange-50 hover:border-orange-100 transition-all duration-200 group">
-                <div className="p-2.5 rounded-xl bg-blue-50 group-hover:bg-blue-100 transition-colors duration-200 mb-2">
-                  <Search className="w-[18px] h-[18px] text-blue-500" />
+                className="flex flex-col items-center justify-center p-6 bg-blue-50/50 border border-blue-100 rounded-[1.5rem] hover:bg-blue-100 hover:scale-105 transition-all duration-300 group">
+                <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <Search className="w-6 h-6 text-blue-500" />
                 </div>
-                <p className="text-[12px] font-semibold text-gray-800 font-['Inter']">Lost & Found</p>
-                <p className="text-[10px] text-gray-400 font-['Inter'] mt-0.5">Report an item</p>
+                <p className="text-[13px] font-bold text-gray-900 font-['Inter']">Lost & Found</p>
               </button>
             </div>
           </div>
@@ -456,7 +448,7 @@ const Dashboard = () => {
           <FormTextarea label="Description" name="description" value={complaintFormData.description} onChange={handleComplaintInputChange} placeholder="Provide as much detail as possible..." required />
           <div className="flex space-x-3 pt-4">
             <button type="button" onClick={handleComplaintModalClose} disabled={isSubmitting} className="flex-1 px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors font-medium font-['Inter'] text-sm disabled:opacity-50">Cancel</button>
-            <button type="submit" disabled={isSubmitting} className="flex-1 px-4 py-2.5 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-all duration-200 font-medium shadow-sm font-['Inter'] text-sm disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center">
+            <button type="submit" disabled={isSubmitting} className="flex-1 px-4 py-2.5 bg-[#065F46] text-white rounded-xl hover:bg-[#064E3B] transition-all duration-200 font-medium shadow-sm font-['Inter'] text-sm disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center">
               {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Submit Complaint"}
             </button>
           </div>
@@ -474,7 +466,7 @@ const Dashboard = () => {
             <button onClick={() => setReportType("lost")} className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${reportType === "lost" ? "bg-red-500 text-white shadow-sm" : "text-gray-500 hover:bg-white hover:text-gray-700"}`}>
               <Package className="w-4 h-4" /><span>I Lost Something</span>
             </button>
-            <button onClick={() => setReportType("found")} className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${reportType === "found" ? "bg-emerald-500 text-white shadow-sm" : "text-gray-500 hover:bg-white hover:text-gray-700"}`}>
+            <button onClick={() => setReportType("found")} className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${reportType === "found" ? "bg-[#065F46] text-white shadow-sm" : "text-gray-500 hover:bg-white hover:text-gray-700"}`}>
               <PackageOpen className="w-4 h-4" /><span>I Found Something</span>
             </button>
           </div>
@@ -491,7 +483,7 @@ const Dashboard = () => {
           <FormInput label="Your Contact Details" name="contactDetails" value={lostFoundFormData.contactDetails} onChange={handleLostFoundInputChange} placeholder="Your email or phone number" required />
           <div className="flex space-x-3 pt-4">
             <button type="button" onClick={handleLostFoundModalClose} disabled={isSubmitting} className="flex-1 px-4 py-2.5 text-gray-600 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors font-medium font-['Inter'] text-sm disabled:opacity-50">Cancel</button>
-            <button type="submit" disabled={isSubmitting} className={`flex-1 px-4 py-2.5 text-white rounded-xl transition-all duration-200 font-medium shadow-sm font-['Inter'] text-sm disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center ${reportType === "lost" ? "bg-red-500 hover:bg-red-600" : "bg-emerald-500 hover:bg-emerald-600"}`}>
+            <button type="submit" disabled={isSubmitting} className={`flex-1 px-4 py-2.5 text-white rounded-xl transition-all duration-200 font-medium shadow-sm font-['Inter'] text-sm disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center ${reportType === "lost" ? "bg-red-500 hover:bg-red-600" : "bg-[#065F46] hover:bg-[#065F46]"}`}>
               {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : reportType === "lost" ? "Report Lost Item" : "Report Found Item"}
             </button>
           </div>

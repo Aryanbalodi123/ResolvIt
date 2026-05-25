@@ -8,8 +8,8 @@ import { useComplaintUpdates } from "../hooks/useComplaintUpdates";
 const STATUS_CONFIG = {
   resolved: {
     icon: CheckCircle,
-    bg: "from-emerald-500 to-green-500",
-    border: "border-emerald-400/40",
+    bg: "bg-[#065F46]",
+    border: "border-green-400/40",
     text: "Complaint Resolved",
     sub: (title) => `"${title}" has been marked as resolved.`,
   },
@@ -22,7 +22,7 @@ const STATUS_CONFIG = {
   },
   pending: {
     icon: AlertCircle,
-    bg: "from-amber-500 to-orange-500",
+    bg: "from-amber-500 to-green-500",
     border: "border-amber-400/40",
     text: "Complaint Pending",
     sub: (title) => `"${title}" has been moved back to pending.`,
@@ -75,10 +75,10 @@ function ToastItem({ toast, onDismiss }) {
       aria-live="polite"
     >
       {/* Left accent bar */}
-      <div className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b ${config.bg}`} />
+      <div className={`absolute left-0 top-0 bottom-0 w-1  ${config.bg}`} />
 
       {/* Icon */}
-      <div className={`ml-4 mt-3.5 flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br ${config.bg} flex items-center justify-center shadow-lg`}>
+      <div className={`ml-4 mt-3.5 flex-shrink-0 w-9 h-9 rounded-xl  ${config.bg} flex items-center justify-center shadow-lg`}>
         <Icon className="w-4.5 h-4.5 text-white" style={{ width: "1.1rem", height: "1.1rem" }} />
       </div>
 
@@ -105,7 +105,7 @@ function ToastItem({ toast, onDismiss }) {
         {/* Progress bar */}
         <div className="absolute bottom-0 left-1 right-0 h-0.5 bg-gray-100">
           <div
-            className={`h-full bg-gradient-to-r ${config.bg} origin-left`}
+            className={`h-full  ${config.bg} origin-left`}
             style={{
               animation: `shrink ${AUTO_DISMISS_MS}ms linear forwards`,
             }}

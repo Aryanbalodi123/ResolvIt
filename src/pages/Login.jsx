@@ -115,7 +115,7 @@ const Login = () => {
 
   return (
     <div className="flex min-h-screen bg-white font-['Poppins',sans-serif] overflow-x-hidden">
-      <div className="hidden md:flex flex-1 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white rounded-br-[60px] rounded-tr-[60px] flex-col justify-center items-center relative overflow-hidden">
+      <div className="hidden md:flex flex-1 bg-[#065F46] text-white rounded-br-[60px] rounded-tr-[60px] flex-col justify-center items-center relative overflow-hidden">
         <div className="absolute w-[150px] h-[150px] bg-white/10 rounded-full top-[10%] -left-[40px]"></div>
         <div className="absolute w-[120px] h-[120px] bg-white/5 rounded-full bottom-[20%] -right-[25px]"></div>
         <img
@@ -133,9 +133,9 @@ const Login = () => {
 
       <div className="flex-1 flex justify-center items-center bg-white rounded-tl-[60px] rounded-bl-[60px] md:-ml-16 md:pl-24 px-4 py-8 relative z-10">
         <div className="w-full max-w-xs mx-auto">
-          <div className="text-center text-4xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 bg-clip-text text-transparent mb-8 relative">
+          <div className="text-center text-4xl font-bold text-[#065F46] mb-8 relative">
             ComplaintUs
-            <div className="absolute bottom-[-8px] left-1/2 transform -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-sm"></div>
+            <div className="absolute bottom-[-8px] left-1/2 transform -translate-x-1/2 w-12 h-1 bg-[#065F46] rounded-sm"></div>
           </div>
 
           <h2 className="text-2xl mb-6 text-left text-gray-800 font-semibold">
@@ -147,7 +147,7 @@ const Login = () => {
               className={`p-2.5 px-3 rounded-lg mb-4 text-sm font-medium ${
                 alert.type === "error"
                   ? "bg-red-50 text-red-600 border border-red-200"
-                  : "bg-green-50 text-green-600 border border-green-200"
+                  : "bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0]"
               }`}
             >
               {alert.message}
@@ -166,8 +166,8 @@ const Login = () => {
                   onClick={() => setSelectedRole(role)}
                   className={`w-full sm:w-auto px-4 py-2 border-2 rounded-xl font-medium cursor-pointer transition-all duration-300 text-sm ${
                     selectedRole === role
-                      ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-transparent shadow-md"
-                      : "border-gray-200 bg-white text-gray-600 hover:border-emerald-500 hover:text-emerald-500"
+                      ? "bg-[#065F46] text-white border-transparent shadow-md"
+                      : "border-gray-200 bg-white text-gray-600 hover:border-green-500 hover:text-[#047857]"
                   }`}
                 >
                   <i
@@ -206,19 +206,19 @@ const Login = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-2 top-9 text-gray-400 hover:text-emerald-500 flex items-center justify-center"
+              className="absolute right-2 top-9 text-gray-400 hover:text-[#047857] flex items-center justify-center"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
 
           <div className="flex justify-between items-center mb-4 text-sm">
-            <label className="flex items-center text-gray-500 cursor-pointer hover:text-emerald-500">
+            <label className="flex items-center text-gray-500 cursor-pointer hover:text-[#047857]">
               <input
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="mr-2 scale-110 cursor-pointer accent-emerald-500"
+                className="mr-2 scale-110 cursor-pointer accent-green-500"
               />
               Remember me
             </label>
@@ -229,7 +229,7 @@ const Login = () => {
             type="submit"
             onClick={handleSubmit}
             disabled={isLoading}
-            className="w-full p-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-none rounded-xl font-semibold text-sm mb-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(16,185,129,0.4)] active:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full p-4 bg-[#065F46] text-white border-none rounded-xl font-semibold text-sm mb-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(16,185,129,0.4)] active:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <>
@@ -247,7 +247,7 @@ const Login = () => {
             <a
               href="#"
               onClick={() => navigate("/register")}
-              className="text-emerald-500 font-semibold hover:text-emerald-600 hover:underline"
+              className="text-[#047857] font-semibold hover:text-[#047857] hover:underline"
             >
               Create one here
             </a>

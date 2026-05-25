@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 
 /* ─── Sparkline Component ─── */
-const Sparkline = ({ data = [], color = "#F97316", height = 48 }) => {
+const Sparkline = ({ data = [], color = "#047857", height = 48 }) => {
   if (!data.length) return null;
   const min = Math.min(...data);
   const max = Math.max(...data);
@@ -167,9 +167,9 @@ const AdminDashboard = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'unassigned': return 'bg-red-50 text-red-600 border border-red-100';
-      case 'pending': return 'bg-orange-50 text-orange-600 border border-orange-100';
+      case 'pending': return 'bg-[#ECFDF5] text-green-700 border border-[#D1FAE5]';
       case 'in-progress': return 'bg-gray-100 text-gray-600 border border-gray-200';
-      case 'resolved': return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
+      case 'resolved': return 'bg-[#ECFDF5] text-[#047857] border border-[#D1FAE5]';
       default: return 'bg-gray-50 text-gray-600 border border-gray-200';
     }
   };
@@ -177,58 +177,47 @@ const AdminDashboard = () => {
   const getPriorityColor = (priority) => {
     switch (priority) {
       case 'high': return 'text-red-500';
-      case 'medium': return 'text-orange-500';
-      case 'low': return 'text-emerald-500';
+      case 'medium': return 'text-[#047857]';
+      case 'low': return 'text-[#047857]';
       default: return 'text-gray-500';
     }
   };
 
   const statCards = [
-    { title: 'Total Complaints', value: stats.total, trend: `${stats.total} this month`, pct: '+18.4%', icon: FileText, iconBg: 'bg-orange-50', iconColor: 'text-orange-500', sparkData: sparklineData.total, sparkColor: '#F97316' },
-    { title: 'Active Complaints', value: stats.active, trend: `${stats.active} this month`, pct: '+12.6%', icon: TrendingUp, iconBg: 'bg-orange-50', iconColor: 'text-orange-500', sparkData: sparklineData.active, sparkColor: '#F97316' },
-    { title: 'Resolved Complaints', value: stats.resolved, trend: `${stats.resolved} this month`, pct: `${stats.total > 0 ? ((stats.resolved/stats.total)*100).toFixed(1) : 0}%`, icon: CheckCircle, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-500', sparkData: sparklineData.resolved, sparkColor: '#22C55E' },
-    { title: 'High Priority', value: stats.highPriority, trend: `${stats.highPriority} this month`, pct: '+25.0%', icon: AlertTriangle, iconBg: 'bg-orange-50', iconColor: 'text-orange-500', sparkData: sparklineData.highPriority, sparkColor: '#F97316' },
+    { title: 'Total Complaints', value: stats.total, trend: `${stats.total} this month`, pct: '+18.4%', icon: FileText, iconBg: 'bg-white/20', iconColor: 'text-white', sparkData: sparklineData.total, sparkColor: '#ffffff', cardBg: 'bg-emerald-500 border-emerald-600 text-white', trendColor: 'text-emerald-100' },
+    { title: 'Active Complaints', value: stats.active, trend: `${stats.active} this month`, pct: '+12.6%', icon: TrendingUp, iconBg: 'bg-white/20', iconColor: 'text-white', sparkData: sparklineData.active, sparkColor: '#ffffff', cardBg: 'bg-green-500 border-green-600 text-white', trendColor: 'text-green-100' },
+    { title: 'Resolved Complaints', value: stats.resolved, trend: `${stats.resolved} this month`, pct: `${stats.total > 0 ? ((stats.resolved/stats.total)*100).toFixed(1) : 0}%`, icon: CheckCircle, iconBg: 'bg-white/20', iconColor: 'text-white', sparkData: sparklineData.resolved, sparkColor: '#ffffff', cardBg: 'bg-teal-500 border-teal-600 text-white', trendColor: 'text-teal-100' },
+    { title: 'High Priority', value: stats.highPriority, trend: `${stats.highPriority} this month`, pct: '+25.0%', icon: AlertTriangle, iconBg: 'bg-white/20', iconColor: 'text-white', sparkData: sparklineData.highPriority, sparkColor: '#ffffff', cardBg: 'bg-cyan-600 border-cyan-700 text-white', trendColor: 'text-cyan-100' },
   ];
 
   const donutSegments = [
-    { label: 'Pending', value: stats.pending, color: '#F97316' },
-    { label: 'In Progress', value: stats.inProgress, color: '#FB923C' },
-    { label: 'Resolved', value: stats.resolved, color: '#22C55E' },
+    { label: 'Pending', value: stats.pending, color: '#047857' },
+    { label: 'In Progress', value: stats.inProgress, color: '#047857' },
+    { label: 'Resolved', value: stats.resolved, color: '#047857' },
     { label: 'High Priority', value: stats.highPriority, color: '#EF4444' },
   ];
 
   const quickActions = [
-    { title: 'Assign Complaint', subtitle: 'Allocate to staff', icon: UserCheck, iconBg: 'bg-orange-50', iconColor: 'text-orange-500' },
-    { title: 'Add Announcement', subtitle: 'Create notice', icon: Megaphone, iconBg: 'bg-orange-50', iconColor: 'text-orange-500' },
-    { title: 'Manage Users', subtitle: 'Add or edit users', icon: UserPlus, iconBg: 'bg-orange-50', iconColor: 'text-orange-500' },
-    { title: 'Generate Reports', subtitle: 'View analytics', icon: BarChart3, iconBg: 'bg-orange-50', iconColor: 'text-orange-500' },
+    { title: 'Assign Complaint', subtitle: 'Allocate to staff', icon: UserCheck, iconBg: 'bg-[#ECFDF5]', iconColor: 'text-[#047857]' },
+    { title: 'Add Announcement', subtitle: 'Create notice', icon: Megaphone, iconBg: 'bg-[#ECFDF5]', iconColor: 'text-[#047857]' },
+    { title: 'Manage Users', subtitle: 'Add or edit users', icon: UserPlus, iconBg: 'bg-[#ECFDF5]', iconColor: 'text-[#047857]' },
+    { title: 'Generate Reports', subtitle: 'View analytics', icon: BarChart3, iconBg: 'bg-[#ECFDF5]', iconColor: 'text-[#047857]' },
   ];
 
   return (
-    <div className="p-6 lg:p-8 max-w-[1400px] mx-auto space-y-6">
+    <div className="p-6 lg:p-10 space-y-8 w-full">
       {/* ─── Header ─── */}
-      <div className="flex items-start justify-between mb-2">
+      <div className="flex items-start justify-between mb-4">
         <div>
-          <h1 className="text-2xl lg:text-[28px] font-bold text-gray-900 font-['Inter'] tracking-tight">
-            Good Morning, Admin! <span className="inline-block">👋</span>
+          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 font-['Inter'] tracking-tight">
+            Good Morning, Admin! <span className="inline-block hover:animate-bounce cursor-default">👋</span>
           </h1>
-          <p className="text-gray-400 mt-1 text-sm font-['Inter']">Here's what's happening with your system today.</p>
+          <p className="text-gray-500 mt-2 text-base font-['Inter']">Here's what's happening with your system today.</p>
         </div>
         <div className="flex items-center space-x-3">
-          {/* Search Bar */}
-          <div className="hidden lg:flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 space-x-2 min-w-[200px]">
-            <Search className="w-4 h-4 text-gray-400" />
-            <span className="text-sm text-gray-400 font-['Inter'] flex-1">Search...</span>
-            <kbd className="hidden xl:inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium text-gray-400 bg-white border border-gray-200 rounded font-['Inter']">⌘K</kbd>
-          </div>
-          {/* Bell */}
-          <button className="relative p-2.5 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors">
-            <Bell className="w-[18px] h-[18px] text-gray-500" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">2</span>
-          </button>
           {/* Export */}
-          <button className="flex items-center px-4 py-2.5 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-all duration-200 shadow-sm hover:shadow-md font-['Inter'] font-medium text-sm">
-            <Download className="w-4 h-4 mr-2" />
+          <button className="flex items-center px-5 py-3 bg-[#065F46] text-white rounded-full hover:bg-[#064E3B] transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 font-['Inter'] font-semibold text-sm">
+            <Download className="w-5 h-5 mr-2" />
             Export Report
           </button>
         </div>
@@ -237,29 +226,29 @@ const AdminDashboard = () => {
       {/* ─── Stats Cards ─── */}
       {isLoading ? (
         <div className="flex items-center justify-center h-48">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-orange-500 border-t-transparent"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-green-500 border-t-transparent"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {statCards.map((stat, index) => {
             const Icon = stat.icon;
             return (
-              <div key={index} className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className={`p-2.5 rounded-xl ${stat.iconBg}`}>
-                    <Icon className={`w-[18px] h-[18px] ${stat.iconColor}`} />
+              <div key={index} className={`rounded-[2rem] border p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 ${stat.cardBg}`}>
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className={`p-3 rounded-2xl ${stat.iconBg} shadow-inner`}>
+                    <Icon className={`w-5 h-5 ${stat.iconColor}`} />
                   </div>
-                  <span className="text-sm text-gray-500 font-['Inter'] font-medium">{stat.title}</span>
+                  <span className="text-sm font-['Inter'] font-bold uppercase tracking-wider text-white/90">{stat.title}</span>
                 </div>
-                <p className="text-3xl font-bold text-gray-900 font-['Inter'] tracking-tight">{stat.value}</p>
-                <div className="flex items-center space-x-2 mt-1.5">
-                  <span className="text-xs text-emerald-500 font-medium font-['Inter'] flex items-center">
-                    <TrendingUp className="w-3 h-3 mr-0.5" />
+                <p className="text-4xl font-black font-['Inter'] tracking-tight drop-shadow-sm text-white">{stat.value}</p>
+                <div className="flex items-center space-x-2 mt-2">
+                  <span className="text-xs font-bold font-['Inter'] flex items-center bg-white/20 text-white px-2 py-0.5 rounded-full">
+                    <TrendingUp className="w-3 h-3 mr-1" />
                     {stat.trend}
                   </span>
-                  <span className="text-xs text-gray-400 font-['Inter']">→ {stat.pct}</span>
+                  <span className={`text-xs font-bold font-['Inter'] ${stat.trendColor || 'text-white/80'}`}>→ {stat.pct}</span>
                 </div>
-                <Sparkline data={stat.sparkData} color={stat.sparkColor} height={44} />
+                <Sparkline data={stat.sparkData} color={stat.sparkColor} height={50} />
               </div>
             );
           })}
@@ -267,64 +256,66 @@ const AdminDashboard = () => {
       )}
 
       {/* ─── Main Content Grid ─── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* ─── Latest Complaints ─── */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100">
-          <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-gray-900 font-['Inter']">Latest Complaints (All Users)</h2>
-            <button className="text-orange-500 hover:text-orange-600 font-medium text-sm font-['Inter'] flex items-center group">
-              View all <ArrowUpRight className="w-3.5 h-3.5 ml-1 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        <div className="lg:col-span-2 bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between bg-white/50 backdrop-blur-sm">
+            <h2 className="text-xl font-bold text-gray-900 font-['Inter']">Latest Complaints (All Users)</h2>
+            <button className="px-4 py-2 bg-gray-50 text-[#047857] hover:bg-green-50 rounded-full font-bold text-sm font-['Inter'] flex items-center group transition-colors">
+              View all <ArrowUpRight className="w-4 h-4 ml-1 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </button>
           </div>
-          <div className="divide-y divide-gray-50 max-h-[480px] overflow-y-auto">
+          <div className="divide-y divide-gray-50 max-h-[500px] overflow-y-auto p-2">
             {isLoading ? (
               <div className="flex items-center justify-center h-48">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-orange-500 border-t-transparent"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-green-500 border-t-transparent"></div>
               </div>
             ) : complaints.length === 0 ? (
-              <div className="p-10 text-center">
-                <FileText className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-                <p className="text-gray-400 text-sm font-['Inter']">No complaints found</p>
+              <div className="p-12 text-center">
+                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FileText className="w-8 h-8 text-gray-300" />
+                </div>
+                <p className="text-gray-500 text-sm font-['Inter'] font-medium">No complaints found</p>
               </div>
             ) : complaints
                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                .filter((complaint) => complaint.status !== "resolved")
                .slice(0, 6)
                .map((complaint) => (
-              <div key={complaint.id || complaint.complaint_id} className="px-6 py-4 hover:bg-gray-50/60 transition-colors duration-150 group">
+              <div key={complaint.id || complaint.complaint_id} className="p-4 mx-2 my-1 hover:bg-gray-50 rounded-2xl transition-all duration-200 group">
                 <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center space-x-2.5 mb-1.5">
-                      <h3 className="text-sm font-semibold text-gray-900 font-['Inter']">{complaint.title}</h3>
-                      <span className={`px-2 py-0.5 rounded-md text-[11px] font-medium ${getStatusColor(complaint.status)}`}>
-                        {complaint.status?.charAt(0).toUpperCase() + complaint.status?.slice(1)}
+                  <div className="flex-1 min-w-0 pr-4">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <h3 className="text-base font-bold text-gray-900 font-['Inter'] truncate">{complaint.title}</h3>
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase ${getStatusColor(complaint.status)}`}>
+                        {complaint.status}
                       </span>
                     </div>
-                    <p className="text-[13px] text-gray-400 mb-2.5 font-['Inter'] line-clamp-1">{complaint.description}</p>
-                    <div className="flex items-center space-x-4 text-[12px] text-gray-400">
+                    <p className="text-[14px] text-gray-500 mb-3 font-['Inter'] line-clamp-2 leading-relaxed">{complaint.description}</p>
+                    <div className="flex flex-wrap items-center gap-4 text-[12px] text-gray-400 font-medium">
                       {complaint.location && (
-                        <span className="flex items-center font-['Inter']">
-                          <MapPin className="w-3 h-3 mr-1 text-gray-300" />
+                        <span className="flex items-center bg-gray-50 px-2.5 py-1 rounded-lg">
+                          <MapPin className="w-3.5 h-3.5 mr-1.5 text-gray-400" />
                           {complaint.location}
                         </span>
                       )}
-                      <span className="flex items-center font-['Inter']">
-                        <Clock className="w-3 h-3 mr-1 text-gray-300" />
-                        {complaint.date || new Date(complaint.created_at).toLocaleDateString()}
+                      <span className="flex items-center bg-gray-50 px-2.5 py-1 rounded-lg">
+                        <Clock className="w-3.5 h-3.5 mr-1.5 text-gray-400" />
+                        {complaint.date || new Date(complaint.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </span>
                       {complaint.priority && (
-                        <span className={`flex items-center font-['Inter'] font-medium ${getPriorityColor(complaint.priority)}`}>
-                          <Flag className="w-3 h-3 mr-1" />
-                          {complaint.priority?.charAt(0).toUpperCase() + complaint.priority?.slice(1)} priority
+                        <span className={`flex items-center px-2.5 py-1 rounded-lg ${complaint.priority === 'high' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
+                          <Flag className="w-3.5 h-3.5 mr-1.5" />
+                          {complaint.priority} priority
                         </span>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center space-x-0.5 ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                  <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <button className="w-10 h-10 flex items-center justify-center bg-white border border-gray-100 shadow-sm text-gray-400 hover:text-[#065F46] hover:border-[#D1FAE5] hover:bg-[#ECFDF5] rounded-xl transition-all">
                       <Eye className="w-4 h-4" />
                     </button>
-                    <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                    <button className="w-10 h-10 flex items-center justify-center bg-white border border-gray-100 shadow-sm text-gray-400 hover:text-[#065F46] hover:border-[#D1FAE5] hover:bg-[#ECFDF5] rounded-xl transition-all">
                       <MoreVertical className="w-4 h-4" />
                     </button>
                   </div>
@@ -335,13 +326,13 @@ const AdminDashboard = () => {
         </div>
 
         {/* ─── Right Column ─── */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* ─── Complaint Overview (Donut Chart) ─── */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-semibold text-gray-900 font-['Inter']">Complaint Overview</h2>
+          <div className="bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-xl font-bold text-gray-900 font-['Inter']">Overview</h2>
               <select
-                className="text-xs bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1.5 font-['Inter'] text-gray-500 focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
+                className="text-xs bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1.5 font-bold font-['Inter'] text-gray-600 focus:ring-2 focus:ring-[#D1FAE5] focus:border-[#047857]"
                 value={selectedTimeframe}
                 onChange={(e) => setSelectedTimeframe(e.target.value)}
               >
@@ -350,15 +341,17 @@ const AdminDashboard = () => {
                 <option value="quarter">This Quarter</option>
               </select>
             </div>
-            <div className="flex items-center justify-between">
-              <DonutChart segments={donutSegments} size={160} />
-              <div className="space-y-3 ml-4">
+            <div className="flex flex-col items-center justify-center">
+              <DonutChart segments={donutSegments} size={200} />
+              <div className="w-full grid grid-cols-2 gap-3 mt-8">
                 {donutSegments.map((seg, i) => (
-                  <div key={i} className="flex items-center space-x-2">
-                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: seg.color }}></span>
-                    <span className="text-xs text-gray-500 font-['Inter'] whitespace-nowrap">{seg.label}</span>
-                    <span className="text-xs font-semibold text-gray-800 font-['Inter'] ml-auto pl-3">
-                      {seg.value} ({stats.total > 0 ? ((seg.value / stats.total) * 100).toFixed(1) : 0}%)
+                  <div key={i} className="flex flex-col items-center p-4 rounded-2xl bg-gray-50 text-center">
+                    <span className="w-3 h-3 rounded-full mb-2 shadow-sm" style={{ backgroundColor: seg.color }}></span>
+                    <span className="text-xl font-black text-gray-900 leading-none mb-1">
+                      {seg.value}
+                    </span>
+                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+                      {seg.label}
                     </span>
                   </div>
                 ))}
@@ -367,21 +360,21 @@ const AdminDashboard = () => {
           </div>
 
           {/* ─── Quick Actions (2×2 Grid) ─── */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
-            <h2 className="text-base font-semibold text-gray-900 font-['Inter'] mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-2 gap-3">
+          <div className="bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm">
+            <h2 className="text-xl font-bold text-gray-900 font-['Inter'] mb-6">Quick Actions</h2>
+            <div className="grid grid-cols-2 gap-4">
               {quickActions.map((action, i) => {
                 const Icon = action.icon;
                 return (
                   <button
                     key={i}
-                    className="flex flex-col items-center text-center p-4 bg-gray-50/60 border border-gray-100 rounded-xl hover:bg-orange-50 hover:border-orange-100 transition-all duration-200 group"
+                    className="flex flex-col items-center justify-center p-5 bg-gray-50/50 border border-gray-100 rounded-[1.5rem] hover:bg-gray-100 hover:scale-105 transition-all duration-300 group"
                   >
-                    <div className={`p-2.5 rounded-xl ${action.iconBg} group-hover:bg-orange-100 transition-colors duration-200 mb-2`}>
-                      <Icon className={`w-[18px] h-[18px] ${action.iconColor}`} />
+                    <div className={`w-12 h-12 rounded-full shadow-sm flex items-center justify-center bg-white group-hover:scale-110 transition-transform mb-3`}>
+                      <Icon className={`w-5 h-5 ${action.iconColor}`} />
                     </div>
-                    <p className="text-[12px] font-semibold text-gray-800 font-['Inter']">{action.title}</p>
-                    <p className="text-[10px] text-gray-400 font-['Inter'] mt-0.5">{action.subtitle}</p>
+                    <p className="text-[13px] font-bold text-gray-900 font-['Inter'] leading-tight">{action.title}</p>
+                    <p className="text-[10px] text-gray-500 font-['Inter'] mt-1">{action.subtitle}</p>
                   </button>
                 );
               })}

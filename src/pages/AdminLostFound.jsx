@@ -85,126 +85,180 @@ export default function LostFound() {
     return `${Math.floor(days / 30)} months ago`;
   };
 
+  const allItems = [...lostItems.map(i => ({...i, type: 'lost'})), ...foundItems.map(i => ({...i, type: 'found'}))]
+    .sort((a, b) => new Date(b.date || b.timeAgo) - new Date(a.date || a.timeAgo));
+  const totalReports = allItems.length;
+
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-8">
+    <div className="p-6 lg:p-10 w-full min-h-screen space-y-8 bg-[#F5F5F5]">
 
-      {/* Page Title */}
-      <h1 className="text-3xl font-semibold text-gray-800">Lost & Found</h1>
+      {/* Header & Stats Widgets */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        
+        {/* Main Hero Card */}
+        <div className="md:col-span-8 bg-gray-900 rounded-[2rem] p-8 md:p-10 text-white flex flex-col justify-between relative overflow-hidden shadow-xl">
+          <div className="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl"></div>
+          <div className="absolute -left-20 -bottom-20 w-64 h-64 bg-red-500/20 rounded-full blur-3xl"></div>
+          
+          <div className="relative z-10">
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight font-['Inter'] mb-4 leading-tight">
+              Admin Lost & Found <br/><span className="text-gray-400">Management</span>
+            </h1>
+            <p className="text-gray-300 max-w-lg font-['Inter'] text-sm md:text-base leading-relaxed">
+              Oversee and manage all lost and found items. Permanently remove resolved or inappropriate reports to keep the platform clean.
+            </p>
+          </div>
+        </div>
 
-      {/* Loader */}
+        {/* Floating Stat Widgets */}
+        <div className="md:col-span-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-4">
+          <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex items-center justify-between group hover:shadow-xl hover:-translate-y-1 transition-all">
+            <div>
+              <div className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-1 font-['Inter']">Total Records</div>
+              <div className="text-4xl font-black text-gray-900 font-['Inter']">{totalReports}</div>
+            </div>
+            <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <PackageSearch className="w-6 h-6 text-gray-700" />
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex items-center justify-between group hover:shadow-xl hover:-translate-y-1 transition-all">
+            <div>
+              <div className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-1 font-['Inter']">Action Required</div>
+              <div className="text-4xl font-black text-gray-900 font-['Inter']">0</div>
+            </div>
+            <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <PackageCheck className="w-6 h-6 text-red-600" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Sections */}
       {isLoading ? (
-        <div className="flex justify-center py-20">
-          <Loader2 className="w-10 h-10 animate-spin text-gray-400" />
+        <div className="flex justify-center py-32">
+          <Loader2 className="w-12 h-12 animate-spin text-gray-400" />
         </div>
       ) : (
-        <>
-          {/* LOST ITEMS */}
-          <Section
-            icon={<PackageSearch className="w-6 h-6 text-red-500" />}
-            title="Lost Items"
-            count={lostItems.length}
-            items={lostItems}
-            badgeColor="bg-red-100/80 text-red-700 border-red-200/60"
-            onDelete={handleDelete}
-          />
+        <div className="space-y-16">
+          
+          {/* Lost Items Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
+              <div className="p-3 bg-red-100 rounded-2xl text-red-600">
+                <PackageSearch className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-gray-900 font-['Inter'] tracking-tight">Reported Lost</h2>
+                <p className="text-sm text-gray-500 font-medium font-['Inter']">Manage {lostItems.length} missing items</p>
+              </div>
+            </div>
 
-          {/* FOUND ITEMS */}
-          <Section
-            icon={<PackageCheck className="w-6 h-6 text-emerald-500" />}
-            title="Found Items"
-            count={foundItems.length}
-            items={foundItems}
-            badgeColor="bg-emerald-100/80 text-emerald-700 border-emerald-200/60"
-            onDelete={handleDelete}
-          />
-        </>
+            {lostItems.length === 0 ? (
+              <div className="py-16 text-center bg-white rounded-[3rem] shadow-sm border border-gray-100">
+                <div className="font-black text-gray-400 text-xl font-['Inter']">No lost items match your filters</div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {lostItems.map((item) => (
+                  <ItemCard 
+                    key={item.id} 
+                    item={item} 
+                    isLost={true} 
+                    handleDelete={handleDelete} 
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Found Items Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
+              <div className="p-3 bg-emerald-100 rounded-2xl text-[#065F46]">
+                <PackageCheck className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-gray-900 font-['Inter'] tracking-tight">Reported Found</h2>
+                <p className="text-sm text-gray-500 font-medium font-['Inter']">{foundItems.length} items waiting to be claimed</p>
+              </div>
+            </div>
+
+            {foundItems.length === 0 ? (
+              <div className="py-16 text-center bg-white rounded-[3rem] shadow-sm border border-gray-100">
+                <div className="font-black text-gray-400 text-xl font-['Inter']">No found items match your filters</div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {foundItems.map((item) => (
+                  <ItemCard 
+                    key={item.id} 
+                    item={item} 
+                    isLost={false} 
+                    handleDelete={handleDelete} 
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+        </div>
       )}
     </div>
   );
 }
 
-function Section({ icon, title, count, items, badgeColor, onDelete }) {
+// Reusable card component for grid
+function ItemCard({ item, isLost, handleDelete }) {
+  const badgeColor = isLost ? 'bg-red-500' : 'bg-[#065F46]';
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        {icon}
-        <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
-        <span className="text-sm text-gray-500">({count})</span>
+    <div className="relative group rounded-[2rem] overflow-hidden h-[380px] shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer w-full flex flex-col justify-end">
+      {/* Image or Solid Vibrant Block */}
+      <div className="absolute inset-0 bg-gray-900">
+        {item.imageUrl ? (
+          <img 
+            src={item.imageUrl} 
+            alt={item.title} 
+            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out opacity-80 group-hover:opacity-100" 
+          />
+        ) : (
+          <div className={`w-full h-full ${badgeColor} flex flex-col items-center justify-center transform group-hover:scale-105 transition-transform duration-700`}>
+              {isLost ? <PackageSearch className="w-20 h-20 text-white/30" /> : <PackageCheck className="w-20 h-20 text-white/30" />}
+          </div>
+        )}
       </div>
 
-      {items.length === 0 ? (
-        <div className="bg-white/50 backdrop-blur-md border p-8 rounded-xl text-center">
-          <p className="text-gray-500">No items reported yet.</p>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-500" />
+
+      {/* Top Floating Badge */}
+      <div className="absolute top-4 left-4 z-10 flex gap-2">
+        <span className={`px-3 py-1 rounded-full text-[10px] font-black text-white uppercase tracking-widest ${badgeColor} shadow-md`}>
+          {isLost ? "Lost" : "Found"}
+        </span>
+      </div>
+
+      {/* Animated Content Block */}
+      <div className="relative z-10 p-6 transform transition-transform duration-500 group-hover:-translate-y-2">
+        <h3 className="text-xl font-black text-white leading-tight mb-2 drop-shadow-sm line-clamp-2">{item.title}</h3>
+        <div className="flex items-center text-xs font-bold text-gray-300 uppercase tracking-wide mb-1">
+          <MapPin className={`w-3.5 h-3.5 mr-1.5 ${isLost ? 'text-red-400' : 'text-emerald-400'}`} /> {item.location}
         </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {items.map((item) => {
-            const isLost = title === "Lost Items";
-            const colorClass = isLost ? "pink" : "emerald";
-            const colorClassDark = isLost ? "red" : "emerald";
-            const badgeBg = isLost ? "bg-red-500" : "bg-emerald-500";
-            
-            return (
-              <div key={item.id} className="relative group rounded-3xl overflow-hidden h-[420px] shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer">
-                {/* Background Image / Gradient */}
-                <div className="absolute inset-0 bg-gray-900">
-                  {item.imageUrl ? (
-                    <img 
-                      src={item.imageUrl} 
-                      alt={item.title} 
-                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out opacity-90 group-hover:opacity-100" 
-                    />
-                  ) : (
-                    <div className={`w-full h-full bg-gradient-to-br ${isLost ? 'from-rose-500 to-orange-400' : 'from-emerald-500 to-teal-400'} flex items-center justify-center opacity-90 group-hover:opacity-100 transition-opacity duration-500`}>
-                       <ImageIcon className="w-32 h-32 text-white/20 transform group-hover:scale-110 transition-transform duration-700" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-500" />
-
-                {/* Top Badges */}
-                <div className="absolute top-5 left-5 flex gap-2 z-10">
-                  <span className={`px-4 py-1.5 rounded-full text-xs font-bold text-white uppercase tracking-wider ${isLost ? 'bg-red-500/90' : 'bg-emerald-500/90'} backdrop-blur-md shadow-lg border border-white/10`}>
-                    {isLost ? "Lost" : "Found"}
-                  </span>
-                  <span className="px-4 py-1.5 rounded-full text-xs font-bold text-gray-900 uppercase tracking-wider bg-white/95 backdrop-blur-md shadow-lg">
-                    {item.status || 'Active'}
-                  </span>
-                </div>
-
-                {/* Hover Sliding Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end z-10 h-full">
-                  <div className="mt-auto transform transition-transform duration-500 group-hover:-translate-y-2">
-                    <h3 className="text-2xl font-black text-white tracking-tight mb-2 drop-shadow-md line-clamp-2">{item.title}</h3>
-                    <div className="flex items-center text-sm text-gray-300 font-medium mb-1 drop-shadow-sm">
-                      <MapPin className={`w-4 h-4 mr-1.5 text-${colorClassDark}-400`} /> {item.location}
-                    </div>
-                    <div className="flex items-center text-sm text-gray-300 font-medium drop-shadow-sm mb-4">
-                      <Calendar className={`w-4 h-4 mr-1.5 text-${colorClassDark}-400`} /> {item.timeAgo}
-                    </div>
-                  </div>
-                  
-                  <div className="max-h-0 opacity-0 group-hover:max-h-[250px] group-hover:opacity-100 transition-all duration-500 ease-in-out overflow-hidden">
-                    <p className="text-gray-200 text-sm mb-4 line-clamp-2 leading-relaxed">{item.description}</p>
-                    
-                    <div className="flex flex-wrap gap-2 mb-5">
-                      <span className="text-xs font-semibold bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-lg text-white flex items-center border border-white/10">
-                        <Tag className={`w-3 h-3 mr-1.5 text-${colorClassDark}-400`} /> {item.category}
-                      </span>
-                    </div>
-
-                    <button onClick={() => onDelete(item.id)} className="w-full py-3.5 rounded-xl font-bold transition-all shadow-lg text-red-100 bg-red-600/80 hover:bg-red-500 backdrop-blur-md flex items-center justify-center font-['Inter'] hover:shadow-red-500/25 border border-red-500/50">
-                      Delete Record
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+        <div className="flex items-center text-xs font-bold text-gray-300 uppercase tracking-wide mb-4">
+          <Calendar className={`w-3.5 h-3.5 mr-1.5 ${isLost ? 'text-red-400' : 'text-emerald-400'}`} /> {item.timeAgo}
         </div>
-    )}
+
+        {/* Hidden expanding info */}
+        <div className="max-h-0 opacity-0 group-hover:max-h-[250px] group-hover:opacity-100 transition-all duration-500 ease-in-out overflow-hidden">
+          <p className="text-gray-300 text-xs mb-4 line-clamp-2 leading-relaxed">{item.description}</p>
+          
+          <button 
+            onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+            className="w-full py-2.5 rounded-xl font-bold transition-all text-white bg-red-600 hover:bg-red-700 flex items-center justify-center font-['Inter'] text-xs shadow-xl"
+          >
+            Delete Record
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

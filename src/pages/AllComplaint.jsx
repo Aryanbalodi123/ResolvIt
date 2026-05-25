@@ -36,17 +36,17 @@
 //   const getStatusColor = (status) => {
 //     switch (status) {
 //       case 'pending': return 'bg-amber-100/80 text-amber-700 border-amber-200/60';
-//       case 'in-progress': return 'bg-emerald-100/80 text-emerald-700 border-emerald-200/60';
-//       case 'resolved': return 'bg-emerald-50/90 text-emerald-800 border-emerald-100/80';
+//       case 'in-progress': return 'bg-green-100/80 text-green-700 border-[#A7F3D0]/60';
+//       case 'resolved': return 'bg-[#ECFDF5]/90 text-green-800 border-[#D1FAE5]/80';
 //       default: return 'bg-gray-100/80 text-gray-700 border-gray-200/60';
 //     }
 //   };
 
 //   const getPriorityColor = (priority) => {
 //     switch (priority) {
-//       case 'high': return 'text-emerald-800 bg-emerald-100/80';
-//       case 'medium': return 'text-emerald-700 bg-emerald-50/80';
-//       case 'low': return 'text-emerald-600 bg-emerald-50/60';
+//       case 'high': return 'text-green-800 bg-green-100/80';
+//       case 'medium': return 'text-green-700 bg-[#ECFDF5]/80';
+//       case 'low': return 'text-[#047857] bg-[#ECFDF5]/60';
 //       default: return 'text-gray-600 bg-gray-100/60';
 //     }
 //   };
@@ -139,7 +139,7 @@
 //       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 //         {filterOptions.map((option) => (
 //           <div key={option.value} className={`bg-white/40 backdrop-blur-sm rounded-xl border p-4 text-center transition-colors cursor-pointer ${
-//             selectedFilter === option.value ? 'border-emerald-200 bg-emerald-50/40' : 'border-white/40 hover:border-white/60'
+//             selectedFilter === option.value ? 'border-[#A7F3D0] bg-[#ECFDF5]/40' : 'border-white/40 hover:border-white/60'
 //           }`} onClick={() => setSelectedFilter(option.value)}>
 //             <div className="text-2xl font-semibold text-gray-800 font-['Inter']">{option.count}</div>
 //             <div className="text-sm text-gray-600 font-['Inter']">{option.label}</div>
@@ -169,7 +169,7 @@
 //                 onClick={() => setSelectedFilter(option.value)}
 //                 className={`px-3 py-2 rounded-xl text-sm font-medium transition-colors font-['Inter'] ${
 //                   selectedFilter === option.value
-//                     ? 'bg-gradient-to-r from-emerald-400 to-green-500 text-white shadow-lg'
+//                     ? 'bg-green-400 text-white shadow-lg'
 //                     : 'bg-white/30 text-gray-700 hover:bg-white/40 backdrop-blur-sm'
 //                 }`}
 //               >
@@ -225,7 +225,7 @@
 //                         {complaint.category}
 //                       </span>
 //                       <div className="flex items-center space-x-2">
-//                         <button className="text-emerald-600 hover:text-emerald-700 text-sm font-medium font-['Inter'] flex items-center group">
+//                         <button className="text-[#047857] hover:text-[#065F46] text-sm font-medium font-['Inter'] flex items-center group">
 //                           <Eye className="w-4 h-4 mr-1" />
 //                           View Details
 //                         </button>
@@ -256,7 +256,7 @@
 //             {(!searchQuery && selectedFilter === 'all') && (
 //               <button 
 //                 onClick={handleComplaintModalOpen}
-//                 className="bg-gradient-to-r from-emerald-400 to-green-500 text-white px-6 py-3 rounded-xl font-medium hover:from-emerald-500 hover:to-green-600 transition-all duration-300 font-['Inter'] shadow-lg hover:shadow-xl"
+//                 className="bg-green-400 text-white px-6 py-3 rounded-xl font-medium hover:from-green-500 hover:to-green-600 transition-all duration-300 font-['Inter'] shadow-lg hover:shadow-xl"
 //               >
 //                 <Plus className="w-4 h-4 inline mr-2" />
 //                 Submit Your First Complaint
@@ -273,7 +273,7 @@
 //             <button className="px-3 py-2 text-sm bg-white/30 border border-white/40 rounded-xl hover:bg-white/40 font-['Inter'] backdrop-blur-sm">
 //               Previous
 //             </button>
-//             <button className="px-3 py-2 text-sm bg-gradient-to-r from-pink-300 to-rose-300 text-white rounded-xl font-['Inter'] shadow-md">
+//             <button className="px-3 py-2 text-sm  from-pink-300 to-rose-300 text-white rounded-xl font-['Inter'] shadow-md">
 //               1
 //             </button>
 //             <button className="px-3 py-2 text-sm bg-white/30 border border-white/40 rounded-xl hover:bg-white/40 font-['Inter'] backdrop-blur-sm">
@@ -377,7 +377,7 @@
 //                 </button>
 //                 <button
 //                   type="submit"
-//                   className="flex-1 px-4 py-2 bg-gradient-to-r from-pink-300 to-rose-300 text-white rounded-xl hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-medium shadow-md font-['Inter']"
+//                   className="flex-1 px-4 py-2  from-pink-300 to-rose-300 text-white rounded-xl hover:from-pink-400 hover:to-rose-400 transition-all duration-200 font-medium shadow-md font-['Inter']"
 //                 >
 //                   Submit Complaint
 //                 </button>

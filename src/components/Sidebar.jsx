@@ -4,17 +4,16 @@ import {
   LayoutDashboard,
   FileText,
   Search,
-  Settings,
-  User,
   Bell,
-  ChevronDown
+  ChevronRight,
+  ChevronLeft
 } from "lucide-react";
 import { useComplaintUpdates } from "../hooks/useComplaintUpdates";
 
 const Sidebar = () => {
   const role = localStorage.getItem("role");
-  const userName = localStorage.getItem("name") || "User";
   const location = useLocation();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const [liveUnread, setLiveUnread] = useState(() => {
     try {
@@ -66,27 +65,35 @@ const Sidebar = () => {
         ];
 
   return (
-    <div className="w-72 bg-white border-r border-gray-100 min-h-full sticky top-0 z-40 flex flex-col">
-      {/* ─── Logo ─── */}
-      <div className="px-6 pt-7 pb-5 border-b border-gray-100">
-        <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-sm">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <div 
+      className={`relative z-40 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        isExpanded ? "w-64" : "w-[72px]"
+      } flex flex-col flex-shrink-0 h-[calc(100vh-3rem)] lg:h-[calc(100vh-5rem)] my-6 ml-6 lg:my-10 lg:ml-10`}
+    >
+      <div className="bg-white/80 backdrop-blur-xl h-full w-full rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col relative py-8 overflow-hidden">
+        
+        {/* Toggle Button */}
+        <button 
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-12 bg-white border border-gray-200 shadow-sm rounded-l-xl flex items-center justify-center hover:bg-gray-50 z-50 transition-colors"
+        >
+          {isExpanded ? <ChevronLeft className="w-4 h-4 text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-400" />}
+        </button>
+
+        {/* Logo */}
+        <div className="px-4 mb-8 flex items-center justify-center min-h-[40px]">
+          <div className="w-10 h-10 bg-[#065F46] rounded-2xl flex items-center justify-center shadow-sm flex-shrink-0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
-          <div>
-            <h2 className="text-[15px] font-bold text-gray-900 font-['Inter'] tracking-tight">
+          <div className={`ml-3 whitespace-nowrap transition-all duration-300 ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}`}>
+            <h2 className="text-[16px] font-bold text-gray-900 font-['Inter'] tracking-tight">
               ComplaintUs
             </h2>
-            <p className="text-[11px] text-gray-400 font-['Inter']">
-              {role === "user" ? "Student Portal" : "Admin Portal"}
-            </p>
           </div>
         </div>
-      </div>
 
-      {/* ─── Navigation ─── */}
-      <nav className="flex-1 px-4 py-5">
-        <div className="space-y-1">
+        {/* Navigation */}
+        <nav className="flex-1 px-3 space-y-2 overflow-y-auto overflow-x-hidden no-scrollbar">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isDashboard = item.id === "dashboard";
@@ -96,66 +103,43 @@ const Sidebar = () => {
                 to={item.path}
                 end={isDashboard}
                 className={({ isActive }) =>
-                  `w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-left transition-all duration-200 font-['Inter'] group ${
+                  `flex items-center rounded-full transition-all duration-200 font-['Inter'] group relative ${
+                    isExpanded ? "px-4 py-3 w-full" : "justify-center w-12 h-12 mx-auto"
+                  } ${
                     isActive
-                      ? "bg-orange-50 text-orange-600 font-semibold"
-                      : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                      ? "bg-[#065F46] text-white shadow-md shadow-[#065F46]/20"
+                      : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
                     <div className="relative flex-shrink-0">
-                      <Icon className={`w-[18px] h-[18px] ${isActive ? 'text-orange-500' : 'text-gray-400 group-hover:text-gray-600'}`} />
+                      <Icon className={`w-[20px] h-[20px] ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-700'}`} />
                       {item.liveBadge && liveUnread > 0 && (
                         <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold shadow ring-2 ring-white animate-pulse">
                           {liveUnread > 9 ? "9+" : liveUnread}
                         </span>
                       )}
                     </div>
-                    <span className="text-[13px]">{item.label}</span>
+                    
+                    <span className={`text-[14px] font-medium whitespace-nowrap transition-all duration-300 ${isExpanded ? 'opacity-100 w-auto ml-3' : 'opacity-0 w-0 overflow-hidden ml-0'}`}>
+                      {item.label}
+                    </span>
+
+                    {/* Tooltip for collapsed state */}
+                    {!isExpanded && (
+                      <div className="absolute left-14 bg-gray-900 text-white text-xs px-2.5 py-1.5 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 whitespace-nowrap shadow-lg">
+                        {item.label}
+                      </div>
+                    )}
                   </>
                 )}
               </NavLink>
             );
           })}
-        </div>
+        </nav>
 
-        {/* Settings — separated */}
-        <div className="mt-6 pt-4 border-t border-gray-100">
-          <NavLink
-            to="/settings"
-            end
-            className={({ isActive }) =>
-              `w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-left transition-all duration-200 font-['Inter'] group ${
-                isActive
-                  ? "bg-orange-50 text-orange-600 font-semibold"
-                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-              }`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                <Settings className={`w-[18px] h-[18px] ${isActive ? 'text-orange-500' : 'text-gray-400 group-hover:text-gray-600'}`} />
-                <span className="text-[13px]">Settings</span>
-              </>
-            )}
-          </NavLink>
-        </div>
-      </nav>
-
-      {/* ─── User Profile ─── */}
-      <div className="px-4 py-4 border-t border-gray-100 mt-auto">
-        <div className="flex items-center space-x-3 px-2">
-          <div className="w-9 h-9 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
-            <User className="w-4 h-4 text-gray-500" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-gray-800 font-['Inter'] truncate">{userName}</p>
-            <p className="text-[11px] text-gray-400 font-['Inter']">{role === "admin" ? "Administrator" : "Student"}</p>
-          </div>
-          <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />
-        </div>
       </div>
     </div>
   );

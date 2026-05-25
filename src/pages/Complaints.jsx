@@ -26,6 +26,7 @@ import { useLiveComplaintList } from '../hooks/useComplaintUpdates';
 const Complaints = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [complaints, setComplaints] = useState([]);
   const [error, setError] = useState(null);
@@ -61,6 +62,15 @@ const Complaints = () => {
     // Polling removed — live updates handled by WebSocket below
   }, []);
 
+  // Debounce search query
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
   // ── Live real-time updates via Socket.io ──────────────────────────────
   // When admin patches a complaint, the server pushes 'complaint:updated'
   // and the hook patches the local state in-place — no full refetch needed.
@@ -75,7 +85,7 @@ const Complaints = () => {
     switch (status) {
       case 'pending': return 'bg-amber-100/80 text-amber-700 border-amber-200/60';
       case 'in-progress': return 'bg-blue-100/80 text-blue-700 border-blue-200/60';
-      case 'resolved': return 'bg-emerald-100/80 text-emerald-700 border-emerald-200/60';
+      case 'resolved': return 'bg-green-100/80 text-green-700 border-[#A7F3D0]/60';
       default: return 'bg-gray-100/80 text-gray-700 border-gray-200/60';
     }
   };
@@ -84,7 +94,7 @@ const Complaints = () => {
     switch (priority) {
       case 'high': return 'text-red-800 bg-red-100/80 border-red-200/60';
       case 'medium': return 'text-amber-800 bg-amber-100/80 border-amber-200/60';
-      case 'low': return 'text-green-800 bg-green-100/80 border-green-200/60';
+      case 'low': return 'text-green-800 bg-green-100/80 border-[#A7F3D0]/60';
       default: return 'text-gray-600 bg-gray-100/60';
     }
   };
@@ -166,155 +176,186 @@ const Complaints = () => {
   const filteredComplaints = complaints
     .filter(complaint => selectedFilter === 'all' || complaint.status === selectedFilter)
     .filter(complaint => {
-      if (!searchQuery) return true;
-      const searchLower = searchQuery.toLowerCase();
+      if (!debouncedSearchQuery) return true;
+      const searchLower = debouncedSearchQuery.toLowerCase();
       return (
         complaint.title.toLowerCase().includes(searchLower) ||
         complaint.description.toLowerCase().includes(searchLower) ||
         complaint.location.toLowerCase().includes(searchLower) ||
-        complaint.category.toLowerCase().includes(searchLower)
+        complaint.category.toLowerCase().includes(searchLower) ||
+        String(complaint.complaint_id).includes(searchLower)
       );
     });
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-800 font-['Inter']">My Complaints</h1>
-          <p className="text-gray-600 mt-1 font-['Inter']">Track and manage all your submitted complaints</p>
-        </div>
-        <div className="flex items-center gap-3">
-          {/* Live connection badge */}
-          <div
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
-              socketConnected
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                : 'bg-amber-50 text-amber-700 border-amber-200'
-            }`}
-            title={socketConnected ? 'Live updates active' : 'Connecting to live updates...'}
-          >
-            {socketConnected
-              ? <Wifi className="w-3.5 h-3.5" />
-              : <WifiOff className="w-3.5 h-3.5" />}
-            {socketConnected ? 'Live' : 'Reconnecting'}
-          </div>
-
-          <button
-            onClick={handleComplaintModalOpen}
-            className="bg-gradient-to-r from-emerald-400 to-green-500 text-white px-4 py-2 rounded-xl font-medium hover:from-emerald-500 hover:to-green-600 transition-all duration-200 font-['Inter'] flex items-center shadow-md btn-animate"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            New Complaint
-          </button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {filterOptions.map((option) => (
-          <div
-            key={option.value}
-            className={`bg-white/40 backdrop-blur-sm rounded-xl border p-4 text-center transition-colors cursor-pointer ${
-              selectedFilter === option.value ? 'border-emerald-300/60 bg-emerald-100/40' : 'border-white/40 hover:border-white/60'
-            }`}
-            onClick={() => setSelectedFilter(option.value)}
-          >
-            <div className="text-2xl font-semibold text-gray-800 font-['Inter']">{option.count}</div>
-            <div className="text-sm text-gray-600 font-['Inter']">{option.label}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-4">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search by title, location, category..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-emerald-300/50 focus:border-transparent font-['Inter'] backdrop-blur-sm"
-              />
-            </div>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {filterOptions.map((option) => (
-              <button
-                key={option.value}
-                onClick={() => setSelectedFilter(option.value)}
-                className={`px-3 py-2 rounded-xl text-sm font-medium transition-colors font-['Inter'] ${
-                  selectedFilter === option.value
-                    ? 'bg-gradient-to-r from-emerald-400 to-green-500 text-white shadow-md'
-                    : 'bg-white/30 text-gray-700 hover:bg-white/40 backdrop-blur-sm'
+    <div className="p-6 lg:p-10 w-full min-h-screen bg-[#F5F5F5] space-y-8">
+      
+      {/* Header & Hero Widget */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-8 bg-[#065F46] rounded-[2rem] p-8 md:p-10 text-white relative overflow-hidden shadow-xl flex flex-col justify-between">
+          <div className="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/30 rounded-full blur-3xl"></div>
+          
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight font-['Inter']">
+                My Complaints
+              </h1>
+              {/* Live connection badge */}
+              <div
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold border backdrop-blur-md transition-all ${
+                  socketConnected
+                    ? 'bg-emerald-500/20 text-emerald-100 border-emerald-400/30 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                    : 'bg-amber-500/20 text-amber-100 border-amber-400/30'
                 }`}
               >
-                {option.label} ({option.count})
-              </button>
-            ))}
+                {socketConnected
+                  ? <><Wifi className="w-4 h-4 animate-pulse" /> Live Sync</>
+                  : <><WifiOff className="w-4 h-4" /> Reconnecting...</>}
+              </div>
+            </div>
+            <p className="text-emerald-100 font-['Inter'] max-w-md text-sm leading-relaxed">
+              Track your submitted issues. We ensure every complaint is addressed promptly to improve our campus infrastructure.
+            </p>
           </div>
+
+          <div className="relative z-10 mt-8">
+            <button
+              onClick={handleComplaintModalOpen}
+              className="bg-white text-[#065F46] px-6 py-3.5 rounded-xl font-bold hover:bg-gray-50 transition-all duration-300 font-['Inter'] flex items-center shadow-lg hover:shadow-xl hover:-translate-y-1"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              File New Complaint
+            </button>
+          </div>
+        </div>
+
+        {/* Stats Grid Widget */}
+        <div className="lg:col-span-4 grid grid-cols-2 gap-4">
+          {filterOptions.map((option) => {
+            const isSelected = selectedFilter === option.value;
+            let iconColor = "text-gray-400";
+            let bgLight = "bg-white";
+            if (option.value === 'pending') iconColor = "text-amber-500";
+            if (option.value === 'in-progress') iconColor = "text-blue-500";
+            if (option.value === 'resolved') iconColor = "text-emerald-500";
+            
+            return (
+              <div
+                key={option.value}
+                onClick={() => setSelectedFilter(option.value)}
+                className={`rounded-[1.5rem] p-5 border transition-all cursor-pointer flex flex-col justify-between group ${
+                  isSelected 
+                    ? 'border-[#065F46] bg-emerald-50 shadow-md ring-1 ring-[#065F46]/20' 
+                    : 'border-gray-100 bg-white hover:border-gray-200 hover:shadow-md'
+                }`}
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className="text-sm font-bold text-gray-500 uppercase tracking-wider font-['Inter']">
+                    {option.label}
+                  </div>
+                  <div className={`p-2 rounded-full bg-gray-50 group-hover:scale-110 transition-transform ${iconColor}`}>
+                    {option.value === 'all' && <FileText className="w-4 h-4" />}
+                    {option.value === 'pending' && <Clock className="w-4 h-4" />}
+                    {option.value === 'in-progress' && <Loader2 className="w-4 h-4" />}
+                    {option.value === 'resolved' && <CheckCircle className="w-4 h-4" />}
+                  </div>
+                </div>
+                <div className={`text-4xl font-black font-['Inter'] ${isSelected ? 'text-[#065F46]' : 'text-gray-900'}`}>
+                  {option.count}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
+      {/* Modern Search Bar */}
+      <div className="bg-white p-3 rounded-full shadow-sm border border-gray-100 flex items-center relative z-20">
+        <Search className="w-5 h-5 text-gray-400 ml-3" />
+        <input
+          type="text"
+          placeholder="Search complaints by title, ID, or location..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-3 pr-4 py-2 bg-transparent border-none focus:ring-0 text-gray-800 font-['Inter'] outline-none placeholder-gray-400"
+        />
+      </div>
+
+      {/* Ticket Style Cards */}
       {isLoading ? (
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="w-12 h-12 text-emerald-500 animate-spin" />
+        <div className="flex justify-center items-center py-20">
+          <Loader2 className="w-12 h-12 text-[#065F46] animate-spin" />
         </div>
       ) : error ? (
-        <div className="text-center py-8 text-red-600 bg-red-50/50 border border-red-200/60 rounded-xl">
-          <AlertTriangle className="w-12 h-12 mx-auto mb-4" />
-          <p className="font-medium">Failed to load complaints</p>
-          <p className="text-sm">{error}</p>
+        <div className="text-center py-12 text-red-600 bg-white rounded-[2rem] border border-red-100 shadow-sm">
+          <AlertTriangle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+          <p className="font-bold text-lg">Failed to load complaints</p>
+          <p className="text-sm text-red-400">{error}</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-12">
           {filteredComplaints.length === 0 ? (
-            <div className="text-center py-12 bg-white/40 backdrop-blur-sm rounded-xl border border-white/40">
-              <FileText className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-700 font-['Inter']">
-                {searchQuery || selectedFilter !== 'all' ? 'No complaints found' : 'You haven\'t submitted any complaints yet.'}
+            <div className="col-span-full text-center py-24 bg-white rounded-[3rem] shadow-sm border border-gray-100">
+              <FileText className="w-16 h-16 mx-auto text-gray-200 mb-4" />
+              <h3 className="text-2xl font-black text-gray-900 font-['Inter']">
+                {searchQuery || selectedFilter !== 'all' ? 'No matches found' : 'No complaints filed'}
               </h3>
-              <p className="text-gray-500 mt-2 text-sm font-['Inter']">
-                {searchQuery || selectedFilter !== 'all' ? 'Try adjusting your search or filter.' : 'Click "New Complaint" to get started.'}
+              <p className="text-gray-500 mt-2 font-medium font-['Inter']">
+                {searchQuery || selectedFilter !== 'all' ? 'Try a different search term.' : 'Click the button above to file your first complaint.'}
               </p>
             </div>
           ) : (
-            filteredComplaints.map((complaint) => (
-              <div
-                key={complaint.complaint_id}
-                className="bg-white/40 backdrop-blur-sm rounded-xl border border-white/40 p-6 transition-all hover:shadow-lg card-hover"
-              >
-                <div className="flex justify-between items-start gap-4">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1 font-['Inter']">
-                      {complaint.title}
-                    </h3>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(complaint.status)}`}>
+            filteredComplaints.map((complaint) => {
+              // Determine dynamic border color based on status
+              let statusBorder = "border-l-gray-300";
+              if(complaint.status === "pending") statusBorder = "border-l-amber-500";
+              if(complaint.status === "in-progress") statusBorder = "border-l-blue-500";
+              if(complaint.status === "resolved") statusBorder = "border-l-emerald-500";
+
+              return (
+                <div
+                  key={complaint.complaint_id}
+                  className={`bg-white rounded-[2rem] border border-gray-100 border-l-[6px] ${statusBorder} p-6 hover:shadow-xl transition-all duration-300 flex flex-col group relative overflow-hidden`}
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-gray-50 to-transparent opacity-50 pointer-events-none"></div>
+                  
+                  <div className="flex justify-between items-start mb-4 relative z-10">
+                    <span className="text-xs font-bold text-gray-400 font-['Inter'] uppercase tracking-wider">
+                      #{String(complaint.complaint_id).substring(0, 8)}
+                    </span>
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${getPriorityColor(complaint.priority)} border-0 shadow-sm`}>
+                      {complaint.priority}
+                    </span>
+                  </div>
+
+                  <h3 className="text-xl font-black text-gray-900 mb-2 font-['Inter'] line-clamp-2 leading-tight relative z-10">
+                    {complaint.title}
+                  </h3>
+                  
+                  <p className="text-gray-500 text-sm mb-6 font-['Inter'] line-clamp-3 leading-relaxed relative z-10">
+                    {complaint.description}
+                  </p>
+
+                  <div className="mt-auto pt-4 border-t border-gray-50 space-y-3 relative z-10">
+                    <div className="flex items-center text-xs font-bold text-gray-400 uppercase tracking-wide">
+                      <MapPin className="w-3.5 h-3.5 mr-2 text-gray-400" />
+                      <span className="truncate">{complaint.location}</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center text-xs font-bold text-gray-400 uppercase tracking-wide">
+                        <Calendar className="w-3.5 h-3.5 mr-2 text-gray-400" />
+                        {new Date(complaint.created_at).toLocaleDateString()}
+                      </div>
+                      
+                      <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${getStatusColor(complaint.status)} border-0`}>
                         {complaint.status.replace('-', ' ')}
                       </span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(complaint.priority)}`}>
-                        {complaint.priority} priority
-                      </span>
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-white/60 text-gray-700 border border-gray-200/60">
-                        {complaint.category}
-                      </span>
-                    </div>
-                    <p className="text-gray-600 text-sm mb-4 font-['Inter']">{complaint.description}</p>
-                    <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                      <div className="flex items-center gap-1 font-['Inter']">
-                        <MapPin className="w-4 h-4" />
-                        <span>{complaint.location}</span>
-                      </div>
-                      <div className="flex items-center gap-1 font-['Inter']">
-                        <Calendar className="w-4 h-4" />
-                        <span>{new Date(complaint.created_at).toLocaleDateString()}</span>
-                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       )}
@@ -343,7 +384,7 @@ const Complaints = () => {
               onChange={handleComplaintInputChange}
               placeholder="e.g., Broken streetlight on main road"
               required
-              className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+              className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-green-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
             />
           </div>
 
@@ -395,7 +436,7 @@ const Complaints = () => {
               onChange={handleComplaintInputChange}
               placeholder="e.g., Outside 'A' Block, near library"
               required
-              className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
+              className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-green-300 focus:border-transparent bg-white/80 backdrop-blur-sm font-['Inter']"
             />
           </div>
 
@@ -410,7 +451,7 @@ const Complaints = () => {
               placeholder="Provide as much detail as possible..."
               required
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-emerald-300 focus:border-transparent bg-white/80 backdrop-blur-sm resize-none font-['Inter']"
+              className="w-full px-3 py-2 border border-gray-300/60 rounded-xl focus:ring-2 focus:ring-green-300 focus:border-transparent bg-white/80 backdrop-blur-sm resize-none font-['Inter']"
             />
           </div>
 
@@ -426,7 +467,7 @@ const Complaints = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-xl hover:from-emerald-500 hover:to-green-600 transition-all duration-200 font-medium shadow-md font-['Inter'] disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+              className="flex-1 px-4 py-2 bg-green-400 text-white rounded-xl hover:from-green-500 hover:to-green-600 transition-all duration-200 font-medium shadow-md font-['Inter'] disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
             >
               {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Submit Complaint"}
             </button>

@@ -221,14 +221,14 @@ const Register = () => {
   const getStrengthBarColor = () => {
     if (passwordStrength.className === 'strength-weak') return 'bg-red-500';
     if (passwordStrength.className === 'strength-medium') return 'bg-amber-500';
-    if (passwordStrength.className === 'strength-strong') return 'bg-emerald-500';
+    if (passwordStrength.className === 'strength-strong') return 'bg-[#065F46]';
     return 'bg-gray-300';
   };
 
   return (
     <div className="flex h-screen overflow-hidden bg-white font-['Poppins',sans-serif]">
       {/* Left Section */}
-      <div className="flex-1 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white rounded-br-[50px] rounded-tr-[50px] flex flex-col justify-center items-center relative overflow-hidden">
+      <div className="flex-1 bg-[#065F46] text-white rounded-br-[50px] rounded-tr-[50px] flex flex-col justify-center items-center relative overflow-hidden">
         <img
           src="https://niceillustrations.com/wp-content/uploads/2021/12/Call-Center-color-800px.png"
           alt="Illustration"
@@ -244,7 +244,7 @@ const Register = () => {
       <div className="flex-1 flex justify-center items-center bg-white rounded-tl-[50px] rounded-bl-[50px] -ml-12 px-3 py-3 pl-20 animate-[slideInRight_1s_ease-out] overflow-y-auto">
         <div className="w-full max-w-[300px]">
           {/* Logo */}
-          <div className="text-center text-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 bg-clip-text text-transparent mb-3 relative">
+          <div className="text-center text-2xl font-bold text-[#065F46] mb-3 relative">
             ComplaintUs
           </div>
           
@@ -261,8 +261,8 @@ const Register = () => {
                 onClick={() => handleRoleSelect('user')}
                 className={`border-none rounded-md py-2 px-2.5 text-xs font-semibold cursor-pointer transition-all duration-300 text-center ${
                   selectedRole === 'user'
-                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-emerald-600 transform -translate-y-1 shadow-[0_2px_8px_rgba(16,185,129,0.3)]'
-                    : 'bg-gray-50 text-gray-500 border-2 border-gray-200 hover:bg-green-50 hover:text-emerald-600 hover:border-emerald-500'
+                    ? 'bg-[#065F46] text-white border-green-600 transform -translate-y-1 shadow-[0_2px_8px_rgba(16,185,129,0.3)]'
+                    : 'bg-gray-50 text-gray-500 border-2 border-gray-200 hover:bg-[#ECFDF5] hover:text-[#047857] hover:border-green-500'
                 }`}
               >
                 User
@@ -276,7 +276,7 @@ const Register = () => {
             <div className={`p-2 rounded-md mb-2 text-xs ${
               alert.type === 'error' 
                 ? 'bg-red-50 text-red-600 border border-red-200' 
-                : 'bg-green-50 text-green-600 border border-green-200'
+                : 'bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0]'
             }`}>
               {alert.message}
             </div>
@@ -293,7 +293,7 @@ const Register = () => {
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 required
-                className="text-black w-full border-0 border-b-2 border-gray-200 py-2 pr-6 text-xs bg-transparent transition-all duration-300 focus:outline-none focus:border-emerald-500 focus:transform focus:-translate-y-1"
+                className="text-black w-full border-0 border-b-2 border-gray-200 py-2 pr-6 text-xs bg-transparent transition-all duration-300 focus:outline-none focus:border-green-500 focus:transform focus:-translate-y-1"
               />
             </div>
 
@@ -308,7 +308,7 @@ const Register = () => {
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 placeholder="john@chitkara.edu.in"
                 required
-                className="text-black w-full border-0 border-b-2 border-gray-200 py-2 pr-6 text-xs bg-transparent transition-all duration-300 focus:outline-none focus:border-emerald-500 focus:transform focus:-translate-Y-1"
+                className="text-black w-full border-0 border-b-2 border-gray-200 py-2 pr-6 text-xs bg-transparent transition-all duration-300 focus:outline-none focus:border-green-500 focus:transform focus:-translate-Y-1"
               />
             </div>
 
@@ -322,7 +322,7 @@ const Register = () => {
                 value={formData.rollNumber}
                 onChange={(e) => handleInputChange('rollNumber', e.target.value)}
                 required
-                className="text-black w-full border-0 border-b-2 border-gray-200 py-2 pr-6 text-xs bg-transparent transition-all duration-300 focus:outline-none focus:border-emerald-500 focus:transform focus:-translate-y-1"
+                className="text-black w-full border-0 border-b-2 border-gray-200 py-2 pr-6 text-xs bg-transparent transition-all duration-300 focus:outline-none focus:border-green-500 focus:transform focus:-translate-y-1"
               />
             </div>
 
@@ -337,12 +337,12 @@ const Register = () => {
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
                   required
-                  className="text-black w-full border-0 border-b-2 border-gray-200 py-2 pr-6 text-xs bg-transparent transition-all duration-300 focus:outline-none focus:border-emerald-500 focus:transform focus:-translate-y-1"
+                  className="text-black w-full border-0 border-b-2 border-gray-200 py-2 pr-6 text-xs bg-transparent transition-all duration-300 focus:outline-none focus:border-green-500 focus:transform focus:-translate-y-1"
                 />
                 <button
                   type="button"
                   onClick={() => togglePasswordVisibility('password')}
-                  className="absolute right-0 top-2 bg-none border-none cursor-pointer text-gray-500 p-0 w-5 h-3 flex items-center justify-center text-xs hover:text-emerald-500"
+                  className="absolute right-0 top-2 bg-none border-none cursor-pointer text-gray-500 p-0 w-5 h-3 flex items-center justify-center text-xs hover:text-[#047857]"
                 >
                   {passwordVisible ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -358,7 +358,7 @@ const Register = () => {
                 <span className={`text-xs ${
                   passwordStrength.className === 'strength-weak' ? 'text-red-500' :
                   passwordStrength.className === 'strength-medium' ? 'text-amber-500' :
-                  passwordStrength.className === 'strength-strong' ? 'text-emerald-500' : 'text-gray-500'
+                  passwordStrength.className === 'strength-strong' ? 'text-[#047857]' : 'text-gray-500'
                 }`}>{passwordStrength.text}</span>
               </div>
             </div>
@@ -374,19 +374,19 @@ const Register = () => {
                   value={confirmPassword}
                   onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                   required
-                  className="text-black w-full border-0 border-b-2 border-gray-200 py-2 pr-6 text-xs bg-transparent transition-all duration-300 focus:outline-none focus:border-emerald-500 focus:transform focus:-translate-y-1"
+                  className="text-black w-full border-0 border-b-2 border-gray-200 py-2 pr-6 text-xs bg-transparent transition-all duration-300 focus:outline-none focus:border-green-500 focus:transform focus:-translate-y-1"
                 />
                 <button
                   type="button"
                   onClick={() => togglePasswordVisibility('confirmPassword')}
-                  className="absolute right-0 top-2 bg-none border-none cursor-pointer text-gray-500 p-0 w-5 h-3 flex items-center justify-center text-xs hover:text-emerald-500"
+                  className="absolute right-0 top-2 bg-none border-none cursor-pointer text-gray-500 p-0 w-5 h-3 flex items-center justify-center text-xs hover:text-[#047857]"
                 >
                   {confirmPasswordVisible ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               {/* Password Match Indicator */}
               {passwordMatch.text && (
-                <span className={`text-xs mt-0.5 ${passwordMatch.matches ? 'text-emerald-500' : 'text-red-500'}`}>
+                <span className={`text-xs mt-0.5 ${passwordMatch.matches ? 'text-[#047857]' : 'text-red-500'}`}>
                   {passwordMatch.text}
                 </span>
               )}
@@ -396,7 +396,7 @@ const Register = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-2.5 border-none rounded-md bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-semibold cursor-pointer mt-2 transition-all duration-300 hover:transform hover:-translate-y-1 hover:shadow-[0_6px_15px_rgba(16,185,129,0.4)] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full py-2.5 border-none rounded-md bg-[#065F46] text-white text-xs font-semibold cursor-pointer mt-2 transition-all duration-300 hover:transform hover:-translate-y-1 hover:shadow-[0_6px_15px_rgba(16,185,129,0.4)] disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>
@@ -419,7 +419,7 @@ const Register = () => {
                 e.preventDefault();
                 navigate("/login");
               }}
-              className="text-emerald-500 font-semibold hover:underline"
+              className="text-[#047857] font-semibold hover:underline"
             >
               Sign in here
             </a>
